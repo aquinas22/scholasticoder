@@ -27,6 +27,10 @@ const LANG_MAP: Record<string, string> = {
   ruby: 'ruby',
   nasm: 'nasm',
   asm: 'nasm',
+  php: 'php',
+  lua: 'lua',
+  kotlin: 'kotlin',
+  swift: 'swift',
   text: 'text',
 }
 
@@ -53,6 +57,11 @@ const LANG_LABEL: Record<string, string> = {
   ruby: 'Ruby',
   nasm: 'x86-64 ASM',
   asm: 'ASM',
+  php: 'PHP',
+  lua: 'Lua',
+  kotlin: 'Kotlin',
+  swift: 'Swift',
+  text: 'Text',
 }
 
 // Shared typographic constants — must match between the line-number column and the pre
@@ -70,6 +79,7 @@ interface Props {
 export function CodeBlock({ code, language = 'text', showLineNumbers = false }: Props) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), [])
@@ -131,6 +141,16 @@ export function CodeBlock({ code, language = 'text', showLineNumbers = false }: 
 
   // Trim trailing newline that template literals often add
   const trimmedCode = code.replace(/\n$/, '')
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(trimmedCode)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // clipboard unavailable (insecure context / old browser)
+    }
+  }
   const lineCount   = trimmedCode.split('\n').length
   const numWidth    = `${Math.max(String(lineCount).length, 1) + 0.5}ch`
 
@@ -175,7 +195,32 @@ export function CodeBlock({ code, language = 'text', showLineNumbers = false }: 
           </span>
         )}
 
-        <div style={{ width: 42 }} />
+        <button
+          onClick={handleCopy}
+          aria-label={copied ? 'Copied' : 'Copy code'}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '0.25rem 0.4rem',
+            fontSize: '0.68rem',
+            fontFamily: 'var(--font-mono, monospace)',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: copied
+              ? '#28c840'
+              : isDark ? '#484868' : '#9298b0',
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => { if (!copied) e.currentTarget.style.color = isDark ? '#8888b0' : '#5a6078' }}
+          onMouseLeave={e => { if (!copied) e.currentTarget.style.color = isDark ? '#484868' : '#9298b0' }}
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
       </div>
 
       {/* ── Code body ────────────────────────────────── */}

@@ -89,7 +89,7 @@ export default function HomePage() {
             }}
           >
             <span className="cursor-blink">▮</span>
-            20 languages · Free forever · No account needed
+            {languages.length} languages & topics · Free forever · No account needed
           </div>
 
           {/* Headline */}
@@ -130,7 +130,7 @@ export default function HomePage() {
           >
             Real lessons. Real code. Real explanations.
             No paywalls, no &quot;premium&quot; gating, no pseudocode that doesn&apos;t compile.
-            Just you and 20 languages.
+            Just you and {languages.length} languages &amp; topics.
           </p>
 
           {/* CTAs */}
@@ -219,7 +219,7 @@ export default function HomePage() {
             Choose your weapon
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            20 languages & frameworks, all free, sorted by where most people start.
+            {languages.length} languages, frameworks & CS topics, all free, sorted by where most people start.
           </p>
         </div>
 

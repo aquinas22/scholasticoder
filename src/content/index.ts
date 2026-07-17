@@ -31,6 +31,7 @@ import { internet } from './languages/internet'
 import { computerArchitecture } from './languages/computer-architecture'
 import { operatingSystems } from './languages/operating-systems'
 import { compilers } from './languages/compilers'
+import { dsa } from './languages/dsa'
 
 export const languages: Language[] = [
   python,
@@ -59,6 +60,7 @@ export const languages: Language[] = [
   powershell,
   terminal,
   ruby,
+  dsa,
   internet,
   computerArchitecture,
   operatingSystems,

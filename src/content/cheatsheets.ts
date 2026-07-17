@@ -2496,4 +2496,108 @@ then read: Crafting Interpreters (free online)`,
       },
     ],
   },
+  dsa: {
+    slug: 'cheatsheet',
+    title: 'DSA Cheatsheet',
+    intro: 'Every structure, its costs, and when to reach for it — one page.',
+    sections: [
+      {
+        type: 'code',
+        language: 'text',
+        content: `── Big-O, fastest to slowest ────────────
+O(1)        constant     hash lookup, array index
+O(log n)    logarithmic  binary search, balanced BST
+O(n)        linear       one pass over data
+O(n log n)  linearithmic good sorting (merge, Timsort)
+O(n^2)      quadratic    nested loops over same data
+O(2^n)      exponential  try all subsets — hopeless past ~30
+
+drop constants: O(2n + 5) = O(n)
+n = 1M: O(n) ~ 1 sec, O(n^2) ~ 11 days
+
+── Structure costs ──────────────────────
+                access  search  insert  delete
+array (index)   O(1)    O(n)    O(n)*   O(n)*
+                                *O(1) at the end
+hash map/set    —       O(1)    O(1)    O(1)
+linked list     O(n)    O(n)    O(1)**  O(1)**
+                                **given the node
+balanced BST    —       O(logn) O(logn) O(logn)
+stack/queue     top/front only, all O(1)`,
+      },
+      {
+        type: 'code',
+        language: 'text',
+        content: `── Which structure? ─────────────────────
+lookup by key / seen before?   hash map / set
+ordered + index access         array (list)
+last in first out (undo, calls)  stack
+first in first out (jobs, BFS)   queue (deque)
+sorted + fast search           sorted array + binary search
+hierarchy (files, DOM, JSON)   tree
+things connected to things     graph (adjacency list)
+top-k / running min-max        heap (priority queue)
+
+── Pattern -> problem type ──────────────
+two pointers      pairs, reverse, dedup in sorted data
+sliding window    best subarray/substring
+hash map          kill the inner loop: O(n^2) -> O(n)
+stack             nesting, matching brackets, undo
+BFS + queue       shortest path (unweighted)
+DFS + recursion   any path, components, cycles
+binary search     sorted data, O(log n)
+recursion + cache overlapping subproblems (DP)
+sort first        duplicates adjacent, enables binary search`,
+      },
+      {
+        type: 'code',
+        language: 'python',
+        content: `# ── Snippets you'll rewrite forever ────
+from collections import deque
+from functools import lru_cache
+
+# counting
+counts = {}
+for x in items:
+    counts[x] = counts.get(x, 0) + 1
+
+# binary search (canonical form)
+lo, hi = 0, len(a) - 1
+while lo <= hi:
+    mid = (lo + hi) // 2
+    if a[mid] == target: break
+    if a[mid] < target: lo = mid + 1
+    else: hi = mid - 1
+
+# BFS skeleton
+queue, visited = deque([start]), {start}
+while queue:
+    node = queue.popleft()
+    for nb in graph[node]:
+        if nb not in visited:
+            visited.add(nb)
+            queue.append(nb)
+
+# DFS skeleton
+def dfs(node, visited):
+    visited.add(node)
+    for nb in graph[node]:
+        if nb not in visited:
+            dfs(nb, visited)
+
+# memoized recursion (DP)
+@lru_cache(maxsize=None)
+def solve(n): ...
+
+# sort by key, then tiebreak
+items.sort(key=lambda p: (p[1], p[0]))
+
+# ── Traps ──────────────────────────────
+# list.pop(0) is O(n)      -> use deque.popleft()
+# str += in loop is O(n^2) -> ''.join(parts)
+# BFS/DFS without visited  -> infinite loop on cycles
+# unbalanced BST           -> degrades to O(n)`,
+      },
+    ],
+  },
 }

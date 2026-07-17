@@ -27,7 +27,7 @@ const firaCode = Fira_Code({
 
 export const metadata: Metadata = {
   title: 'ScholastiCoder — Learn to code. Actually learn it.',
-  description: 'Free lessons in 31 languages & CS topics — Python, JavaScript, TypeScript, SQL, Git, Rust, Go, Swift, Kotlin, and more, plus how computers, the internet, and compilers actually work. No paywalls, no accounts, no nonsense.',
+  description: 'Free lessons in 32 languages & CS topics — Python, JavaScript, TypeScript, SQL, Git, Rust, Go, Swift, Kotlin, and more, plus how computers, the internet, and compilers actually work. No paywalls, no accounts, no nonsense.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

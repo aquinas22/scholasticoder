@@ -711,5 +711,605 @@ curl -X PUT http://localhost:8080/tasks/1/done`,
         },
       ],
     },
+    {
+      slug: 'goroutines-channels',
+      title: 'Goroutines & Channels',
+      intro: 'A goroutine costs a couple of kilobytes, so starting ten thousand is normal. Channels are how they talk: "do not communicate by sharing memory; share memory by communicating."',
+      sections: [
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+func worker(id int, wg *sync.WaitGroup) {
+	defer wg.Done()               // signal completion no matter how we return
+	time.Sleep(100 * time.Millisecond)
+	fmt.Printf("worker %d finished\\n", id)
+}
+
+func main() {
+	var wg sync.WaitGroup
+
+	for i := 1; i <= 5; i++ {
+		wg.Add(1)                 // count BEFORE starting the goroutine
+		go worker(i, &wg)         // "go" runs it concurrently
+	}
+
+	wg.Wait()                     // block until every Done() has been called
+	fmt.Println("all done")
+
+	// Without the WaitGroup, main would exit immediately and kill every
+	// goroutine mid-flight. Nothing waits for a goroutine automatically.
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import "fmt"
+
+func main() {
+	// Unbuffered channel: a send blocks until a receiver is ready.
+	done := make(chan string)
+	go func() { done <- "finished" }()
+	fmt.Println(<-done)
+
+	// Buffered channel: sends succeed until the buffer is full.
+	jobs := make(chan int, 100)
+	results := make(chan int, 100)
+
+	// Worker pool — three goroutines sharing one queue of work
+	for w := 1; w <= 3; w++ {
+		go func(id int) {
+			for j := range jobs {          // ranges until jobs is closed
+				results <- j * j
+			}
+		}(w)
+	}
+
+	for i := 1; i <= 9; i++ {
+		jobs <- i
+	}
+	close(jobs)                            // tells the workers no more work is coming
+
+	total := 0
+	for i := 0; i < 9; i++ {
+		total += <-results
+	}
+	fmt.Println(total)                     // 285
+
+	// Direction in the signature documents intent and is compiler-checked
+	// func produce(out chan<- int)   send-only
+	// func consume(in <-chan int)    receive-only
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+)
+
+// select waits on several channels at once
+func race(a, b <-chan string) string {
+	select {
+	case msg := <-a:
+		return "a: " + msg
+	case msg := <-b:
+		return "b: " + msg
+	case <-time.After(2 * time.Second):
+		return "timeout"
+	}
+}
+
+// context is how you cancel work in Go: pass it as the FIRST parameter.
+func fetch(ctx context.Context, url string) (string, error) {
+	select {
+	case <-time.After(500 * time.Millisecond):     // pretend this is a network call
+		return "body of " + url, nil
+	case <-ctx.Done():
+		return "", ctx.Err()                       // context canceled / deadline exceeded
+	}
+}
+
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()                                 // always cancel to release resources
+
+	if _, err := fetch(ctx, "/slow"); errors.Is(err, context.DeadlineExceeded) {
+		fmt.Println("gave up:", err)
+	}
+
+	// Mutex when a channel would be overkill (a shared counter, a cache)
+	// var mu sync.Mutex; mu.Lock(); defer mu.Unlock()
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'Run your tests with "go test -race". The race detector finds unsynchronized access to shared variables that will otherwise corrupt data intermittently in production and never reproduce on your laptop.',
+        },
+        {
+          type: 'note',
+          content: 'Deadlock rules: receiving from a channel nobody sends to blocks forever; sending on a full or unbuffered channel with no receiver blocks forever; closing a channel twice, or sending on a closed channel, panics. Only the sender should ever close a channel.',
+        },
+      ],
+    },
+    {
+      slug: 'errors-and-testing',
+      title: 'Errors, Panics & Testing',
+      intro: 'Go has no exceptions. Errors are ordinary values returned alongside results, checked with an if, and wrapped as they travel up. It is more typing and far fewer surprises.',
+      sections: [
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+)
+
+// Sentinel errors — comparable values callers can test for
+var ErrNotFound = errors.New("not found")
+
+// Custom error types carry structured detail
+type ValidationError struct {
+	Field  string
+	Reason string
+}
+
+func (e *ValidationError) Error() string {
+	return fmt.Sprintf("field %q is invalid: %s", e.Field, e.Reason)
+}
+
+func findUser(id int) (string, error) {
+	users := map[int]string{1: "Ada"}
+	name, ok := users[id]
+	if !ok {
+		return "", fmt.Errorf("findUser %d: %w", id, ErrNotFound)   // %w wraps
+	}
+	return name, nil
+}
+
+func main() {
+	_, err := findUser(99)
+
+	// errors.Is unwraps the chain looking for a specific value
+	if errors.Is(err, ErrNotFound) {
+		fmt.Println("no such user")
+	}
+
+	// errors.As unwraps looking for a specific TYPE, and binds it
+	var verr *ValidationError
+	if errors.As(err, &verr) {
+		fmt.Println("bad field:", verr.Field)
+	}
+
+	if _, err := os.Open("missing.txt"); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("file is not there")
+	}
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"fmt"
+	"os"
+)
+
+// defer runs when the function returns — even on panic. LIFO order.
+func processFile(path string) (err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return fmt.Errorf("open %s: %w", path, err)
+	}
+	defer f.Close()                 // guaranteed cleanup
+
+	// Named return + recover turns a panic back into an error
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered: %v", r)
+		}
+	}()
+
+	// ... work that might panic ...
+	return nil
+}
+
+// Panic is for programmer error and unrecoverable state, NOT control flow.
+func mustPositive(n int) int {
+	if n <= 0 {
+		panic("n must be positive")     // a bug in the caller, not a runtime condition
+	}
+	return n
+}
+
+func main() {
+	if err := processFile("nope.txt"); err != nil {
+		fmt.Println("error:", err)
+	}
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `// calc.go
+package calc
+
+import "errors"
+
+func Add(a, b int) int { return a + b }
+
+func Divide(a, b float64) (float64, error) {
+	if b == 0 {
+		return 0, errors.New("division by zero")
+	}
+	return a / b, nil
+}
+
+// calc_test.go — file name must end in _test.go
+package calc
+
+import "testing"
+
+func TestAdd(t *testing.T) {
+	if got := Add(2, 3); got != 5 {
+		t.Errorf("Add(2,3) = %d, want 5", got)
+	}
+}
+
+// Table-driven tests are the Go idiom
+func TestDivide(t *testing.T) {
+	tests := []struct {
+		name    string
+		a, b    float64
+		want    float64
+		wantErr bool
+	}{
+		{"simple", 10, 2, 5, false},
+		{"fraction", 1, 4, 0.25, false},
+		{"by zero", 1, 0, 0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {      // subtest: named, isolated
+			got, err := Divide(tt.a, tt.b)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("unexpected error state: %v", err)
+			}
+			if !tt.wantErr && got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkAdd(b *testing.B) {
+	for i := 0; i < b.N; i++ { Add(1, 2) }
+}
+
+// go test ./...            run everything
+// go test -v -run Divide   verbose, only matching tests
+// go test -cover           coverage
+// go test -race            race detector`,
+        },
+        {
+          type: 'tip',
+          content: 'Wrap errors with context as they travel up: fmt.Errorf("loading config: %w", err). By the time the error is printed at the top you get "starting server: loading config: open config.yaml: no such file" — a stack trace made of sentences.',
+        },
+        {
+          type: 'warning',
+          content: 'Never ignore an error with _ unless you can explain why in a comment. "if err != nil { return err }" everywhere looks repetitive precisely because Go makes you see every place something can fail.',
+        },
+      ],
+    },
+    {
+      slug: 'packages-modules',
+      title: 'Packages, Modules & the Standard Library',
+      intro: 'Go\'s build system is refreshingly small: one go.mod file, one command, no plugin configuration. Get the layout right and everything else follows.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `# Start a module — the path is normally the repo URL
+go mod init github.com/you/myapp
+
+# Add a dependency (or just import it and run go mod tidy)
+go get github.com/google/uuid
+go mod tidy          # add what is imported, remove what is not
+
+go run ./cmd/server  # compile and run
+go build ./...       # build everything
+go test ./...        # test everything
+go vet ./...         # catch suspicious constructs
+gofmt -w .           # formatting is not a debate in Go
+
+# A conventional layout
+# myapp/
+#   go.mod
+#   cmd/server/main.go       package main — the entry point
+#   internal/store/store.go  importable ONLY inside this module
+#   pkg/api/client.go        intended for outside consumers
+#   go.sum                   checksums, commit this file`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `// internal/store/store.go
+package store          // package name = directory name, lowercase, no underscores
+
+import "errors"
+
+// Exported: capital letter. Unexported: lowercase, package-private.
+var ErrMissing = errors.New("store: key missing")
+
+type Store struct {
+	data map[string]string     // unexported field — callers cannot touch it
+}
+
+func New() *Store {            // constructor convention: New / NewX
+	return &Store{data: make(map[string]string)}
+}
+
+func (s *Store) Set(key, value string) { s.data[key] = value }
+
+func (s *Store) Get(key string) (string, error) {
+	v, ok := s.data[key]
+	if !ok {
+		return "", ErrMissing
+	}
+	return v, nil
+}
+
+// cmd/server/main.go
+package main
+
+import (
+	"fmt"
+	"github.com/you/myapp/internal/store"
+)
+
+func main() {
+	s := store.New()
+	s.Set("greeting", "hello")
+	v, _ := s.Get("greeting")
+	fmt.Println(v)
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+)
+
+type Todo struct {
+	ID    int    \`json:"id"\`
+	Title string \`json:"title"\`
+	Done  bool   \`json:"done,omitempty"\`   // struct tags control JSON names
+}
+
+func main() {
+	// encoding/json
+	data, _ := json.Marshal(Todo{ID: 1, Title: "Learn Go"})
+	fmt.Println(string(data))               // {"id":1,"title":"Learn Go"}
+
+	var t Todo
+	json.Unmarshal([]byte(\`{"id":2,"title":"Ship it","done":true}\`), &t)
+
+	// net/http server in six lines — no framework required
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /todos/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id := r.PathValue("id")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(Todo{ID: 1, Title: "todo " + id})
+	})
+	srv := &http.Server{Addr: ":8080", Handler: mux, ReadTimeout: 5 * time.Second}
+	go srv.ListenAndServe()
+
+	// strings, os and friends
+	fmt.Println(strings.Join([]string{"a", "b"}, "-"))
+	fmt.Println(strings.HasPrefix("golang", "go"))
+	fmt.Println(os.Getenv("HOME"))
+}`,
+        },
+        {
+          type: 'note',
+          content: 'Anything under a directory named internal/ can only be imported by code inside the same module. It is the compiler-enforced way to say "this is not part of my public API" — use it generously.',
+        },
+        {
+          type: 'tip',
+          content: 'Go\'s standard library covers HTTP servers and clients, JSON, templates, crypto, compression and testing. Check it before adding a dependency; most Go services run on the standard library plus two or three packages.',
+        },
+      ],
+    },
+    {
+      slug: 'generics-go',
+      title: 'Generics',
+      intro: 'Since Go 1.18 you can write one function that works for many types without interface{} and type assertions. Generics in Go are deliberately plain — type parameters and constraints, nothing more.',
+      sections: [
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"fmt"
+	"cmp"
+)
+
+// [T any] declares a type parameter. any is an alias for interface{}.
+func Map[T, U any](items []T, fn func(T) U) []U {
+	out := make([]U, 0, len(items))
+	for _, item := range items {
+		out = append(out, fn(item))
+	}
+	return out
+}
+
+func Filter[T any](items []T, keep func(T) bool) []T {
+	var out []T
+	for _, item := range items {
+		if keep(item) {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
+func Reduce[T, A any](items []T, initial A, fn func(A, T) A) A {
+	acc := initial
+	for _, item := range items {
+		acc = fn(acc, item)
+	}
+	return acc
+}
+
+func main() {
+	nums := []int{1, 2, 3, 4, 5}
+
+	doubled := Map(nums, func(n int) int { return n * 2 })
+	labels := Map(nums, func(n int) string { return fmt.Sprintf("#%d", n) })
+	evens := Filter(nums, func(n int) bool { return n%2 == 0 })
+	sum := Reduce(nums, 0, func(a, n int) int { return a + n })
+
+	fmt.Println(doubled, labels, evens, sum)
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"cmp"
+	"fmt"
+	"golang.org/x/exp/constraints"    // or declare your own constraint
+)
+
+// A constraint is an interface listing the permitted types.
+type Number interface {
+	~int | ~int64 | ~float32 | ~float64      // ~ also allows named types with that base
+}
+
+func Sum[T Number](values []T) T {
+	var total T                              // zero value of whatever T is
+	for _, v := range values {
+		total += v
+	}
+	return total
+}
+
+// cmp.Ordered covers every type supporting < and >
+func Max[T cmp.Ordered](values []T) (T, bool) {
+	var zero T
+	if len(values) == 0 {
+		return zero, false
+	}
+	best := values[0]
+	for _, v := range values[1:] {
+		if v > best {
+			best = v
+		}
+	}
+	return best, true
+}
+
+func main() {
+	fmt.Println(Sum([]int{1, 2, 3}))            // 6
+	fmt.Println(Sum([]float64{1.5, 2.5}))       // 4
+	fmt.Println(Max([]string{"b", "a", "c"}))   // c true
+}`,
+        },
+        {
+          type: 'code',
+          language: 'go',
+          content: `package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+// Generic types: a type-safe, concurrency-safe cache
+type Cache[K comparable, V any] struct {
+	mu    sync.RWMutex
+	items map[K]V
+}
+
+func NewCache[K comparable, V any]() *Cache[K, V] {
+	return &Cache[K, V]{items: make(map[K]V)}
+}
+
+func (c *Cache[K, V]) Set(key K, value V) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.items[key] = value
+}
+
+func (c *Cache[K, V]) Get(key K) (V, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	v, ok := c.items[key]
+	return v, ok
+}
+
+// A generic stack
+type Stack[T any] struct{ items []T }
+
+func (s *Stack[T]) Push(v T) { s.items = append(s.items, v) }
+func (s *Stack[T]) Pop() (T, bool) {
+	var zero T
+	if len(s.items) == 0 {
+		return zero, false
+	}
+	v := s.items[len(s.items)-1]
+	s.items = s.items[:len(s.items)-1]
+	return v, true
+}
+
+func main() {
+	c := NewCache[string, int]()
+	c.Set("hits", 42)
+	fmt.Println(c.Get("hits"))       // 42 true
+
+	var s Stack[string]
+	s.Push("a"); s.Push("b")
+	fmt.Println(s.Pop())             // b true
+}`,
+        },
+        {
+          type: 'note',
+          content: 'comparable is the constraint for anything usable as a map key or with ==. Slices, maps and functions are not comparable, so Cache[[]byte, V] will not compile.',
+        },
+        {
+          type: 'tip',
+          content: 'Go\'s culture is to reach for generics only when a concrete type or an interface genuinely will not do. The standard slices and maps packages already provide sorted, contains, keys and clone — check those before writing your own.',
+        },
+      ],
+    },
   ],
 }

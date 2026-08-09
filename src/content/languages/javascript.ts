@@ -1163,5 +1163,442 @@ async function loadDashboard(userId) {
         },
       ],
     },
+    {
+      slug: 'fetch-and-apis',
+      title: 'Fetch & Working with APIs',
+      intro: 'Almost every real app talks to a server. fetch is the browser (and Node) built-in for HTTP — but its defaults surprise people, especially the fact that a 404 is not an error.',
+      sections: [
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// GET — the shape you will write a thousand times
+async function getUser(id) {
+  const res = await fetch(\`https://api.example.com/users/\${id}\`)
+
+  // fetch only rejects on NETWORK failure. A 404 or 500 still "succeeds".
+  if (!res.ok) {
+    throw new Error(\`HTTP \${res.status} \${res.statusText}\`)
+  }
+
+  return res.json()          // res.json() is itself async
+}
+
+// POST with a JSON body
+async function createUser(data) {
+  const res = await fetch('https://api.example.com/users', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: \`Bearer \${token}\`,
+    },
+    body: JSON.stringify(data),   // body must be a string, not an object
+  })
+  if (!res.ok) throw new Error(await res.text())
+  return res.json()
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Parallel requests — do not await in sequence when they are independent
+const [user, posts, comments] = await Promise.all([
+  fetch('/api/user').then(r => r.json()),
+  fetch('/api/posts').then(r => r.json()),
+  fetch('/api/comments').then(r => r.json()),
+])
+// 3 requests, one round trip of waiting instead of three
+
+// Promise.allSettled — when partial failure is acceptable
+const results = await Promise.allSettled([
+  fetch('/api/a'),
+  fetch('/api/b'),
+])
+for (const r of results) {
+  if (r.status === 'fulfilled') console.log('ok', r.value.url)
+  else console.warn('failed', r.reason)
+}
+
+// Cancellation and timeouts with AbortController
+const controller = new AbortController()
+const timer = setTimeout(() => controller.abort(), 5000)
+
+try {
+  const res = await fetch('/api/slow', { signal: controller.signal })
+  console.log(await res.json())
+} catch (err) {
+  if (err.name === 'AbortError') console.log('request timed out')
+  else throw err
+} finally {
+  clearTimeout(timer)
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// A reusable client: one place for base URL, auth, errors and retries
+class ApiClient {
+  constructor(baseUrl, { token, retries = 2 } = {}) {
+    this.baseUrl = baseUrl
+    this.token = token
+    this.retries = retries
+  }
+
+  async request(path, options = {}) {
+    const url = this.baseUrl + path
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(this.token && { Authorization: \`Bearer \${this.token}\` }),
+      ...options.headers,
+    }
+
+    for (let attempt = 0; attempt <= this.retries; attempt++) {
+      const res = await fetch(url, { ...options, headers })
+
+      // Retry only on transient server errors, never on 4xx
+      if (res.status >= 500 && attempt < this.retries) {
+        await new Promise(r => setTimeout(r, 2 ** attempt * 200))
+        continue
+      }
+      if (!res.ok) {
+        const body = await res.text()
+        throw new Error(\`\${res.status} \${url}: \${body}\`)
+      }
+      return res.status === 204 ? null : res.json()
+    }
+  }
+
+  get(path)        { return this.request(path) }
+  post(path, data) { return this.request(path, { method: 'POST', body: JSON.stringify(data) }) }
+  del(path)        { return this.request(path, { method: 'DELETE' }) }
+}
+
+const api = new ApiClient('https://api.example.com', { token: 'abc123' })
+const todos = await api.get('/todos')
+`,
+        },
+        {
+          type: 'warning',
+          content: 'Never put an API secret in front-end JavaScript. Anything shipped to the browser is readable by every visitor — DevTools shows your bundle in plain text. Secrets belong on a server you control, which then calls the third-party API.',
+        },
+        {
+          type: 'note',
+          content: 'A "CORS error" is not a bug in your fetch call — it is the browser enforcing that the SERVER did not send an Access-Control-Allow-Origin header permitting your page. The fix is server-side (or a proxy), never client-side.',
+        },
+      ],
+    },
+    {
+      slug: 'iterators-generators-js',
+      title: 'Iterators, Generators & Symbols',
+      intro: 'for...of, spread, and destructuring all work through one protocol. Once you can implement it, your own objects become first-class citizens of the language.',
+      sections: [
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// The iterable protocol: an object with a [Symbol.iterator] method
+const range = {
+  from: 1,
+  to: 5,
+  [Symbol.iterator]() {
+    let current = this.from
+    const last = this.to
+    return {
+      next() {
+        return current <= last
+          ? { value: current++, done: false }
+          : { value: undefined, done: true }
+      },
+    }
+  },
+}
+
+console.log([...range])          // [1, 2, 3, 4, 5]
+for (const n of range) console.log(n)
+const [first, second] = range    // 1, 2
+
+// Generators write the same thing in three lines
+function* rangeGen(from, to, step = 1) {
+  for (let i = from; i <= to; i += step) yield i
+}
+console.log([...rangeGen(0, 10, 2)])   // [0, 2, 4, 6, 8, 10]
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Generators are lazy — nothing runs until you pull
+function* idGenerator() {
+  let id = 1
+  while (true) yield id++     // infinite, but harmless
+}
+const ids = idGenerator()
+console.log(ids.next().value)  // 1
+console.log(ids.next().value)  // 2
+
+// yield* delegates to another iterable
+function* walk(node) {
+  yield node.value
+  for (const child of node.children ?? []) yield* walk(child)
+}
+
+const tree = {
+  value: 'root',
+  children: [
+    { value: 'a', children: [{ value: 'a1' }] },
+    { value: 'b' },
+  ],
+}
+console.log([...walk(tree)])   // ['root', 'a', 'a1', 'b']
+
+// Two-way: next(v) sends a value back INTO the generator
+function* adder() {
+  let total = 0
+  while (true) {
+    const n = yield total     // the yielded value goes out, next()'s arg comes in
+    total += n
+  }
+}
+const acc = adder()
+acc.next()          // prime it
+console.log(acc.next(5).value)   // 5
+console.log(acc.next(3).value)   // 8
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Async iteration — for await...of over a stream of promises
+async function* fetchPages(url) {
+  let next = url
+  while (next) {
+    const res = await fetch(next)
+    const page = await res.json()
+    yield* page.items          // hand out each item
+    next = page.nextUrl        // then request the next page
+  }
+}
+
+for await (const item of fetchPages('/api/items?page=1')) {
+  console.log(item.id)         // consumer never sees the pagination
+}
+
+// Symbols: unique keys that never collide with string keys
+const CACHE = Symbol('cache')
+class Repo {
+  constructor() { this[CACHE] = new Map() }
+  get(id) {
+    if (!this[CACHE].has(id)) this[CACHE].set(id, { id })
+    return this[CACHE].get(id)
+  }
+}
+const repo = new Repo()
+console.log(Object.keys(repo))   // []  — symbol keys are hidden from enumeration
+`,
+        },
+        {
+          type: 'tip',
+          content: 'Generators shine for lazy pipelines and for anything paginated or infinite. If the data is already fully in memory as an array, plain array methods are simpler and faster.',
+        },
+      ],
+    },
+    {
+      slug: 'this-and-prototypes',
+      title: '"this", Prototypes & the Object Model',
+      intro: 'JavaScript has no classes underneath — class is syntax over prototypes. Understanding what "this" points at, and how property lookup walks the prototype chain, explains most of the language\'s famous weirdness.',
+      sections: [
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// "this" is decided by HOW a function is called, not where it is defined.
+const user = {
+  name: 'Ada',
+  greet() { return \`Hi, \${this.name}\` },
+}
+
+console.log(user.greet())        // "Hi, Ada"  — called as a method
+
+const fn = user.greet
+console.log(fn())                // "Hi, undefined" — lost its receiver
+
+// Fix 1: bind
+const bound = user.greet.bind(user)
+console.log(bound())             // "Hi, Ada"
+
+// Fix 2: call / apply set "this" for one invocation
+console.log(user.greet.call({ name: 'Grace' }))   // "Hi, Grace"
+
+// Fix 3: arrow functions have NO own "this" — they inherit it lexically
+class Timer {
+  constructor() { this.ticks = 0 }
+  start() {
+    setInterval(() => { this.ticks++ }, 1000)   // arrow keeps "this" = the Timer
+  }
+  startBroken() {
+    setInterval(function () { this.ticks++ }, 1000)  // "this" is not the Timer
+  }
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Every object has a hidden link to a prototype. Lookup walks the chain.
+const animal = {
+  speak() { return \`\${this.name} makes a sound\` },
+}
+
+const dog = Object.create(animal)   // dog's prototype is animal
+dog.name = 'Rex'
+
+console.log(dog.speak())                          // "Rex makes a sound"
+console.log(Object.getPrototypeOf(dog) === animal) // true
+console.log(dog.hasOwnProperty('speak'))           // false — it is inherited
+
+// class is exactly this, with nicer syntax
+class Animal {
+  constructor(name) { this.name = name }
+  speak() { return \`\${this.name} makes a sound\` }
+}
+class Dog extends Animal {
+  speak() { return \`\${super.speak()} (a bark)\` }
+}
+
+const rex = new Dog('Rex')
+console.log(rex.speak())
+console.log(Object.getPrototypeOf(Dog.prototype) === Animal.prototype)  // true
+// Methods live on the PROTOTYPE, shared by every instance — not copied per object.
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Private fields (#) are real privacy, enforced by the engine
+class BankAccount {
+  #balance = 0                      // not accessible from outside, at all
+
+  constructor(owner) { this.owner = owner }
+
+  deposit(amount) {
+    if (amount <= 0) throw new RangeError('amount must be positive')
+    this.#balance += amount
+    return this
+  }
+
+  get balance() { return this.#balance }      // getter — read like a property
+
+  static from(owner, initial) {               // static factory
+    return new BankAccount(owner).deposit(initial)
+  }
+}
+
+const acct = BankAccount.from('Ada', 100)
+console.log(acct.balance)     // 100
+// acct.#balance            -> SyntaxError, cannot even be referenced
+
+// Freezing and copying
+const config = Object.freeze({ retries: 3 })
+// config.retries = 5      -> silently ignored (throws in strict mode)
+
+const clone = structuredClone({ a: { b: [1, 2] } })   // real deep copy
+`,
+        },
+        {
+          type: 'warning',
+          content: 'Deep-copying with JSON.parse(JSON.stringify(obj)) silently destroys Date objects, Map, Set, undefined values, and functions, and throws on circular references. Use structuredClone instead.',
+        },
+        {
+          type: 'note',
+          content: 'Quick "this" checklist: called as obj.method() -> this is obj. Called bare -> undefined in modules/strict mode. Called with new -> the fresh object. Arrow function -> whatever this was where it was written.',
+        },
+      ],
+    },
+    {
+      slug: 'regular-expressions',
+      title: 'Regular Expressions',
+      intro: 'Regex is a tiny language for describing text patterns. It is dense and easy to abuse, but for validation, extraction, and search-and-replace it turns twenty lines of string fiddling into one expression.',
+      sections: [
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Two ways to build one
+const re1 = /\\d{3}-\\d{4}/          // literal — compiled once, use when the pattern is fixed
+const re2 = new RegExp('\\\\d{3}-\\\\d{4}')  // from a string — note the doubled backslashes
+
+// The pieces you will actually use
+// \\d digit   \\w word char   \\s whitespace   .  any char
+// +  1+      *  0+           ?  0 or 1       {2,5} between 2 and 5
+// ^  start   $  end          |  or           [abc] one of   [^abc] none of
+// () capture group           (?:) group without capturing
+
+const text = 'Order 1234 shipped on 2026-08-08 to alice@example.com'
+
+console.log(/\\d+/.test(text))            // true
+console.log(text.match(/\\d+/g))          // ['1234', '2026', '08', '08']
+console.log(text.search(/@/))             // index of first match
+console.log(text.replace(/\\d{4}-\\d{2}-\\d{2}/, 'DATE'))
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Capture groups pull pieces out; named groups make them readable
+const dateRe = /(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})/
+const m = '2026-08-08'.match(dateRe)
+console.log(m.groups.year, m.groups.month)   // 2026 08
+
+// matchAll gives every match WITH its groups
+const log = 'GET /home 200\\nPOST /login 401\\nGET /admin 403'
+const lineRe = /(?<method>GET|POST) (?<path>\\/\\S*) (?<status>\\d{3})/g
+
+for (const { groups } of log.matchAll(lineRe)) {
+  if (groups.status !== '200') console.log(\`\${groups.method} \${groups.path} failed\`)
+}
+
+// Replace with a function for full control
+const prices = 'shirt $20, shoes $75'
+console.log(prices.replace(/\\$(\\d+)/g, (_, n) => '$' + (Number(n) * 1.1).toFixed(2)))
+
+// Flags: g global, i ignore case, m multiline (^ and $ per line), s dot matches newline
+console.log('Hello HELLO'.match(/hello/gi))   // ['Hello', 'HELLO']
+`,
+        },
+        {
+          type: 'code',
+          language: 'javascript',
+          content: `// Practical patterns
+const patterns = {
+  // "Good enough" email check — real validation means sending a confirmation mail
+  email: /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/,
+  slug: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+  hexColor: /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i,
+  // Lookahead: at least one digit, one lowercase, one uppercase, 8+ chars
+  strongPassword: /^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+}
+
+console.log(patterns.slug.test('my-first-post'))     // true
+console.log(patterns.hexColor.test('#1a2b3c'))       // true
+
+// Splitting on a pattern
+console.log('a1b22c333d'.split(/\\d+/))               // ['a','b','c','d']
+
+// Escaping user input before putting it in a regex
+function escapeRegex(s) {
+  return s.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&')
+}
+const needle = new RegExp(escapeRegex('price (USD)'), 'i')
+console.log(needle.test('Total price (USD): 40'))    // true
+`,
+        },
+        {
+          type: 'warning',
+          content: 'A regex with /g is stateful: it keeps a lastIndex between calls to .test() and .exec(). Reusing one global regex in a loop skips matches. Use .matchAll(), or create the regex fresh, or drop the g flag for simple tests.',
+        },
+        {
+          type: 'warning',
+          content: 'Do not parse HTML with regex — use DOMParser or a real parser. And beware catastrophic backtracking: nested quantifiers like (a+)+ can hang your program on a crafted input, which is a real denial-of-service vector.',
+        },
+      ],
+    },
   ],
 }

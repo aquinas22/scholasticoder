@@ -759,5 +759,492 @@ java Bank`,
         },
       ],
     },
+    {
+      slug: 'interfaces-generics',
+      title: 'Interfaces, Abstract Classes & Generics',
+      intro: 'Interfaces describe what a type can do; generics let one class or method work with many types without giving up compile-time safety. Together they are the backbone of every Java library you will ever use.',
+      sections: [
+        {
+          type: 'code',
+          language: 'java',
+          content: `// An interface is a contract: methods without bodies (plus default/static ones).
+interface Shape {
+    double area();                       // every implementer must provide this
+    double perimeter();
+
+    default String describe() {          // default method — inherited body
+        return String.format("%s: area=%.2f", getClass().getSimpleName(), area());
+    }
+
+    static Shape unitSquare() {          // static factory on the interface
+        return new Rectangle(1, 1);
+    }
+}
+
+record Rectangle(double width, double height) implements Shape {
+    public double area()      { return width * height; }
+    public double perimeter() { return 2 * (width + height); }
+}
+
+record Circle(double radius) implements Shape {
+    public double area()      { return Math.PI * radius * radius; }
+    public double perimeter() { return 2 * Math.PI * radius; }
+}
+
+// A class can implement MANY interfaces but extend only ONE class.
+public class Demo {
+    public static void main(String[] args) {
+        List<Shape> shapes = List.of(new Rectangle(3, 4), new Circle(2));
+        for (Shape s : shapes) System.out.println(s.describe());
+    }
+}`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `// Abstract classes sit between interfaces and concrete classes:
+// they hold STATE and constructors, which interfaces cannot.
+abstract class Employee {
+    protected final String name;
+    protected final double baseSalary;
+
+    protected Employee(String name, double baseSalary) {
+        this.name = name;
+        this.baseSalary = baseSalary;
+    }
+
+    public abstract double monthlyPay();      // subclasses must define
+
+    public String payslip() {                 // shared behaviour
+        return "%s: %.2f".formatted(name, monthlyPay());
+    }
+}
+
+class Salaried extends Employee {
+    Salaried(String name, double annual) { super(name, annual); }
+    public double monthlyPay() { return baseSalary / 12; }
+}
+
+class Contractor extends Employee {
+    private final int hours;
+    Contractor(String name, double rate, int hours) {
+        super(name, rate);
+        this.hours = hours;
+    }
+    public double monthlyPay() { return baseSalary * hours; }
+}
+
+// Rule of thumb: interface for capability ("Comparable", "Closeable"),
+// abstract class when subclasses genuinely share fields and construction logic.`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.*;
+
+// A generic class: T is a placeholder chosen by the caller.
+class Box<T> {
+    private T value;
+    public void put(T value) { this.value = value; }
+    public T get()           { return value; }
+}
+
+// Bounded type parameter: T must be Comparable with itself.
+class Range<T extends Comparable<T>> {
+    private final T low, high;
+    Range(T low, T high) { this.low = low; this.high = high; }
+    boolean contains(T v) { return low.compareTo(v) <= 0 && high.compareTo(v) >= 0; }
+}
+
+public class Generics {
+    // Generic method — <T> declared before the return type
+    static <T> List<T> repeat(T item, int times) {
+        List<T> out = new ArrayList<>();
+        for (int i = 0; i < times; i++) out.add(item);
+        return out;
+    }
+
+    // Wildcards control what you can read and write:
+    //   ? extends Number  -> you can READ Numbers  (producer)
+    //   ? super Integer   -> you can WRITE Integers (consumer)
+    static double sum(List<? extends Number> nums) {
+        double total = 0;
+        for (Number n : nums) total += n.doubleValue();
+        return total;
+    }
+
+    static void addInts(List<? super Integer> sink) {
+        sink.add(1);
+        sink.add(2);
+    }
+
+    public static void main(String[] args) {
+        Box<String> box = new Box<>();
+        box.put("hello");
+        System.out.println(box.get().length());     // no cast needed
+
+        System.out.println(new Range<>(1, 10).contains(7));   // true
+        System.out.println(sum(List.of(1, 2.5, 3L)));         // 6.5
+        System.out.println(repeat("x", 3));                   // [x, x, x]
+    }
+}`,
+        },
+        {
+          type: 'note',
+          content: 'Java generics are erased at runtime: List<String> and List<Integer> are the same class once compiled. That is why you cannot write "new T[]" or check "x instanceof List<String>". The types protect you at compile time only.',
+        },
+        {
+          type: 'tip',
+          content: 'Remember PECS — Producer Extends, Consumer Super. If a parameter supplies values to you, use "? extends T". If it receives values from you, use "? super T".',
+        },
+      ],
+    },
+    {
+      slug: 'streams-lambdas',
+      title: 'Lambdas & the Stream API',
+      intro: 'Streams turn loops-with-a-mutable-accumulator into a readable pipeline: filter, map, collect. They are the single biggest readability upgrade in modern Java.',
+      sections: [
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.function.*;
+
+// A lambda is a compact implementation of a single-method interface.
+Runnable task            = () -> System.out.println("running");
+Function<String, Integer> len = s -> s.length();
+BiFunction<Integer, Integer, Integer> add = (a, b) -> a + b;
+Predicate<String> isEmpty     = String::isEmpty;      // method reference
+Supplier<List<String>> maker   = ArrayList::new;      // constructor reference
+Consumer<String> printer       = System.out::println;
+
+// The core functional interfaces you will meet constantly:
+//   Function<T,R>   R apply(T)      transform
+//   Predicate<T>    boolean test(T) filter
+//   Consumer<T>     void accept(T)  side effect
+//   Supplier<T>     T get()         produce
+//   UnaryOperator<T>  Function<T,T>
+
+System.out.println(len.apply("hello"));       // 5
+System.out.println(add.apply(2, 3));          // 5
+
+// Composition
+Function<Integer, Integer> doubled = x -> x * 2;
+Function<Integer, Integer> plusTen = x -> x + 10;
+System.out.println(doubled.andThen(plusTen).apply(5));   // 20
+System.out.println(doubled.compose(plusTen).apply(5));   // 30`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.*;
+import java.util.stream.*;
+
+record Order(String customer, String region, double total, int items) {}
+
+List<Order> orders = List.of(
+    new Order("Ada",  "EU", 120.50, 3),
+    new Order("Bob",  "US",  45.00, 1),
+    new Order("Cleo", "EU", 310.75, 8),
+    new Order("Dan",  "US", 210.00, 4),
+    new Order("Ada",  "EU",  60.25, 2)
+);
+
+// Filter -> map -> collect
+List<String> bigEuCustomers = orders.stream()
+    .filter(o -> o.region().equals("EU"))
+    .filter(o -> o.total() > 100)
+    .map(Order::customer)
+    .distinct()
+    .sorted()
+    .toList();                                   // [Ada, Cleo]
+
+// Reductions
+double revenue   = orders.stream().mapToDouble(Order::total).sum();
+OptionalDouble avg = orders.stream().mapToDouble(Order::total).average();
+Optional<Order> biggest = orders.stream().max(Comparator.comparingDouble(Order::total));
+
+System.out.println(revenue);                     // 746.5
+System.out.println(biggest.map(Order::customer).orElse("none"));   // Cleo
+
+// Sorting by several keys
+List<Order> sorted = orders.stream()
+    .sorted(Comparator.comparing(Order::region)
+                      .thenComparing(Comparator.comparingDouble(Order::total).reversed()))
+    .toList();`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.*;
+import java.util.stream.*;
+
+// Collectors do the heavy lifting for grouping and summarising.
+Map<String, List<Order>> byRegion = orders.stream()
+    .collect(Collectors.groupingBy(Order::region));
+
+Map<String, Double> revenueByRegion = orders.stream()
+    .collect(Collectors.groupingBy(Order::region,
+             Collectors.summingDouble(Order::total)));
+// {EU=491.5, US=255.0}
+
+Map<Boolean, List<Order>> split = orders.stream()
+    .collect(Collectors.partitioningBy(o -> o.total() >= 100));
+
+String names = orders.stream()
+    .map(Order::customer)
+    .distinct()
+    .collect(Collectors.joining(", ", "[", "]"));   // [Ada, Bob, Cleo, Dan]
+
+DoubleSummaryStatistics stats = orders.stream()
+    .collect(Collectors.summarizingDouble(Order::total));
+System.out.println(stats.getMax() + " " + stats.getCount());
+
+// flatMap flattens nested structures
+List<List<String>> tags = List.of(List.of("a", "b"), List.of("c"));
+List<String> flat = tags.stream().flatMap(List::stream).toList();  // [a, b, c]
+
+// Generating streams
+List<Integer> firstTen = Stream.iterate(1, n -> n + 1).limit(10).toList();
+IntStream.rangeClosed(1, 5).forEach(System.out::println);`,
+        },
+        {
+          type: 'warning',
+          content: 'A stream is consumed once. Calling a second terminal operation on the same stream throws IllegalStateException ("stream has already been operated upon or closed"). Build a new stream from the source instead.',
+        },
+        {
+          type: 'note',
+          content: 'Nothing runs until a terminal operation (toList, collect, forEach, sum, findFirst). Intermediate steps like filter and map only describe the pipeline — that laziness is what lets streams short-circuit on findFirst or limit.',
+        },
+      ],
+    },
+    {
+      slug: 'concurrency',
+      title: 'Threads, Executors & Concurrency',
+      intro: 'Java has real OS threads, and since Java 21, cheap virtual threads. The hard part is never starting work in parallel — it is sharing data safely between the pieces.',
+      sections: [
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.concurrent.*;
+import java.util.*;
+
+public class Concurrency {
+    public static void main(String[] args) throws Exception {
+        // Do not create raw Threads by hand — use an executor pool.
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+
+        List<Callable<Integer>> jobs = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            final int n = i;
+            jobs.add(() -> { Thread.sleep(100); return n * n; });
+        }
+
+        List<Future<Integer>> futures = pool.invokeAll(jobs);
+        int total = 0;
+        for (Future<Integer> f : futures) total += f.get();   // get() blocks
+        System.out.println("total = " + total);               // 204
+
+        pool.shutdown();
+        pool.awaitTermination(5, TimeUnit.SECONDS);
+
+        // Java 21+: virtual threads — millions of them, cheap to block
+        try (var vt = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (int i = 0; i < 10_000; i++) {
+                vt.submit(() -> { Thread.sleep(1000); return null; });
+            }
+        }   // close() waits for all tasks
+    }
+}`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
+// The classic bug: two threads incrementing the same field.
+class Counter {
+    private int count = 0;
+    void increment() { count++; }              // NOT atomic: read, add, write
+    int get() { return count; }
+}
+
+// Three correct fixes:
+class SyncCounter {
+    private int count = 0;
+    synchronized void increment() { count++; }        // 1. lock the method
+    synchronized int get() { return count; }
+}
+
+class AtomicCounter {
+    private final AtomicInteger count = new AtomicInteger();
+    void increment() { count.incrementAndGet(); }     // 2. atomic primitive
+    int get() { return count.get(); }
+}
+
+class LockCounter {
+    private final java.util.concurrent.locks.ReentrantLock lock =
+        new java.util.concurrent.locks.ReentrantLock();
+    private int count = 0;
+    void increment() {                                 // 3. explicit lock
+        lock.lock();
+        try { count++; } finally { lock.unlock(); }    // ALWAYS unlock in finally
+    }
+}
+
+// Concurrent collections instead of manual locking
+ConcurrentHashMap<String, Integer> hits = new ConcurrentHashMap<>();
+hits.merge("/home", 1, Integer::sum);
+BlockingQueue<String> queue = new LinkedBlockingQueue<>(100);`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.util.concurrent.*;
+
+// CompletableFuture: composable async work without blocking on get()
+CompletableFuture<String> user   = CompletableFuture.supplyAsync(() -> fetchUser(42));
+CompletableFuture<String> orders = CompletableFuture.supplyAsync(() -> fetchOrders(42));
+
+CompletableFuture<String> combined = user
+    .thenCombine(orders, (u, o) -> u + " has " + o)
+    .thenApply(String::toUpperCase)
+    .exceptionally(err -> "failed: " + err.getMessage())
+    .orTimeout(3, TimeUnit.SECONDS);
+
+System.out.println(combined.join());
+
+// Chain dependent calls with thenCompose (flatMap for futures)
+CompletableFuture<Integer> pipeline =
+    CompletableFuture.supplyAsync(() -> 21)
+        .thenCompose(n -> CompletableFuture.supplyAsync(() -> n * 2));
+
+static String fetchUser(int id)   { return "user" + id; }
+static String fetchOrders(int id) { return "3 orders"; }`,
+        },
+        {
+          type: 'warning',
+          content: 'Shared mutable state is the source of nearly every concurrency bug. Prefer immutable objects (records, List.of, final fields) and message passing through a queue. A field only one thread ever writes needs no lock at all.',
+        },
+        {
+          type: 'tip',
+          content: 'If two threads take the same two locks in different orders, they will eventually deadlock. Always acquire locks in a fixed global order, or restructure so only one lock is needed.',
+        },
+      ],
+    },
+    {
+      slug: 'file-io-records',
+      title: 'Files, I/O & Modern Java Features',
+      intro: 'Reading and writing files in Java used to mean five nested streams. java.nio.file makes it one line — and records, sealed types, and pattern matching make the surrounding code far shorter than the Java you may have seen before.',
+      sections: [
+        {
+          type: 'code',
+          language: 'java',
+          content: `import java.nio.file.*;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
+
+Path path = Path.of("data", "notes.txt");
+
+// Whole-file operations
+Files.writeString(path, "first line\\nsecond line\\n");
+String all = Files.readString(path);
+List<String> lines = Files.readAllLines(path);
+
+// Append instead of overwrite
+Files.writeString(path, "third line\\n", StandardOpenOption.APPEND);
+
+// Stream a large file lazily — never loads it all into memory
+try (Stream<String> stream = Files.lines(path)) {
+    long errors = stream.filter(l -> l.contains("ERROR")).count();
+    System.out.println(errors);
+}
+
+// Buffered writer for many small writes
+try (BufferedWriter w = Files.newBufferedWriter(Path.of("out.csv"))) {
+    w.write("id,name");
+    w.newLine();
+    w.write("1,Ada");
+    w.newLine();
+}
+
+// Paths and directories
+Files.createDirectories(Path.of("data/archive"));
+System.out.println(Files.exists(path) + " " + Files.size(path));
+try (Stream<Path> walk = Files.walk(Path.of("data"))) {
+    walk.filter(Files::isRegularFile).forEach(System.out::println);
+}`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `// Records: immutable data carriers in one line.
+// You get constructor, accessors, equals, hashCode and toString for free.
+record Point(int x, int y) {
+    // Compact constructor for validation
+    Point {
+        if (x < 0 || y < 0) throw new IllegalArgumentException("negative coordinate");
+    }
+    // Extra methods are allowed
+    double distanceTo(Point other) {
+        return Math.hypot(x - other.x, y - other.y);
+    }
+    static Point origin() { return new Point(0, 0); }
+}
+
+var a = new Point(3, 4);
+System.out.println(a);                       // Point[x=3, y=4]
+System.out.println(a.distanceTo(Point.origin()));   // 5.0
+System.out.println(a.equals(new Point(3, 4)));      // true — value equality
+
+// Sealed types: a closed set of subtypes the compiler knows about
+sealed interface Event permits Click, KeyPress, Scroll {}
+record Click(int x, int y) implements Event {}
+record KeyPress(char key) implements Event {}
+record Scroll(int amount) implements Event {}`,
+        },
+        {
+          type: 'code',
+          language: 'java',
+          content: `// Pattern matching over a sealed hierarchy — exhaustive, no default needed.
+static String describe(Event e) {
+    return switch (e) {
+        case Click(int x, int y) when x == y -> "diagonal click at " + x;
+        case Click(int x, int y)             -> "click at " + x + "," + y;
+        case KeyPress(char k)                -> "key " + k;
+        case Scroll s                        -> "scrolled " + s.amount();
+    };
+}
+
+// instanceof pattern removes the cast
+static int length(Object o) {
+    if (o instanceof String s) return s.length();     // s is in scope, already cast
+    if (o instanceof Collection<?> c) return c.size();
+    return -1;
+}
+
+// Text blocks for multi-line strings
+String query = """
+    SELECT id, name
+    FROM users
+    WHERE active = true
+    ORDER BY name
+    """;
+
+// var for local type inference (the type is still static, just inferred)
+var counts = new HashMap<String, Integer>();
+for (var entry : counts.entrySet()) { /* ... */ }`,
+        },
+        {
+          type: 'note',
+          content: 'try-with-resources (the parentheses after try) closes anything implementing AutoCloseable, even when an exception is thrown. Any stream over a file — Files.lines, Files.walk — must be closed this way or you leak file handles.',
+        },
+        {
+          type: 'tip',
+          content: 'Reach for records whenever a class exists only to hold data: DTOs, API responses, coordinates, config. If you find yourself writing getters and equals by hand, a record probably fits.',
+        },
+      ],
+    },
   ],
 }

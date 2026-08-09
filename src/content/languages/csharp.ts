@@ -637,5 +637,503 @@ while (true) {
         },
       ],
     },
+    {
+      slug: 'linq',
+      title: 'LINQ — Querying Anything',
+      intro: 'LINQ is one query language for lists, databases, XML, and anything else that can be enumerated. Learn it once and the same filter/project/group vocabulary works everywhere in .NET.',
+      sections: [
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+record Employee(string Name, string Dept, decimal Salary, int Years);
+
+var staff = new List<Employee>
+{
+    new("Ada",  "Engineering", 145_000m, 6),
+    new("Bob",  "Sales",        78_000m, 2),
+    new("Cleo", "Engineering", 132_000m, 4),
+    new("Dan",  "Sales",        95_000m, 7),
+    new("Eve",  "Design",       88_000m, 1),
+};
+
+// Method syntax — what you will write 95% of the time
+var seniorEngineers = staff
+    .Where(e => e.Dept == "Engineering" && e.Years >= 5)
+    .OrderByDescending(e => e.Salary)
+    .Select(e => e.Name)
+    .ToList();                              // [ "Ada" ]
+
+// Query syntax — same thing, SQL-ish
+var query = from e in staff
+            where e.Salary > 90_000m
+            orderby e.Name
+            select new { e.Name, e.Dept };
+
+foreach (var row in query)
+    Console.WriteLine($"{row.Name} - {row.Dept}");
+
+// Single values
+decimal payroll = staff.Sum(e => e.Salary);
+decimal average = staff.Average(e => e.Salary);
+var topEarner   = staff.MaxBy(e => e.Salary);          // .NET 6+
+bool anyDesign  = staff.Any(e => e.Dept == "Design");
+bool allPaid    = staff.All(e => e.Salary > 50_000m);
+var firstSales  = staff.FirstOrDefault(e => e.Dept == "Sales");   // null if none`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Grouping and joining
+var byDept = staff
+    .GroupBy(e => e.Dept)
+    .Select(g => new
+    {
+        Dept  = g.Key,
+        Count = g.Count(),
+        Total = g.Sum(e => e.Salary),
+        Top   = g.OrderByDescending(e => e.Salary).First().Name,
+    })
+    .OrderByDescending(x => x.Total);
+
+foreach (var d in byDept)
+    Console.WriteLine($"{d.Dept}: {d.Count} people, {d.Total:C}, top={d.Top}");
+
+record Budget(string Dept, decimal Cap);
+var budgets = new List<Budget> { new("Engineering", 300_000m), new("Sales", 200_000m) };
+
+// Join two sequences on a key
+var overBudget = staff
+    .GroupBy(e => e.Dept)
+    .Join(budgets,
+          g => g.Key,
+          b => b.Dept,
+          (g, b) => new { b.Dept, Spend = g.Sum(e => e.Salary), b.Cap })
+    .Where(x => x.Spend > x.Cap);
+
+// Flattening
+var words = new[] { "hello world", "linq is nice" };
+var allWords = words.SelectMany(s => s.Split(' ')).Distinct().ToArray();
+
+// Set operations and paging
+var page2 = staff.OrderBy(e => e.Name).Skip(2).Take(2).ToList();
+var names = staff.Select(e => e.Name).Except(new[] { "Bob" });`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Deferred execution: a LINQ query is a RECIPE, not a result.
+var list = new List<int> { 1, 2, 3 };
+var evens = list.Where(n => n % 2 == 0);     // nothing has run yet
+
+list.Add(4);
+Console.WriteLine(string.Join(",", evens));  // "2,4" — it re-ran over the new list
+
+// Materialize with ToList/ToArray to freeze the result and avoid re-querying.
+var snapshot = list.Where(n => n % 2 == 0).ToList();
+
+// The same query against a database is translated to SQL (IQueryable),
+// so the filtering happens on the server:
+//   var users = db.Users.Where(u => u.IsActive).OrderBy(u => u.Name).Take(10).ToList();
+//   -> SELECT TOP 10 ... WHERE IsActive = 1 ORDER BY Name
+
+// This is why the order matters. Wrong:
+//   db.Users.ToList().Where(u => u.IsActive)   // downloads EVERY user, then filters
+// Right:
+//   db.Users.Where(u => u.IsActive).ToList()   // filters in the database
+
+// Custom extension methods plug straight into the chain
+public static class Extensions
+{
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
+        where T : class
+        => source.Where(x => x is not null)!;
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'Enumerating the same LINQ query twice runs it twice — twice the database round trips, twice the work. If you loop over a result more than once, call ToList() first.',
+        },
+        {
+          type: 'tip',
+          content: 'First() throws when nothing matches; FirstOrDefault() returns null/default. Use First() when a missing element is genuinely a bug, and FirstOrDefault() when absence is expected — then the throw or null tells the next reader which case it is.',
+        },
+      ],
+    },
+    {
+      slug: 'generics-interfaces',
+      title: 'Generics, Interfaces & Delegates',
+      intro: 'Generics give you reusable code without boxing or casting, interfaces define contracts, and delegates make functions into values. These three make up the vocabulary of .NET library design.',
+      sections: [
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `using System;
+using System.Collections.Generic;
+
+// A generic class with a constraint
+public class Repository<T> where T : class, IEntity
+{
+    private readonly Dictionary<int, T> _items = new();
+
+    public void Add(T item)      => _items[item.Id] = item;
+    public T? Get(int id)        => _items.TryGetValue(id, out var v) ? v : null;
+    public IEnumerable<T> All()  => _items.Values;
+    public bool Remove(int id)   => _items.Remove(id);
+}
+
+public interface IEntity { int Id { get; } }
+
+public record Product(int Id, string Name, decimal Price) : IEntity;
+
+var repo = new Repository<Product>();
+repo.Add(new Product(1, "Keyboard", 79.99m));
+Console.WriteLine(repo.Get(1)?.Name);        // Keyboard
+
+// Common constraints:
+//   where T : class          reference type
+//   where T : struct         value type
+//   where T : new()          has a parameterless constructor
+//   where T : IComparable<T> implements an interface
+//   where T : Base           derives from a class
+
+public static T Max<T>(T a, T b) where T : IComparable<T>
+    => a.CompareTo(b) >= 0 ? a : b;`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Interfaces: contracts, and the seam that makes code testable.
+public interface IClock { DateTime Now { get; } }
+public interface INotifier { Task SendAsync(string to, string message); }
+
+public class SystemClock : IClock { public DateTime Now => DateTime.UtcNow; }
+public class FakeClock : IClock { public DateTime Now { get; set; } }   // for tests
+
+public class ReminderService
+{
+    private readonly IClock _clock;
+    private readonly INotifier _notifier;
+
+    // Dependencies come in through the constructor — this is dependency injection.
+    public ReminderService(IClock clock, INotifier notifier)
+    {
+        _clock = clock;
+        _notifier = notifier;
+    }
+
+    public async Task RunAsync(IEnumerable<(string Email, DateTime Due)> tasks)
+    {
+        foreach (var (email, due) in tasks)
+            if (due <= _clock.Now)
+                await _notifier.SendAsync(email, "Your task is due");
+    }
+}
+
+// Explicit implementation when two interfaces collide
+public class Duck : IWalker, ISwimmer
+{
+    void IWalker.Move()  => Console.WriteLine("waddle");
+    void ISwimmer.Move() => Console.WriteLine("paddle");
+}
+public interface IWalker  { void Move(); }
+public interface ISwimmer { void Move(); }`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Delegates: a type-safe reference to a method.
+public delegate decimal PriceRule(decimal price);
+
+PriceRule tax      = p => p * 1.2m;
+PriceRule discount = p => p - 5m;
+
+// Built-in generic delegates — you rarely need to declare your own:
+//   Func<T, TResult>   returns a value
+//   Action<T>          returns void
+//   Predicate<T>       returns bool
+Func<int, int, int> add = (a, b) => a + b;
+Action<string> log = msg => Console.WriteLine($"[log] {msg}");
+Predicate<int> isEven = n => n % 2 == 0;
+
+// Delegates combine (multicast)
+PriceRule both = p => discount(tax(p));
+Console.WriteLine(both(100m));      // 115.0
+
+// Events: a delegate the outside world may subscribe to but not raise
+public class Downloader
+{
+    public event EventHandler<int>? ProgressChanged;
+
+    public void Download()
+    {
+        for (int i = 0; i <= 100; i += 25)
+            ProgressChanged?.Invoke(this, i);      // ?. avoids "no subscribers" crash
+    }
+}
+
+var d = new Downloader();
+d.ProgressChanged += (sender, pct) => Console.WriteLine($"{pct}%");
+d.Download();`,
+        },
+        {
+          type: 'tip',
+          content: 'Depend on interfaces at boundaries you want to swap or fake in tests (clock, file system, HTTP, email). Inside a single class, concrete types are simpler and clearer — an interface with exactly one implementation and no test double is usually noise.',
+        },
+        {
+          type: 'note',
+          content: 'Always unsubscribe from events (-=) when the subscriber outlives the publisher, or the publisher keeps the subscriber alive and you get a memory leak — the classic cause of leaks in long-running desktop apps.',
+        },
+      ],
+    },
+    {
+      slug: 'records-patterns',
+      title: 'Records, Pattern Matching & Nullable Types',
+      intro: 'Modern C# reads very differently from C# of ten years ago. Records remove boilerplate, patterns replace chains of if-else casts, and nullable reference types turn NullReferenceException into a compiler warning.',
+      sections: [
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Records: immutable value objects with equality, ToString and deconstruction
+public record Money(decimal Amount, string Currency)
+{
+    // Validation runs in the primary constructor body
+    public decimal Amount { get; init; } = Amount >= 0
+        ? Amount
+        : throw new ArgumentOutOfRangeException(nameof(Amount));
+}
+
+public record Address(string Street, string City, string Zip);
+public record Customer(int Id, string Name, Address Home);
+
+var a = new Money(10m, "EUR");
+var b = new Money(10m, "EUR");
+Console.WriteLine(a == b);          // True — value equality, not reference
+Console.WriteLine(a);               // Money { Amount = 10, Currency = EUR }
+
+// "with" makes a modified copy, leaving the original untouched
+var customer = new Customer(1, "Ada", new Address("1 Main St", "Lisbon", "1000"));
+var moved = customer with { Home = customer.Home with { City = "Porto" } };
+
+// Deconstruction
+var (id, name, _) = customer;
+Console.WriteLine($"{id} {name}");
+
+// record struct for small value types (no heap allocation)
+public readonly record struct Point(double X, double Y);`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `// Pattern matching: switch expressions replace long if/else ladders.
+abstract record Shape;
+record Circle(double Radius) : Shape;
+record Rect(double W, double H) : Shape;
+record Triangle(double Base, double Height) : Shape;
+
+static double Area(Shape shape) => shape switch
+{
+    Circle c              => Math.PI * c.Radius * c.Radius,
+    Rect { W: var w, H: var h } => w * h,
+    Triangle t            => 0.5 * t.Base * t.Height,
+    _                     => throw new ArgumentException("unknown shape"),
+};
+
+// Property, relational and logical patterns
+static string Describe(object o) => o switch
+{
+    int n when n < 0        => "negative",
+    int and > 100           => "big number",
+    int                     => "number",
+    string { Length: 0 }    => "empty string",
+    string s                => $"string of {s.Length}",
+    Circle { Radius: > 10 } => "big circle",
+    null                    => "nothing",
+    _                       => "something else",
+};
+
+// Positional patterns deconstruct records inline
+static string Quadrant(Point p) => p switch
+{
+    (0, 0)          => "origin",
+    ( > 0, > 0)     => "I",
+    ( < 0, > 0)     => "II",
+    _               => "elsewhere",
+};
+
+// is patterns in conditions
+if (o is string { Length: > 3 } text) Console.WriteLine(text.ToUpper());`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `#nullable enable        // on by default in new projects
+
+// The ? is now part of the type: string vs string?
+string definitelyThere = "hi";
+string? maybeMissing = null;
+
+// Console.WriteLine(maybeMissing.Length);   // warning: possible null dereference
+
+if (maybeMissing is not null)
+    Console.WriteLine(maybeMissing.Length);  // fine — the compiler narrowed it
+
+// Null-handling operators
+string display = maybeMissing ?? "(none)";        // null-coalescing
+maybeMissing ??= "default";                       // assign only if null
+int? len = maybeMissing?.Length;                  // null-conditional
+string forced = maybeMissing!;                    // "trust me" — use sparingly
+
+// Guard clauses
+static void Send(string? email)
+{
+    ArgumentException.ThrowIfNullOrWhiteSpace(email);   // .NET 8+
+    Console.WriteLine(email.ToUpper());                 // no warning after the guard
+}
+
+// required members must be set at construction
+public class Config
+{
+    public required string ConnectionString { get; init; }
+    public int Timeout { get; init; } = 30;
+}
+var cfg = new Config { ConnectionString = "..." };   // omitting it is a compile error`,
+        },
+        {
+          type: 'warning',
+          content: 'The null-forgiving operator (!) silences the compiler without changing anything at runtime. Each one is a place where you promised something the compiler could not verify — if you are wrong, you get the NullReferenceException you were trying to avoid.',
+        },
+        {
+          type: 'tip',
+          content: 'Turn nullable reference types on in every new project (<Nullable>enable</Nullable>). On an existing codebase, enable it per file with #nullable enable and migrate gradually rather than drowning in thousands of warnings at once.',
+        },
+      ],
+    },
+    {
+      slug: 'files-and-json',
+      title: 'Files, JSON & HTTP',
+      intro: 'The three things nearly every C# program does: read and write files, serialize objects to JSON, and call an HTTP API. All three have a modern built-in answer in .NET.',
+      sections: [
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `using System.IO;
+using System.Text;
+
+// Whole-file helpers
+await File.WriteAllTextAsync("notes.txt", "first line\\nsecond line\\n");
+string content = await File.ReadAllTextAsync("notes.txt");
+string[] lines = await File.ReadAllLinesAsync("notes.txt");
+await File.AppendAllTextAsync("notes.txt", "third line\\n");
+
+// Streaming a large file — constant memory
+await foreach (string line in File.ReadLinesAsync("huge.log"))
+{
+    if (line.Contains("ERROR")) Console.WriteLine(line);
+}
+
+// Writers and using declarations (disposed at end of scope)
+using var writer = new StreamWriter("out.csv", append: false, Encoding.UTF8);
+await writer.WriteLineAsync("id,name");
+await writer.WriteLineAsync("1,Ada");
+
+// Paths — never concatenate with "/" by hand
+string path = Path.Combine(AppContext.BaseDirectory, "data", "report.csv");
+Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+Console.WriteLine(Path.GetExtension(path));       // .csv
+Console.WriteLine(File.Exists(path));
+
+foreach (var file in Directory.EnumerateFiles("data", "*.csv", SearchOption.AllDirectories))
+    Console.WriteLine(file);`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `using System.Text.Json;
+using System.Text.Json.Serialization;
+
+public record Todo(int Id, string Title, bool Completed)
+{
+    [JsonPropertyName("due_date")]
+    public DateOnly? DueDate { get; init; }
+
+    [JsonIgnore]
+    public string Internal { get; init; } = "";
+}
+
+var options = new JsonSerializerOptions
+{
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+    WriteIndented = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+};
+
+var todo = new Todo(1, "Write docs", false) { DueDate = new DateOnly(2026, 9, 1) };
+
+string json = JsonSerializer.Serialize(todo, options);
+Console.WriteLine(json);
+
+Todo? back = JsonSerializer.Deserialize<Todo>(json, options);
+
+// Straight to and from a file, without building the whole string
+await using (var fs = File.Create("todo.json"))
+    await JsonSerializer.SerializeAsync(fs, todo, options);
+
+await using (var fs = File.OpenRead("todo.json"))
+{
+    var loaded = await JsonSerializer.DeserializeAsync<Todo>(fs, options);
+    Console.WriteLine(loaded?.Title);
+}`,
+        },
+        {
+          type: 'code',
+          language: 'csharp',
+          content: `using System.Net.Http;
+using System.Net.Http.Json;
+
+// Create ONE HttpClient and reuse it. A new one per request exhausts sockets.
+static readonly HttpClient Http = new()
+{
+    BaseAddress = new Uri("https://api.example.com/"),
+    Timeout = TimeSpan.FromSeconds(10),
+};
+
+// GET and deserialize in one call
+var todos = await Http.GetFromJsonAsync<List<Todo>>("todos");
+
+// POST an object as JSON
+var response = await Http.PostAsJsonAsync("todos", new Todo(0, "New task", false));
+response.EnsureSuccessStatusCode();               // throws on 4xx/5xx
+var created = await response.Content.ReadFromJsonAsync<Todo>();
+
+// Full control plus cancellation
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+using var request = new HttpRequestMessage(HttpMethod.Get, "todos/1");
+request.Headers.Add("Authorization", "Bearer token123");
+
+try
+{
+    using var res = await Http.SendAsync(request, cts.Token);
+    Console.WriteLine((int)res.StatusCode);
+    Console.WriteLine(await res.Content.ReadAsStringAsync(cts.Token));
+}
+catch (TaskCanceledException)
+{
+    Console.WriteLine("request timed out");
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'Creating a new HttpClient per request is the classic .NET production bug: each one holds its socket open in TIME_WAIT and the app eventually fails with "SocketException: address already in use". Use a static instance, or IHttpClientFactory in ASP.NET Core.',
+        },
+        {
+          type: 'note',
+          content: 'System.Text.Json is case-sensitive by default and will silently leave properties at their default value if the casing does not match. Set PropertyNameCaseInsensitive = true, or a naming policy, when consuming an API you do not control.',
+        },
+      ],
+    },
   ],
 }

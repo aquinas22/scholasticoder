@@ -1206,5 +1206,351 @@ def dot_product(a: Vector, b: Vector) -> float:
         },
       ],
     },
+    {
+      slug: 'iterators-generators',
+      title: 'Iterators & Generators',
+      intro: 'A list holds every element in memory at once. A generator produces elements one at a time, on demand — which means you can iterate over a 40 GB log file, or an infinite sequence, using a few kilobytes of RAM.',
+      sections: [
+        {
+          type: 'text',
+          content: 'Every for loop in Python is powered by the iterator protocol: iter() gets an iterator, next() pulls the next value, and StopIteration signals the end. Generators let you write an iterator without writing a class.',
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# The protocol, by hand
+nums = [1, 2, 3]
+it = iter(nums)
+print(next(it))   # 1
+print(next(it))   # 2
+print(next(it))   # 3
+# next(it) now raises StopIteration
+
+# A generator function — "yield" instead of "return"
+def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+    print("liftoff!")
+
+for x in countdown(3):
+    print(x)      # 3, 2, 1  then "liftoff!"
+
+# Execution PAUSES at each yield and resumes on the next next() call.
+gen = countdown(2)
+print(next(gen))  # 2   — body runs up to the first yield, then freezes
+print(next(gen))  # 1
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# Generator expressions — like a list comprehension with () instead of []
+squares_list = [x * x for x in range(1_000_000)]   # ~40 MB in memory
+squares_gen  = (x * x for x in range(1_000_000))   # a few hundred bytes
+
+print(sum(squares_gen))   # streams through, never materializes the list
+
+# Reading a huge file line by line without loading it all
+def read_lines(path):
+    with open(path) as f:
+        for line in f:          # file objects are already iterators
+            yield line.rstrip()
+
+def only_errors(lines):
+    for line in lines:
+        if "ERROR" in line:
+            yield line
+
+# Pipelines compose: each stage pulls one item at a time
+# for err in only_errors(read_lines("app.log")):
+#     print(err)
+
+# Infinite generators are fine — just do not call list() on them
+def naturals():
+    n = 0
+    while True:
+        yield n
+        n += 1
+
+from itertools import islice
+print(list(islice(naturals(), 5)))   # [0, 1, 2, 3, 4]
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from itertools import chain, groupby, count, cycle, takewhile
+
+# itertools is the standard library's generator toolbox
+print(list(chain([1, 2], [3, 4])))            # [1, 2, 3, 4]
+print(list(takewhile(lambda n: n < 5, count()))) # [0, 1, 2, 3, 4]
+
+# yield from — delegate to another generator
+def flatten(nested):
+    for item in nested:
+        if isinstance(item, list):
+            yield from flatten(item)
+        else:
+            yield item
+
+print(list(flatten([1, [2, [3, [4]]], 5])))   # [1, 2, 3, 4, 5]
+
+# A custom iterator class (when you need extra state or methods)
+class Fibonacci:
+    def __init__(self, limit):
+        self.limit = limit
+
+    def __iter__(self):
+        a, b = 0, 1
+        for _ in range(self.limit):
+            yield a
+            a, b = b, a + b
+
+print(list(Fibonacci(8)))   # [0, 1, 1, 2, 3, 5, 8, 13]
+`,
+        },
+        {
+          type: 'warning',
+          content: 'A generator is exhausted after one full pass. Iterating it a second time yields nothing — no error, just an empty loop. If you need the values twice, call list() on it once and reuse the list.',
+        },
+        {
+          type: 'tip',
+          content: 'Rule of thumb: if you only loop over a result once, make it a generator. If you index into it, len() it, or loop twice, make it a list.',
+        },
+      ],
+    },
+    {
+      slug: 'async-python',
+      title: 'Async & Concurrency',
+      intro: 'Most programs spend their time waiting — on the network, on the disk, on a database. asyncio lets a single thread start hundreds of waits at once and handle whichever finishes first, turning ten sequential one-second requests into one second total.',
+      sections: [
+        {
+          type: 'code',
+          language: 'python',
+          content: `import asyncio, time
+
+async def fetch(name, seconds):
+    print(f"start {name}")
+    await asyncio.sleep(seconds)     # yields control while waiting
+    print(f"done {name}")
+    return f"{name}-result"
+
+async def sequential():
+    a = await fetch("a", 1)
+    b = await fetch("b", 1)
+    return [a, b]                    # takes ~2 seconds
+
+async def concurrent():
+    return await asyncio.gather(
+        fetch("a", 1),
+        fetch("b", 1),
+    )                                # takes ~1 second
+
+start = time.perf_counter()
+print(asyncio.run(concurrent()))
+print(f"{time.perf_counter() - start:.2f}s")
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import asyncio
+
+# Tasks run in the background as soon as they are created
+async def worker(n):
+    await asyncio.sleep(n * 0.1)
+    return n * n
+
+async def main():
+    # TaskGroup (3.11+) — the modern way; cancels siblings if one fails
+    async with asyncio.TaskGroup() as tg:
+        tasks = [tg.create_task(worker(i)) for i in range(5)]
+    print([t.result() for t in tasks])   # [0, 1, 4, 9, 16]
+
+    # Timeouts
+    try:
+        await asyncio.wait_for(asyncio.sleep(10), timeout=0.5)
+    except asyncio.TimeoutError:
+        print("gave up waiting")
+
+    # Bounding concurrency so you do not open 5000 sockets at once
+    sem = asyncio.Semaphore(10)
+    async def limited(i):
+        async with sem:
+            return await worker(i)
+
+    results = await asyncio.gather(*(limited(i) for i in range(100)))
+    print(len(results))
+
+asyncio.run(main())
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import asyncio
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+# Three kinds of concurrency, three right answers:
+#
+#   asyncio      -> many I/O waits, one thread     (network, sockets, DB)
+#   threads      -> blocking I/O in libraries that are not async-aware
+#   processes    -> CPU-bound work (bypasses the GIL)
+
+def cpu_heavy(n):
+    return sum(i * i for i in range(n))
+
+def blocking_io():
+    import time; time.sleep(1); return "io done"
+
+async def main():
+    loop = asyncio.get_running_loop()
+
+    # Push blocking work off the event loop so it stays responsive
+    with ThreadPoolExecutor() as pool:
+        print(await loop.run_in_executor(pool, blocking_io))
+
+    with ProcessPoolExecutor() as pool:
+        results = await asyncio.gather(*(
+            loop.run_in_executor(pool, cpu_heavy, 1_000_000)
+            for _ in range(4)
+        ))
+        print(results[0])
+
+asyncio.run(main())
+`,
+        },
+        {
+          type: 'warning',
+          content: 'Never call a blocking function (time.sleep, requests.get, a synchronous DB driver) inside an async function. It freezes the entire event loop — every other task stops until it returns. Use the async equivalent (asyncio.sleep, httpx, asyncpg) or run_in_executor.',
+        },
+        {
+          type: 'note',
+          content: 'Calling an async function without await does nothing — it just builds a coroutine object and Python warns "coroutine was never awaited". Every async call needs an await, a create_task, or a gather.',
+        },
+      ],
+    },
+    {
+      slug: 'testing-and-tooling',
+      title: 'Testing, Virtual Environments & Packaging',
+      intro: 'Code that is not tested is code you are afraid to change. This lesson covers the practical toolchain around real Python projects: isolated environments, pytest, and a pyproject.toml that makes your code installable.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `# Virtual environments — one isolated set of packages per project
+python -m venv .venv
+source .venv/bin/activate        # macOS / Linux
+.venv\\Scripts\\activate           # Windows PowerShell
+
+pip install pytest requests
+pip freeze > requirements.txt    # snapshot exact versions
+pip install -r requirements.txt  # reproduce elsewhere
+deactivate
+
+# uv — a much faster modern replacement for pip + venv
+# uv venv && uv pip install pytest
+# uv run pytest
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# calculator.py
+def divide(a, b):
+    if b == 0:
+        raise ValueError("cannot divide by zero")
+    return a / b
+
+def apply_discount(price, percent):
+    if not 0 <= percent <= 100:
+        raise ValueError("percent must be 0-100")
+    return round(price * (1 - percent / 100), 2)
+
+
+# test_calculator.py  — pytest finds files named test_*.py
+import pytest
+from calculator import divide, apply_discount
+
+def test_divide_basic():
+    assert divide(10, 2) == 5
+
+def test_divide_by_zero_raises():
+    with pytest.raises(ValueError, match="divide by zero"):
+        divide(1, 0)
+
+# One test body, many cases
+@pytest.mark.parametrize("price,percent,expected", [
+    (100, 0,   100.00),
+    (100, 25,   75.00),
+    (19.99, 10, 17.99),
+])
+def test_discount(price, percent, expected):
+    assert apply_discount(price, percent) == expected
+`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# Fixtures build the world your test needs, then tear it down
+import pytest, json
+
+@pytest.fixture
+def sample_config(tmp_path):
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps({"debug": True, "retries": 3}))
+    return path            # tmp_path is deleted automatically after the test
+
+def test_reads_config(sample_config):
+    data = json.loads(sample_config.read_text())
+    assert data["retries"] == 3
+
+# Replacing a real dependency with a fake
+def get_user(client, user_id):
+    return client.fetch(f"/users/{user_id}")
+
+class FakeClient:
+    def fetch(self, path):
+        return {"path": path, "name": "Alice"}
+
+def test_get_user_uses_correct_path():
+    assert get_user(FakeClient(), 7)["path"] == "/users/7"
+`,
+        },
+        {
+          type: 'code',
+          language: 'bash',
+          content: `pytest                    # run everything
+pytest -v                 # one line per test
+pytest -k discount        # only tests whose name matches "discount"
+pytest -x                 # stop at the first failure
+pytest --lf               # rerun only last failures
+pytest --cov=mypackage    # coverage report (pip install pytest-cov)
+
+# pyproject.toml — the modern project manifest
+# [project]
+# name = "mypackage"
+# version = "0.1.0"
+# requires-python = ">=3.11"
+# dependencies = ["requests>=2.31"]
+#
+# [build-system]
+# requires = ["hatchling"]
+# build-backend = "hatchling.build"
+
+pip install -e .          # install your own project in editable mode
+`,
+        },
+        {
+          type: 'tip',
+          content: 'Write the test first when fixing a bug: reproduce the failure in a test, watch it fail, then fix the code and watch it pass. You end up with proof the bug is gone and a guard against it returning.',
+        },
+        {
+          type: 'note',
+          content: 'Add ruff (linter + formatter) and mypy (type checker) to any serious project. "ruff check --fix ." and "ruff format ." handle style so code review can focus on logic.',
+        },
+      ],
+    },
   ],
 }

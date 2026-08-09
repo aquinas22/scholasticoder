@@ -369,5 +369,435 @@ cursor.execute("SELECT * FROM users WHERE name = ?", (name,))`,
         },
       ],
     },
+    {
+      slug: 'subqueries-and-ctes',
+      title: 'Subqueries & CTEs',
+      intro: 'When one query needs the answer to another query, you have two options: nest it as a subquery, or name it up front as a CTE. CTEs read top to bottom like a recipe, which is why they win for anything non-trivial.',
+      sections: [
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Scalar subquery: returns exactly one value
+SELECT name, price,
+       (SELECT AVG(price) FROM products) AS avg_price
+FROM products
+WHERE price > (SELECT AVG(price) FROM products);
+
+-- IN: does this value appear in that result set?
+SELECT name
+FROM customers
+WHERE id IN (SELECT customer_id FROM orders WHERE total > 500);
+
+-- EXISTS: usually faster, and it stops at the first match
+SELECT c.name
+FROM customers c
+WHERE EXISTS (
+    SELECT 1 FROM orders o
+    WHERE o.customer_id = c.id AND o.total > 500
+);
+
+-- NOT EXISTS: customers who have never ordered
+SELECT c.name
+FROM customers c
+WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id);
+
+-- Derived table: a subquery in the FROM clause (it needs an alias)
+SELECT region, order_count
+FROM (
+    SELECT region, COUNT(*) AS order_count
+    FROM orders
+    GROUP BY region
+) AS totals
+WHERE order_count > 10;`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- A CTE names a result set so you can read the query in order.
+WITH monthly_sales AS (
+    SELECT
+        customer_id,
+        DATE_TRUNC('month', created_at) AS month,
+        SUM(total) AS revenue
+    FROM orders
+    WHERE created_at >= '2026-01-01'
+    GROUP BY customer_id, DATE_TRUNC('month', created_at)
+),
+customer_totals AS (
+    SELECT customer_id, SUM(revenue) AS lifetime_value
+    FROM monthly_sales
+    GROUP BY customer_id
+),
+tiers AS (
+    SELECT
+        customer_id,
+        lifetime_value,
+        CASE
+            WHEN lifetime_value >= 10000 THEN 'platinum'
+            WHEN lifetime_value >=  2000 THEN 'gold'
+            ELSE 'standard'
+        END AS tier
+    FROM customer_totals
+)
+SELECT c.name, t.tier, t.lifetime_value
+FROM tiers t
+JOIN customers c ON c.id = t.customer_id
+WHERE t.tier <> 'standard'
+ORDER BY t.lifetime_value DESC;`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Recursive CTEs walk hierarchies: org charts, category trees, graphs.
+WITH RECURSIVE org_chart AS (
+    -- Anchor: where the walk starts
+    SELECT id, name, manager_id, 1 AS depth, name AS path
+    FROM employees
+    WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- Recursive step: joins back onto the CTE itself
+    SELECT e.id, e.name, e.manager_id, oc.depth + 1, oc.path || ' > ' || e.name
+    FROM employees e
+    JOIN org_chart oc ON e.manager_id = oc.id
+    WHERE oc.depth < 10                 -- always bound the recursion
+)
+SELECT depth, path
+FROM org_chart
+ORDER BY path;
+
+-- Generating a series of dates to fill gaps in a report
+WITH RECURSIVE days AS (
+    SELECT DATE '2026-01-01' AS day
+    UNION ALL
+    SELECT day + INTERVAL '1 day' FROM days WHERE day < DATE '2026-01-31'
+)
+SELECT d.day, COALESCE(SUM(o.total), 0) AS revenue
+FROM days d
+LEFT JOIN orders o ON DATE(o.created_at) = d.day
+GROUP BY d.day
+ORDER BY d.day;`,
+        },
+        {
+          type: 'warning',
+          content: 'A correlated subquery in the SELECT list runs once per output row. On a million-row result that is a million extra queries. Rewrite it as a JOIN or a CTE aggregated once, and compare with EXPLAIN.',
+        },
+        {
+          type: 'note',
+          content: 'NOT IN with a subquery that can produce NULL returns no rows at all, because "x NOT IN (1, NULL)" evaluates to unknown. Use NOT EXISTS instead — it is both safer and usually faster.',
+        },
+      ],
+    },
+    {
+      slug: 'window-functions',
+      title: 'Window Functions',
+      intro: 'GROUP BY collapses rows. A window function computes across a set of rows while keeping every row — which is how you get running totals, rankings, and "compare this row to the previous one" in plain SQL.',
+      sections: [
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- The shape: function() OVER (PARTITION BY ... ORDER BY ...)
+SELECT
+    name,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department)          AS dept_avg,
+    salary - AVG(salary) OVER (PARTITION BY department) AS diff_from_avg,
+    COUNT(*)   OVER (PARTITION BY department)           AS dept_size,
+    SUM(salary) OVER ()                                 AS company_payroll
+FROM employees;
+
+-- PARTITION BY splits the rows into groups; without it the window is everything.
+-- Unlike GROUP BY, every original row is still in the output.
+
+-- Ranking
+SELECT
+    name, department, salary,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS row_num,
+    RANK()       OVER (PARTITION BY department ORDER BY salary DESC) AS rank,
+    DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dense_rank,
+    NTILE(4)     OVER (ORDER BY salary DESC)                         AS quartile
+FROM employees;
+
+-- ROW_NUMBER: 1,2,3,4    always unique
+-- RANK:       1,2,2,4    ties share, then it skips
+-- DENSE_RANK: 1,2,2,3    ties share, no gap`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- "Top N per group" — the classic use of ROW_NUMBER
+WITH ranked AS (
+    SELECT
+        name, department, salary,
+        ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rn
+    FROM employees
+)
+SELECT name, department, salary
+FROM ranked
+WHERE rn <= 3;             -- top 3 earners in each department
+
+-- Comparing a row to its neighbours
+SELECT
+    day,
+    revenue,
+    LAG(revenue, 1)  OVER (ORDER BY day) AS previous_day,
+    LEAD(revenue, 1) OVER (ORDER BY day) AS next_day,
+    revenue - LAG(revenue) OVER (ORDER BY day) AS change,
+    ROUND(100.0 * (revenue - LAG(revenue) OVER (ORDER BY day))
+          / NULLIF(LAG(revenue) OVER (ORDER BY day), 0), 1) AS pct_change,
+    FIRST_VALUE(revenue) OVER (ORDER BY day) AS first_day_revenue
+FROM daily_sales
+ORDER BY day;`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Frames control WHICH rows in the partition are included.
+SELECT
+    day,
+    revenue,
+
+    -- Running total: everything from the start up to this row
+    SUM(revenue) OVER (
+        ORDER BY day
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_total,
+
+    -- 7-day moving average
+    AVG(revenue) OVER (
+        ORDER BY day
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+    ) AS avg_7day,
+
+    -- Centred 3-day window
+    AVG(revenue) OVER (
+        ORDER BY day
+        ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+    ) AS avg_centered,
+
+    -- Share of the grand total
+    ROUND(100.0 * revenue / SUM(revenue) OVER (), 2) AS pct_of_total
+FROM daily_sales;
+
+-- Reusable window definitions with a WINDOW clause
+SELECT
+    day,
+    SUM(revenue) OVER w AS running_total,
+    AVG(revenue) OVER w AS running_avg
+FROM daily_sales
+WINDOW w AS (ORDER BY day ROWS UNBOUNDED PRECEDING);`,
+        },
+        {
+          type: 'warning',
+          content: 'Window functions are evaluated after WHERE and GROUP BY, so you cannot filter on one in the WHERE clause. Wrap the query in a CTE or subquery and filter on the outer level — that is why the "top N per group" pattern always has two levels.',
+        },
+        {
+          type: 'tip',
+          content: 'Adding ORDER BY inside OVER() silently changes the default frame to "start of partition through current row". That is exactly what you want for a running total and exactly wrong for a partition-wide average — so state the frame explicitly whenever it matters.',
+        },
+      ],
+    },
+    {
+      slug: 'schema-design',
+      title: 'Schema Design & Constraints',
+      intro: 'The database is the last line of defence for your data. Application code has bugs, scripts get run by hand, and a second service will eventually write to the same table — constraints are what keep the data honest through all of it.',
+      sections: [
+        {
+          type: 'code',
+          language: 'sql',
+          content: `CREATE TABLE customers (
+    id          BIGSERIAL PRIMARY KEY,
+    email       TEXT        NOT NULL UNIQUE,
+    name        TEXT        NOT NULL,
+    country     CHAR(2)     NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT email_format CHECK (email LIKE '%_@_%.__%')
+);
+
+CREATE TABLE orders (
+    id           BIGSERIAL PRIMARY KEY,
+    customer_id  BIGINT      NOT NULL,
+    status       TEXT        NOT NULL DEFAULT 'pending',
+    total        NUMERIC(12,2) NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_customer
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        ON DELETE CASCADE,          -- delete the customer, delete their orders
+                                    -- alternatives: RESTRICT, SET NULL, NO ACTION
+    CONSTRAINT positive_total CHECK (total >= 0),
+    CONSTRAINT valid_status  CHECK (status IN ('pending','paid','shipped','cancelled'))
+);
+
+-- Many-to-many needs a join table with a composite primary key
+CREATE TABLE order_items (
+    order_id   BIGINT NOT NULL REFERENCES orders(id)   ON DELETE CASCADE,
+    product_id BIGINT NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+    quantity   INT    NOT NULL CHECK (quantity > 0),
+    unit_price NUMERIC(12,2) NOT NULL,
+    PRIMARY KEY (order_id, product_id)
+);`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Normalization: store each fact exactly once.
+
+-- BAD: repeated data, no single source of truth
+-- orders(id, customer_name, customer_email, customer_country, product_name, price)
+--   * changing an email means updating every one of that customer's orders
+--   * two rows can disagree about the same customer
+--   * a customer with no orders cannot exist at all
+
+-- GOOD: one table per entity, linked by keys
+-- customers(id, name, email, country)
+-- products(id, name, price)
+-- orders(id, customer_id, created_at)
+-- order_items(order_id, product_id, quantity, unit_price)
+
+-- Note that order_items stores unit_price even though products has a price.
+-- That is deliberate, not duplication: an order must remember what was charged
+-- AT THE TIME, even after the product price changes.
+
+-- Deliberate denormalization for read speed — keep it explicit and derived:
+ALTER TABLE orders ADD COLUMN item_count INT NOT NULL DEFAULT 0;
+-- ... maintained by a trigger or by the application, and rebuildable from
+-- order_items at any time.`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Changing a live schema: additive first, destructive later.
+ALTER TABLE customers ADD COLUMN phone TEXT;                    -- safe
+ALTER TABLE customers ALTER COLUMN name SET NOT NULL;           -- needs a backfill first
+ALTER TABLE customers RENAME COLUMN country TO country_code;    -- breaks old code
+ALTER TABLE customers DROP COLUMN phone;                        -- irreversible
+
+-- Add a constraint without locking the table for hours (Postgres)
+ALTER TABLE orders ADD CONSTRAINT total_sane CHECK (total < 1000000) NOT VALID;
+ALTER TABLE orders VALIDATE CONSTRAINT total_sane;
+
+-- Useful column types
+--   BIGSERIAL / IDENTITY   auto-incrementing keys
+--   UUID                   keys generated by the client
+--   NUMERIC(12,2)          money. NEVER use FLOAT for money.
+--   TIMESTAMPTZ            an instant. Store UTC, format on display.
+--   TEXT                   strings (no reason to guess a VARCHAR length)
+--   JSONB                  semi-structured data you also want to query
+--   BOOLEAN                a flag; NOT NULL DEFAULT FALSE
+
+-- Soft deletes keep history but every query must now filter
+ALTER TABLE customers ADD COLUMN deleted_at TIMESTAMPTZ;
+CREATE INDEX idx_customers_active ON customers(id) WHERE deleted_at IS NULL;`,
+        },
+        {
+          type: 'warning',
+          content: 'Never store money in FLOAT or DOUBLE. 0.1 + 0.2 is not 0.3 in binary floating point, and the cents drift as they accumulate. Use NUMERIC/DECIMAL, or store integer cents.',
+        },
+        {
+          type: 'tip',
+          content: 'Write migrations as small, forward-only, reviewable steps, and test each one against a copy of production data. "Add column, backfill, start writing, start reading, drop the old column" is five deploys — and it never takes the site down.',
+        },
+      ],
+    },
+    {
+      slug: 'query-performance',
+      title: 'Query Performance & EXPLAIN',
+      intro: 'A query that returns in 5 ms on your laptop can take 30 seconds on production data. EXPLAIN shows you what the database actually plans to do — the difference between guessing and knowing.',
+      sections: [
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- EXPLAIN shows the plan; ANALYZE actually runs it and reports real timings.
+EXPLAIN ANALYZE
+SELECT c.name, COUNT(o.id) AS orders
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE c.country_code = 'PT'
+GROUP BY c.name;
+
+-- What to look for in the output:
+--
+--   Seq Scan on orders          -> reading EVERY row. Fine on 500 rows,
+--                                  a red flag on 50 million.
+--   Index Scan using idx_...    -> using an index. Usually what you want.
+--   Bitmap Heap Scan            -> index found many rows, then fetched them.
+--   Nested Loop                 -> good for small inputs, terrible for large ones.
+--   Hash Join / Merge Join      -> the usual choice for big joins.
+--   rows=1000 ... actual rows=2000000
+--                               -> the estimate is way off; run ANALYZE on the
+--                                  table so the planner has fresh statistics.
+--   Rows Removed by Filter      -> work done and thrown away: index the filter.`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Index the columns you filter, join and sort on.
+CREATE INDEX idx_orders_customer   ON orders(customer_id);
+CREATE INDEX idx_orders_created    ON orders(created_at DESC);
+
+-- Composite index: order matters. This serves
+--   WHERE customer_id = ?
+--   WHERE customer_id = ? AND status = ?
+--   WHERE customer_id = ? AND status = ? ORDER BY created_at DESC
+-- but NOT a query filtering only on status.
+CREATE INDEX idx_orders_lookup ON orders(customer_id, status, created_at DESC);
+
+-- Partial index: smaller and faster when you always filter the same way
+CREATE INDEX idx_orders_pending ON orders(created_at)
+WHERE status = 'pending';
+
+-- Covering index: the query is answered from the index alone (an "index-only scan")
+CREATE INDEX idx_orders_covering ON orders(customer_id) INCLUDE (total, status);
+
+-- Indexes are not free: every INSERT, UPDATE and DELETE has to maintain them,
+-- and they take disk space. Find the ones nobody uses:
+SELECT relname, indexrelname, idx_scan
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+ORDER BY relname;`,
+        },
+        {
+          type: 'code',
+          language: 'sql',
+          content: `-- Patterns that silently disable an index:
+
+-- BAD: a function on the indexed column
+SELECT * FROM users WHERE LOWER(email) = 'ada@example.com';
+-- FIX: index the expression instead
+CREATE INDEX idx_users_email_lower ON users(LOWER(email));
+
+-- BAD: leading wildcard cannot use a normal B-tree index
+SELECT * FROM products WHERE name LIKE '%phone%';
+-- FIX: a trigram index or a full-text search column
+CREATE INDEX idx_products_name_trgm ON products USING GIN (name gin_trgm_ops);
+
+-- BAD: arithmetic on the column
+SELECT * FROM orders WHERE total * 1.23 > 100;
+-- FIX: move the maths to the other side
+SELECT * FROM orders WHERE total > 100 / 1.23;
+
+-- BAD: SELECT * when you need two columns — more I/O, no index-only scan
+SELECT * FROM orders WHERE customer_id = 42;
+SELECT id, total FROM orders WHERE customer_id = 42;   -- better
+
+-- BAD: OFFSET paging deep into a large table (it still reads every skipped row)
+SELECT * FROM orders ORDER BY id LIMIT 20 OFFSET 100000;
+-- FIX: keyset pagination
+SELECT * FROM orders WHERE id > 100000 ORDER BY id LIMIT 20;`,
+        },
+        {
+          type: 'warning',
+          content: 'The N+1 query problem is the most common performance bug in application code: fetch 100 orders, then loop and fetch each customer separately. That is 101 round trips. One JOIN, or one WHERE id IN (...), replaces all of them.',
+        },
+        {
+          type: 'note',
+          content: 'Optimize with real data volumes. A sequential scan over 1000 rows is faster than an index lookup, so the planner is right to choose it — and a query tuned against an empty test database teaches you nothing.',
+        },
+      ],
+    },
   ],
 }

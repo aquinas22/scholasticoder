@@ -49,8 +49,8 @@ export function Navigation() {
             gap: '0.4rem',
           }}
         >
-          <span style={{ color: 'var(--accent)', fontFamily: 'monospace' }}>&gt;_</span>
-          ScholastiCoder
+          <span className="nav-seal">学</span>
+          <span>Scholasti<span style={{ color: 'var(--accent)' }}>Coder</span></span>
         </Link>
 
         {/* Desktop nav */}

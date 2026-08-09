@@ -683,5 +683,635 @@ export default WeatherDashboard`,
         },
       ],
     },
+    {
+      slug: 'lists-and-conditionals',
+      title: 'Lists, Keys & Conditional Rendering',
+      intro: 'Rendering an array is where React apps spend most of their JSX — and where the two most common bugs live: a missing key, and a condition that renders a stray 0 on the page.',
+      sections: [
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `function TodoList({ todos, filter }) {
+  const visible = todos.filter(t =>
+    filter === 'all' ? true : filter === 'done' ? t.done : !t.done
+  )
+
+  return (
+    <ul>
+      {visible.map(todo => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
+    </ul>
+  )
+}
+
+// The key tells React which item is which between renders.
+// Use a STABLE id from your data. The array index works only if the list
+// is never reordered, filtered, or inserted into — which is rarely true.
+
+// Wrong: state and DOM follow the position, not the item
+{todos.map((todo, i) => <TodoItem key={i} todo={todo} />)}
+
+// Also wrong: a new key every render remounts the whole row every time
+{todos.map(todo => <TodoItem key={Math.random()} todo={todo} />)}
+
+// Right
+{todos.map(todo => <TodoItem key={todo.id} todo={todo} />)}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `function Dashboard({ user, notifications, error, isLoading }) {
+  // Early returns keep the happy path flat and readable
+  if (isLoading) return <Spinner />
+  if (error) return <ErrorBanner message={error.message} />
+  if (!user) return <LoginPrompt />
+
+  return (
+    <div>
+      {/* Ternary for either/or */}
+      {user.isAdmin ? <AdminPanel /> : <UserPanel />}
+
+      {/* && for "render this or nothing" */}
+      {notifications.length > 0 && <Badge count={notifications.length} />}
+
+      {/* CAREFUL: 0 is falsy but React RENDERS it. This prints a bare "0". */}
+      {notifications.length && <Badge count={notifications.length} />}
+
+      {/* Fixes: force a boolean, or use a ternary */}
+      {notifications.length > 0 && <Badge count={notifications.length} />}
+      {notifications.length ? <Badge count={notifications.length} /> : null}
+
+      {/* Nullish values render nothing: null, undefined, false, "" */}
+      {user.bio ?? <em>No bio yet</em>}
+
+      {/* Fragments group without adding a DOM node */}
+      <>
+        <h2>{user.name}</h2>
+        <p>{user.email}</p>
+      </>
+    </div>
+  )
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `// Empty, loading and error states are part of the component, not an afterthought.
+function SearchResults({ query, results, status }) {
+  if (status === 'idle')    return <p>Type to search.</p>
+  if (status === 'loading') return <SkeletonList count={5} />
+  if (status === 'error')   return <p role="alert">Something went wrong.</p>
+  if (results.length === 0) return <p>No results for "{query}".</p>
+
+  return (
+    <ol>
+      {results.map(r => (
+        <li key={r.id}>
+          <a href={r.url}>{r.title}</a>
+          {r.isNew && <span className="badge">New</span>}
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+// Rendering a lookup table instead of a switch
+const ICONS = { success: '✓', warning: '!', error: '×' }
+
+function Alert({ type = 'success', children }) {
+  return (
+    <div className={\`alert alert-\${type}\`}>
+      <span aria-hidden="true">{ICONS[type]}</span>
+      {children}
+    </div>
+  )
+}
+
+// Grouped lists: build the groups first, render second
+function GroupedTodos({ todos }) {
+  const groups = Object.groupBy(todos, t => t.category)
+  return Object.entries(groups).map(([category, items]) => (
+    <section key={category}>
+      <h3>{category}</h3>
+      <ul>{items.map(t => <li key={t.id}>{t.title}</li>)}</ul>
+    </section>
+  ))
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'Using the array index as a key breaks any list the user can reorder, sort, or delete from: React reuses the wrong DOM node, and typed text or focus jumps to the neighbouring row. If your items have no id, add one when you create them.',
+        },
+        {
+          type: 'tip',
+          content: 'Do the filtering and sorting during render from props and state — never store a derived list in its own useState. Two sources of truth for the same data always drift apart.',
+        },
+      ],
+    },
+    {
+      slug: 'forms',
+      title: 'Forms & User Input',
+      intro: 'Forms are where React\'s "state is the source of truth" model pays off most — and where beginners write the most boilerplate. One state object and one change handler cover almost every form you will build.',
+      sections: [
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useState } from 'react'
+
+function SignupForm({ onSubmit }) {
+  const [form, setForm] = useState({ email: '', password: '', plan: 'free', terms: false })
+  const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+
+  // One handler for every field, keyed by the input's name attribute
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target
+    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+  }
+
+  function validate(values) {
+    const next = {}
+    if (!values.email.includes('@')) next.email = 'Enter a valid email'
+    if (values.password.length < 8)  next.password = 'At least 8 characters'
+    if (!values.terms)               next.terms = 'You must accept the terms'
+    return next
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()                    // stop the browser from reloading the page
+    const found = validate(form)
+    setErrors(found)
+    if (Object.keys(found).length > 0) return
+
+    setSubmitting(true)
+    try {
+      await onSubmit(form)
+      setForm({ email: '', password: '', plan: 'free', terms: false })
+    } catch (err) {
+      setErrors({ form: err.message })
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate>
+      <label htmlFor="email">Email</label>
+      <input id="email" name="email" type="email"
+             value={form.email} onChange={handleChange}
+             aria-invalid={!!errors.email} />
+      {errors.email && <p role="alert">{errors.email}</p>}
+
+      <label htmlFor="password">Password</label>
+      <input id="password" name="password" type="password"
+             value={form.password} onChange={handleChange} />
+      {errors.password && <p role="alert">{errors.password}</p>}
+
+      <select name="plan" value={form.plan} onChange={handleChange}>
+        <option value="free">Free</option>
+        <option value="pro">Pro</option>
+      </select>
+
+      <label>
+        <input name="terms" type="checkbox"
+               checked={form.terms} onChange={handleChange} />
+        I accept the terms
+      </label>
+      {errors.terms && <p role="alert">{errors.terms}</p>}
+
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Creating...' : 'Create account'}
+      </button>
+      {errors.form && <p role="alert">{errors.form}</p>}
+    </form>
+  )
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useState, useRef } from 'react'
+
+// Controlled: React state is the value. Predictable, validates as you type.
+function Controlled() {
+  const [value, setValue] = useState('')
+  return <input value={value} onChange={e => setValue(e.target.value.toUpperCase())} />
+}
+
+// Uncontrolled: the DOM keeps the value, you read it on submit. Less code,
+// fewer renders — good for simple forms and for file inputs (which MUST be
+// uncontrolled).
+function Uncontrolled() {
+  const fileRef = useRef(null)
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)     // reads every named field
+    console.log(Object.fromEntries(data))
+    console.log(fileRef.current.files[0])
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="title" defaultValue="Untitled" />   {/* defaultValue, not value */}
+      <input name="upload" type="file" ref={fileRef} />
+      <button>Save</button>
+    </form>
+  )
+}
+
+// Dynamic field lists
+function TagEditor() {
+  const [tags, setTags] = useState([''])
+
+  const update = (i, v) => setTags(tags.map((t, idx) => (idx === i ? v : t)))
+  const remove = i => setTags(tags.filter((_, idx) => idx !== i))
+
+  return (
+    <>
+      {tags.map((tag, i) => (
+        <div key={i}>
+          <input value={tag} onChange={e => update(i, e.target.value)} />
+          <button type="button" onClick={() => remove(i)}>Remove</button>
+        </div>
+      ))}
+      <button type="button" onClick={() => setTags([...tags, ''])}>Add tag</button>
+    </>
+  )
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useState, useEffect, useMemo } from 'react'
+
+// Debouncing: wait for the user to stop typing before doing expensive work
+function useDebounced(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(timer)      // cancel on every new keystroke
+  }, [value, delay])
+
+  return debounced
+}
+
+function SearchBox({ onSearch }) {
+  const [query, setQuery] = useState('')
+  const debouncedQuery = useDebounced(query, 400)
+
+  useEffect(() => {
+    if (debouncedQuery) onSearch(debouncedQuery)
+  }, [debouncedQuery, onSearch])
+
+  return (
+    <input
+      type="search"
+      value={query}
+      onChange={e => setQuery(e.target.value)}
+      placeholder="Search..."
+      aria-label="Search"
+    />
+  )
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'An input with value but no onChange is read-only and React warns about it. If you want a starting value the user can edit freely, use defaultValue (uncontrolled) instead of value.',
+        },
+        {
+          type: 'tip',
+          content: 'Always call e.preventDefault() in a submit handler, and put the submit logic on the form\'s onSubmit rather than the button\'s onClick — that way Enter in a text field submits too, which is what users expect.',
+        },
+      ],
+    },
+    {
+      slug: 'usereducer-and-state-patterns',
+      title: 'useReducer & State Patterns',
+      intro: 'When five useState calls have to change together, they will eventually get out of sync. useReducer puts every transition in one place, so an impossible state becomes impossible to write.',
+      sections: [
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useReducer } from 'react'
+
+// The reducer is a pure function: (state, action) => new state.
+// No fetching, no timers, no mutation — just the next state.
+const initialState = { items: [], filter: 'all', draft: '' }
+
+function todosReducer(state, action) {
+  switch (action.type) {
+    case 'draft_changed':
+      return { ...state, draft: action.value }
+
+    case 'added':
+      if (!state.draft.trim()) return state
+      return {
+        ...state,
+        draft: '',
+        items: [...state.items, { id: crypto.randomUUID(), title: state.draft, done: false }],
+      }
+
+    case 'toggled':
+      return {
+        ...state,
+        items: state.items.map(t => (t.id === action.id ? { ...t, done: !t.done } : t)),
+      }
+
+    case 'deleted':
+      return { ...state, items: state.items.filter(t => t.id !== action.id) }
+
+    case 'filter_changed':
+      return { ...state, filter: action.filter }
+
+    default:
+      throw new Error('Unknown action: ' + action.type)
+  }
+}
+
+function Todos() {
+  const [state, dispatch] = useReducer(todosReducer, initialState)
+
+  const visible = state.items.filter(t =>
+    state.filter === 'all' ? true : state.filter === 'done' ? t.done : !t.done
+  )
+
+  return (
+    <>
+      <form onSubmit={e => { e.preventDefault(); dispatch({ type: 'added' }) }}>
+        <input
+          value={state.draft}
+          onChange={e => dispatch({ type: 'draft_changed', value: e.target.value })}
+        />
+        <button>Add</button>
+      </form>
+
+      <ul>
+        {visible.map(todo => (
+          <li key={todo.id}>
+            <input type="checkbox" checked={todo.done}
+                   onChange={() => dispatch({ type: 'toggled', id: todo.id })} />
+            {todo.title}
+            <button onClick={() => dispatch({ type: 'deleted', id: todo.id })}>×</button>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useReducer, useEffect } from 'react'
+
+// Model state as a state MACHINE so impossible combinations cannot exist.
+
+// Fragile: isLoading && error && data can all be true at once.
+// const [data, setData] = useState(null)
+// const [isLoading, setIsLoading] = useState(false)
+// const [error, setError] = useState(null)
+
+// Solid: exactly one status at a time.
+const initial = { status: 'idle', data: null, error: null }
+
+function fetchReducer(state, action) {
+  switch (action.type) {
+    case 'fetch_started':   return { status: 'loading', data: null, error: null }
+    case 'fetch_succeeded': return { status: 'success', data: action.data, error: null }
+    case 'fetch_failed':    return { status: 'error',   data: null, error: action.error }
+    case 'reset':           return initial
+    default:                return state
+  }
+}
+
+function useFetchReducer(url) {
+  const [state, dispatch] = useReducer(fetchReducer, initial)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    dispatch({ type: 'fetch_started' })
+
+    fetch(url, { signal: controller.signal })
+      .then(r => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      .then(data => dispatch({ type: 'fetch_succeeded', data }))
+      .catch(error => {
+        if (error.name !== 'AbortError') dispatch({ type: 'fetch_failed', error })
+      })
+
+    return () => controller.abort()
+  }, [url])
+
+  return state
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { createContext, useContext, useReducer } from 'react'
+
+// Reducer + Context = shared state without prop drilling and without a library.
+const CartContext = createContext(null)
+const CartDispatchContext = createContext(null)
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case 'added': {
+      const existing = state.items.find(i => i.id === action.item.id)
+      return existing
+        ? { ...state, items: state.items.map(i =>
+              i.id === action.item.id ? { ...i, qty: i.qty + 1 } : i) }
+        : { ...state, items: [...state.items, { ...action.item, qty: 1 }] }
+    }
+    case 'removed':
+      return { ...state, items: state.items.filter(i => i.id !== action.id) }
+    case 'cleared':
+      return { items: [] }
+    default:
+      return state
+  }
+}
+
+export function CartProvider({ children }) {
+  const [cart, dispatch] = useReducer(cartReducer, { items: [] })
+  // Two contexts: components that only dispatch do not re-render when the cart changes.
+  return (
+    <CartContext.Provider value={cart}>
+      <CartDispatchContext.Provider value={dispatch}>
+        {children}
+      </CartDispatchContext.Provider>
+    </CartContext.Provider>
+  )
+}
+
+export const useCart = () => useContext(CartContext)
+export const useCartDispatch = () => useContext(CartDispatchContext)
+
+function AddToCartButton({ product }) {
+  const dispatch = useCartDispatch()
+  return <button onClick={() => dispatch({ type: 'added', item: product })}>Add</button>
+}`,
+        },
+        {
+          type: 'note',
+          content: 'Reducers must stay pure: same state plus same action gives the same result, with no mutation and no side effects. That is what makes them trivial to unit test — no React, no rendering, just a function call.',
+        },
+        {
+          type: 'tip',
+          content: 'Name actions after what HAPPENED ("added", "filter_changed"), not after what the reducer should do ("setItems"). The event log then reads like a description of user behaviour, and one action can update several fields at once.',
+        },
+      ],
+    },
+    {
+      slug: 'performance',
+      title: 'Performance: memo, useMemo & useCallback',
+      intro: 'React is fast by default. Optimize only what you have measured — but when a list of a thousand rows re-renders on every keystroke, these three tools are the fix.',
+      sections: [
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { memo, useMemo, useCallback, useState } from 'react'
+
+// memo skips re-rendering a component when its props are shallowly equal.
+const Row = memo(function Row({ item, onSelect }) {
+  console.log('rendering', item.id)
+  return <li onClick={() => onSelect(item.id)}>{item.name}</li>
+})
+
+function List({ items }) {
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState(null)
+
+  // useMemo: skip an expensive calculation when its inputs have not changed.
+  const filtered = useMemo(
+    () => items.filter(i => i.name.toLowerCase().includes(query.toLowerCase())),
+    [items, query]
+  )
+
+  // useCallback: keep the SAME function identity between renders, so the
+  // memoized Row above actually stays memoized.
+  const handleSelect = useCallback(id => setSelected(id), [])
+
+  return (
+    <>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      <ul>
+        {filtered.map(item => (
+          <Row key={item.id} item={item} onSelect={handleSelect} />
+        ))}
+      </ul>
+    </>
+  )
+}
+
+// Without useCallback, handleSelect is a NEW function every render, so every
+// Row gets a new prop, so memo never skips anything. memo and useCallback
+// only work as a pair.`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useState, lazy, Suspense } from 'react'
+
+// The cheapest optimizations are structural — no hooks required.
+
+// 1. Move state DOWN so fewer components re-render.
+function SlowPage() {
+  const [text, setText] = useState('')     // every keystroke re-renders ExpensiveTree
+  return (
+    <>
+      <input value={text} onChange={e => setText(e.target.value)} />
+      <ExpensiveTree />
+    </>
+  )
+}
+
+function FastPage() {
+  return (
+    <>
+      <TextField />          {/* state lives here now */}
+      <ExpensiveTree />      {/* untouched by typing */}
+    </>
+  )
+}
+
+// 2. Pass expensive subtrees as children so they keep the same element identity.
+function Wrapper({ children }) {
+  const [count, setCount] = useState(0)
+  return (
+    <div onClick={() => setCount(count + 1)}>
+      {count}
+      {children}             {/* does not re-render when count changes */}
+    </div>
+  )
+}
+
+// 3. Lazy-load routes and heavy components
+const Chart = lazy(() => import('./Chart'))
+
+function Report() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <Chart />
+    </Suspense>
+  )
+}`,
+        },
+        {
+          type: 'code',
+          language: 'jsx',
+          content: `import { useState, useDeferredValue, useTransition, memo } from 'react'
+
+// useDeferredValue: keep the input responsive while a heavy list catches up.
+function SearchPage({ allItems }) {
+  const [query, setQuery] = useState('')
+  const deferredQuery = useDeferredValue(query)
+  const isStale = query !== deferredQuery
+
+  return (
+    <>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      <div style={{ opacity: isStale ? 0.6 : 1 }}>
+        <ExpensiveResults query={deferredQuery} items={allItems} />
+      </div>
+    </>
+  )
+}
+
+const ExpensiveResults = memo(function ExpensiveResults({ query, items }) {
+  const results = items.filter(i => i.name.includes(query))
+  return <ul>{results.map(r => <li key={r.id}>{r.name}</li>)}</ul>
+})
+
+// useTransition: mark an update as low priority so urgent ones interrupt it.
+function TabBar() {
+  const [tab, setTab] = useState('home')
+  const [isPending, startTransition] = useTransition()
+
+  function select(next) {
+    startTransition(() => setTab(next))    // the click feedback stays instant
+  }
+
+  return (
+    <>
+      <button onClick={() => select('reports')}>Reports</button>
+      {isPending && <Spinner />}
+      <TabPanel tab={tab} />
+    </>
+  )
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'Wrapping everything in useMemo and useCallback makes code slower and harder to read: each one costs a comparison and keeps its dependencies alive. Profile first with the React DevTools Profiler, then memoize the component that actually shows up.',
+        },
+        {
+          type: 'note',
+          content: 'The React Compiler (React 19) inserts most of this memoization automatically. If your project has it enabled, write the plain version and let the compiler do the work — hand-written useMemo becomes the exception, not the rule.',
+        },
+      ],
+    },
   ],
 }

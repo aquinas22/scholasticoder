@@ -624,5 +624,525 @@ cargo run -- 15 % 7`,
         },
       ],
     },
+    {
+      slug: 'collections-iterators',
+      title: 'Collections & Iterators',
+      intro: 'Rust\'s iterators are zero-cost: a chain of map, filter and sum compiles down to the same machine code as the hand-written loop, with none of the off-by-one risk.',
+      sections: [
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::collections::{HashMap, HashSet, BTreeMap, VecDeque};
+
+fn main() {
+    // Vec — growable array, the workhorse
+    let mut nums = vec![3, 1, 4, 1, 5];
+    nums.push(9);
+    nums.sort();
+    nums.dedup();
+    println!("{:?}", nums);                 // [1, 3, 4, 5, 9]
+    println!("{:?}", nums.first());         // Some(1)  — never panics
+    println!("{:?}", nums.get(99));         // None     — unlike nums[99]
+
+    // HashMap
+    let mut scores: HashMap<String, i32> = HashMap::new();
+    scores.insert("ada".to_string(), 10);
+
+    // entry() is the idiomatic get-or-insert
+    *scores.entry("ada".into()).or_insert(0) += 5;
+    *scores.entry("bob".into()).or_insert(0) += 1;
+    println!("{:?}", scores.get("ada"));    // Some(15)
+
+    for (name, score) in &scores {
+        println!("{name}: {score}");
+    }
+
+    // HashSet for membership, BTreeMap for sorted keys, VecDeque for a queue
+    let seen: HashSet<i32> = nums.iter().copied().collect();
+    let sorted: BTreeMap<&str, i32> = BTreeMap::from([("b", 2), ("a", 1)]);
+    let mut queue: VecDeque<i32> = VecDeque::from([1, 2, 3]);
+    queue.push_back(4);
+    println!("{:?} {:?} {:?}", seen.contains(&4), sorted.keys().collect::<Vec<_>>(), queue.pop_front());
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `#[derive(Debug, Clone)]
+struct Order { customer: String, region: String, total: f64 }
+
+fn main() {
+    let orders = vec![
+        Order { customer: "Ada".into(),  region: "EU".into(), total: 120.5 },
+        Order { customer: "Bob".into(),  region: "US".into(), total: 45.0 },
+        Order { customer: "Cleo".into(), region: "EU".into(), total: 310.75 },
+    ];
+
+    // Three ways to iterate — the difference is ownership:
+    //   .iter()      -> &T      borrow each item
+    //   .iter_mut()  -> &mut T  borrow mutably
+    //   .into_iter() -> T       consume the collection
+    let total: f64 = orders.iter().map(|o| o.total).sum();
+    println!("{total:.2}");                          // 476.25
+
+    let eu_names: Vec<&str> = orders
+        .iter()
+        .filter(|o| o.region == "EU")
+        .map(|o| o.customer.as_str())
+        .collect();
+    println!("{eu_names:?}");                        // ["Ada", "Cleo"]
+
+    // Nothing runs until a consuming adapter: collect, sum, count, for_each, fold
+    let biggest = orders.iter().max_by(|a, b| a.total.total_cmp(&b.total));
+    println!("{:?}", biggest.map(|o| &o.customer));
+
+    let summary = orders.iter().fold(String::new(), |mut acc, o| {
+        acc.push_str(&format!("{} ", o.customer));
+        acc
+    });
+    println!("{}", summary.trim());
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::collections::HashMap;
+
+fn main() {
+    let words = ["apple", "banana", "avocado", "blueberry", "cherry"];
+
+    // Grouping
+    let mut by_letter: HashMap<char, Vec<&str>> = HashMap::new();
+    for w in words {
+        by_letter.entry(w.chars().next().unwrap()).or_default().push(w);
+    }
+    println!("{:?}", by_letter.get(&'a'));      // Some(["apple", "avocado"])
+
+    // The adapters worth memorising
+    let nums: Vec<i32> = (1..=10).collect();
+    println!("{:?}", nums.iter().enumerate().take(2).collect::<Vec<_>>());
+    println!("{:?}", nums.iter().zip("abc".chars()).collect::<Vec<_>>());
+    println!("{:?}", nums.iter().skip(8).collect::<Vec<_>>());
+    println!("{:?}", nums.chunks(3).next());
+    println!("{:?}", nums.windows(2).next());
+    println!("{}",   nums.iter().any(|&n| n > 9));
+    println!("{}",   nums.iter().all(|&n| n > 0));
+    println!("{:?}", nums.iter().position(|&n| n == 7));
+    println!("{:?}", nums.iter().rev().take(3).collect::<Vec<_>>());
+
+    // filter_map: filter and transform in one pass
+    let inputs = ["1", "two", "3"];
+    let parsed: Vec<i32> = inputs.iter().filter_map(|s| s.parse().ok()).collect();
+    println!("{parsed:?}");                     // [1, 3]
+
+    // collect into a Result: fails fast if ANY item fails
+    let all: Result<Vec<i32>, _> = inputs.iter().map(|s| s.parse::<i32>()).collect();
+    println!("{}", all.is_err());               // true
+}`,
+        },
+        {
+          type: 'tip',
+          content: 'If the compiler cannot infer what collect() should build, tell it: either "let v: Vec<_> = ...collect();" or the turbofish "...collect::<Vec<_>>()". Both are common in real Rust code.',
+        },
+        {
+          type: 'note',
+          content: 'Indexing with nums[i] panics when out of range. nums.get(i) returns Option<&T> instead — prefer it anywhere the index comes from user input or arithmetic.',
+        },
+      ],
+    },
+    {
+      slug: 'lifetimes-generics',
+      title: 'Generics & Lifetimes',
+      intro: 'Generics let one function serve many types; lifetimes let the compiler prove that every reference outlives the thing it points at. Lifetimes look alien for a week and then become invisible.',
+      sections: [
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::fmt::Display;
+
+// Generic function with trait bounds
+fn largest<T: PartialOrd + Copy>(items: &[T]) -> T {
+    let mut best = items[0];
+    for &item in items {
+        if item > best { best = item; }
+    }
+    best
+}
+
+// where clauses keep complicated signatures readable
+fn describe<T, U>(a: T, b: U) -> String
+where
+    T: Display + Clone,
+    U: Display,
+{
+    format!("{a} and {b}")
+}
+
+// Generic struct with methods
+struct Pair<T> { left: T, right: T }
+
+impl<T: PartialOrd + Display> Pair<T> {
+    fn new(left: T, right: T) -> Self { Self { left, right } }
+
+    fn larger(&self) -> &T {
+        if self.left > self.right { &self.left } else { &self.right }
+    }
+}
+
+fn main() {
+    println!("{}", largest(&[1, 5, 3]));
+    println!("{}", largest(&[1.2, 0.4]));
+    println!("{}", describe("x", 42));
+    println!("{}", Pair::new(3, 9).larger());
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `// A lifetime annotation does NOT change how long anything lives.
+// It tells the compiler how the lifetimes of inputs and outputs RELATE.
+
+// "The returned reference lives as long as the shorter of a and b."
+fn longest<'a>(a: &'a str, b: &'a str) -> &'a str {
+    if a.len() >= b.len() { a } else { b }
+}
+
+// Without the annotation the compiler cannot know which input the result
+// borrows from, and refuses to compile.
+
+// Structs holding references need a lifetime parameter
+struct Parser<'a> {
+    input: &'a str,
+    position: usize,
+}
+
+impl<'a> Parser<'a> {
+    fn new(input: &'a str) -> Self { Parser { input, position: 0 } }
+
+    fn next_word(&mut self) -> Option<&'a str> {
+        let rest = &self.input[self.position..];
+        let trimmed = rest.trim_start();
+        if trimmed.is_empty() { return None; }
+        let skipped = rest.len() - trimmed.len();
+        let end = trimmed.find(' ').unwrap_or(trimmed.len());
+        self.position += skipped + end;
+        Some(&trimmed[..end])
+    }
+}
+
+fn main() {
+    let text = String::from("hello brave new world");
+    let mut parser = Parser::new(&text);
+    while let Some(word) = parser.next_word() {
+        println!("{word}");
+    }
+    println!("{}", longest("short", "much longer"));
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::fmt;
+
+// Traits define shared behaviour; impl blocks provide it.
+trait Shape {
+    fn area(&self) -> f64;
+    fn name(&self) -> String { "shape".to_string() }   // default method
+}
+
+struct Circle { radius: f64 }
+struct Square { side: f64 }
+
+impl Shape for Circle {
+    fn area(&self) -> f64 { std::f64::consts::PI * self.radius * self.radius }
+    fn name(&self) -> String { "circle".into() }
+}
+impl Shape for Square {
+    fn area(&self) -> f64 { self.side * self.side }
+}
+
+// Static dispatch: one specialized copy per type, no runtime cost
+fn print_area(shape: &impl Shape) { println!("{}: {:.2}", shape.name(), shape.area()); }
+
+// Dynamic dispatch: one function, a vtable lookup at runtime — needed for mixed collections
+fn total_area(shapes: &[Box<dyn Shape>]) -> f64 {
+    shapes.iter().map(|s| s.area()).sum()
+}
+
+// Implementing standard traits unlocks language features
+impl fmt::Display for Circle {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Circle(r={})", self.radius)
+    }
+}
+
+fn main() {
+    let shapes: Vec<Box<dyn Shape>> = vec![
+        Box::new(Circle { radius: 1.0 }),
+        Box::new(Square { side: 2.0 }),
+    ];
+    print_area(&Circle { radius: 2.0 });
+    println!("{:.2}", total_area(&shapes));
+    println!("{}", Circle { radius: 3.0 });
+}`,
+        },
+        {
+          type: 'note',
+          content: 'Most functions need no lifetime annotations at all — the compiler elides them. You only write them when a function takes several references and returns one, or when a struct stores a reference.',
+        },
+        {
+          type: 'tip',
+          content: 'Fighting the borrow checker over a struct full of references? Storing owned values (String instead of &str, Vec<T> instead of &[T]) is usually the right call. Optimize to borrows later, once the design has settled.',
+        },
+      ],
+    },
+    {
+      slug: 'modules-cargo',
+      title: 'Modules, Crates & Cargo',
+      intro: 'Cargo is build system, package manager, test runner and doc generator in one binary. Combined with the module system it makes Rust projects unusually consistent from repo to repo.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `cargo new myapp           # binary project
+cargo new mylib --lib      # library project
+cargo add serde --features derive
+cargo add tokio --features full
+
+cargo run                  # build + run (debug)
+cargo build --release      # optimized build in target/release
+cargo test                 # run all tests
+cargo check                # type-check only, much faster than build
+cargo clippy               # the linter. Listen to it, it is usually right.
+cargo fmt                  # canonical formatting
+cargo doc --open           # build and read your own API docs
+
+# Cargo.toml
+# [package]
+# name = "myapp"
+# version = "0.1.0"
+# edition = "2021"
+#
+# [dependencies]
+# serde = { version = "1", features = ["derive"] }
+# anyhow = "1"
+#
+# [dev-dependencies]
+# criterion = "0.5"`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `// src/lib.rs — the crate root
+pub mod store {                     // an inline module
+    #[derive(Debug)]
+    pub struct Item {
+        pub name: String,           // pub on the field too, or it stays private
+        quantity: u32,              // private to this module
+    }
+
+    impl Item {
+        pub fn new(name: &str, quantity: u32) -> Self {
+            Self { name: name.to_string(), quantity }
+        }
+        pub fn quantity(&self) -> u32 { self.quantity }
+    }
+
+    pub mod pricing {               // nested module
+        pub fn with_tax(amount: f64) -> f64 { amount * 1.23 }
+
+        pub(crate) fn internal_rate() -> f64 { 0.23 }   // visible inside this crate only
+    }
+}
+
+// Bringing things into scope
+use store::{Item, pricing::with_tax};
+
+pub fn demo() {
+    let item = Item::new("keyboard", 3);
+    println!("{} x{} -> {:.2}", item.name, item.quantity(), with_tax(79.0));
+}
+
+// File-based modules: "mod store;" in lib.rs looks for
+//   src/store.rs   or   src/store/mod.rs
+// and nested modules live in src/store/pricing.rs`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `/// Adds two numbers.
+///
+/// # Examples
+///
+/// \`\`\`
+/// assert_eq!(myapp::add(2, 3), 5);
+/// \`\`\`
+pub fn add(a: i32, b: i32) -> i32 { a + b }
+
+pub fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 { return Err("division by zero".into()); }
+    Ok(a / b)
+}
+
+// Unit tests live in the same file, in a module compiled only for tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn adds_numbers() {
+        assert_eq!(add(2, 3), 5);
+    }
+
+    #[test]
+    fn divides() {
+        assert!(divide(1.0, 0.0).is_err());
+        assert_eq!(divide(10.0, 4.0).unwrap(), 2.5);
+    }
+
+    #[test]
+    #[should_panic(expected = "index out of bounds")]
+    fn panics_on_bad_index() {
+        let v: Vec<i32> = vec![];
+        let _ = v[0];
+    }
+}
+
+// Integration tests go in tests/*.rs and see only the PUBLIC API.
+// Doc examples in /// comments are compiled and run by "cargo test" too.`,
+        },
+        {
+          type: 'note',
+          content: 'Everything in Rust is private by default, including struct fields and enum-free functions. pub exposes an item to the parent module, pub(crate) to the whole crate, and plain pub in lib.rs to the outside world.',
+        },
+        {
+          type: 'tip',
+          content: 'Run cargo clippy before every commit. Its suggestions are not style nitpicks — it catches redundant clones, needless allocations and genuine logic errors.',
+        },
+      ],
+    },
+    {
+      slug: 'concurrency-rust',
+      title: 'Concurrency & Smart Pointers',
+      intro: 'Rust calls this "fearless concurrency": data races are a compile error, not a production incident. The ownership rules you already learned are exactly what makes that possible.',
+      sections: [
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::thread;
+use std::sync::mpsc;
+use std::time::Duration;
+
+fn main() {
+    // Threads: move takes ownership of what the closure captures
+    let data = vec![1, 2, 3];
+    let handle = thread::spawn(move || {
+        println!("{:?}", data);
+        data.iter().sum::<i32>()
+    });
+    let sum = handle.join().unwrap();     // join returns the closure's value
+    println!("sum = {sum}");
+
+    // Channels: multiple producers, single consumer
+    let (tx, rx) = mpsc::channel();
+    for id in 0..3 {
+        let tx = tx.clone();
+        thread::spawn(move || {
+            thread::sleep(Duration::from_millis(50 * id));
+            tx.send(format!("worker {id} done")).unwrap();
+        });
+    }
+    drop(tx);                              // drop the last sender so rx can finish
+
+    for msg in rx {                        // iterates until every sender is gone
+        println!("{msg}");
+    }
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::sync::{Arc, Mutex, RwLock};
+use std::thread;
+
+fn main() {
+    // Arc = Atomically Reference Counted: shared ownership across threads.
+    // Mutex = mutual exclusion: one writer at a time.
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..8 {
+        let counter = Arc::clone(&counter);     // clones the HANDLE, not the data
+        handles.push(thread::spawn(move || {
+            let mut n = counter.lock().unwrap(); // blocks until the lock is free
+            *n += 1;
+        }));                                     // lock released here, automatically
+    }
+
+    for h in handles { h.join().unwrap(); }
+    println!("{}", *counter.lock().unwrap());    // always 8 — no race possible
+
+    // RwLock: many readers OR one writer
+    let cache = Arc::new(RwLock::new(vec!["a".to_string()]));
+    {
+        let read = cache.read().unwrap();
+        println!("{}", read.len());
+    }
+    cache.write().unwrap().push("b".into());
+
+    // Rc<RefCell<T>> is the single-threaded equivalent (Rc is not thread safe).
+}`,
+        },
+        {
+          type: 'code',
+          language: 'rust',
+          content: `use std::rc::Rc;
+use std::cell::RefCell;
+
+// Box<T>: a value on the heap. Needed for recursive types of unknown size.
+#[derive(Debug)]
+enum Tree {
+    Leaf(i32),
+    Node(Box<Tree>, Box<Tree>),
+}
+
+fn sum(tree: &Tree) -> i32 {
+    match tree {
+        Tree::Leaf(v) => *v,
+        Tree::Node(l, r) => sum(l) + sum(r),
+    }
+}
+
+// Rc<T>: shared ownership in one thread. RefCell<T>: borrow rules checked at RUNTIME.
+#[derive(Debug)]
+struct Account { balance: RefCell<f64> }
+
+fn main() {
+    let tree = Tree::Node(
+        Box::new(Tree::Leaf(1)),
+        Box::new(Tree::Node(Box::new(Tree::Leaf(2)), Box::new(Tree::Leaf(3)))),
+    );
+    println!("{}", sum(&tree));               // 6
+
+    let account = Rc::new(Account { balance: RefCell::new(100.0) });
+    let a = Rc::clone(&account);
+    let b = Rc::clone(&account);
+
+    *a.balance.borrow_mut() += 50.0;          // mutate through a shared reference
+    *b.balance.borrow_mut() -= 20.0;
+
+    println!("{} owners, balance {}", Rc::strong_count(&account), account.balance.borrow());
+}`,
+        },
+        {
+          type: 'warning',
+          content: 'RefCell moves the borrow check from compile time to run time: two overlapping borrow_mut() calls panic with "already borrowed". Keep the borrow scopes as short as possible, and never hold one across a function call that might borrow again.',
+        },
+        {
+          type: 'note',
+          content: 'Send means a type can be moved to another thread; Sync means it can be shared by reference. The compiler derives both automatically, which is why Rc (not thread safe) simply will not compile inside thread::spawn while Arc will.',
+        },
+      ],
+    },
   ],
 }

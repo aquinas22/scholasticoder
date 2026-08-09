@@ -855,5 +855,324 @@ main().catch(err => {
         },
       ],
     },
+    {
+      slug: 'narrowing-and-guards',
+      title: 'Narrowing & Type Guards',
+      intro: 'A value typed string | number is useless until TypeScript knows which one it is. Narrowing is how the compiler follows your control flow and shrinks a union down to a single concrete type.',
+      sections: [
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `function format(value: string | number | Date): string {
+  // typeof narrowing
+  if (typeof value === 'string') {
+    return value.toUpperCase()      // value: string here
+  }
+  if (typeof value === 'number') {
+    return value.toFixed(2)         // value: number here
+  }
+  // instanceof narrowing
+  return value.toISOString()        // value: Date — the only option left
+}
+
+// truthiness narrowing
+function greet(name?: string) {
+  if (!name) return 'Hello, stranger'
+  return \`Hello, \${name.trim()}\`     // name: string
+}
+
+// "in" narrowing for object shapes
+type Bird = { fly: () => void }
+type Fish = { swim: () => void }
+
+function move(animal: Bird | Fish) {
+  if ('fly' in animal) animal.fly()
+  else animal.swim()
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Discriminated unions — the single most useful modeling pattern in TS.
+// Every member shares a literal "tag" field the compiler can switch on.
+type Result<T> =
+  | { status: 'loading' }
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: Error }
+
+function render(result: Result<string[]>): string {
+  switch (result.status) {
+    case 'loading': return 'Spinner...'
+    case 'success': return result.data.join(', ')   // .data exists only here
+    case 'error':   return result.error.message     // .error exists only here
+  }
+}
+
+// Exhaustiveness checking: if someone adds a new variant, this fails to compile.
+function assertNever(x: never): never {
+  throw new Error('Unhandled case: ' + JSON.stringify(x))
+}
+
+function renderStrict(result: Result<string[]>): string {
+  switch (result.status) {
+    case 'loading': return 'Spinner...'
+    case 'success': return result.data.join(', ')
+    case 'error':   return result.error.message
+    default:        return assertNever(result)
+  }
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Custom type guards: a function whose return type is "arg is T"
+type User = { id: number; email: string }
+
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === 'object' && value !== null &&
+    'id' in value && typeof (value as User).id === 'number' &&
+    'email' in value && typeof (value as User).email === 'string'
+  )
+}
+
+async function loadUser(): Promise<User> {
+  const data: unknown = await fetch('/api/me').then(r => r.json())
+  if (!isUser(data)) throw new Error('API returned an unexpected shape')
+  return data                       // data: User from here on
+}
+
+// Assertion functions throw instead of returning a boolean
+function assertDefined<T>(v: T | null | undefined, name: string): asserts v is T {
+  if (v == null) throw new Error(name + ' is required')
+}
+
+function process(input?: string) {
+  assertDefined(input, 'input')
+  return input.length               // input: string — no ? needed
+}
+`,
+        },
+        {
+          type: 'warning',
+          content: 'Prefer unknown over any for values crossing your program\'s boundary (JSON, form data, third-party callbacks). any switches type checking off entirely and the mistakes leak outward; unknown forces you to prove the shape before use.',
+        },
+        {
+          type: 'note',
+          content: 'A type guard is a promise you make to the compiler, not a check it verifies. If isUser returns true for something that is not a User, TypeScript believes you and the bug surfaces at runtime. Keep guards simple, or generate them with a schema library like Zod.',
+        },
+      ],
+    },
+    {
+      slug: 'advanced-types',
+      title: 'Conditional, Mapped & Template Literal Types',
+      intro: 'TypeScript\'s type system is itself a small functional language: it has conditionals, iteration over keys, pattern matching with infer, and string manipulation. This is how utility types like Partial and ReturnType are built.',
+      sections: [
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Conditional types — "if" for types
+type IsArray<T> = T extends unknown[] ? true : false
+type A = IsArray<string[]>    // true
+type B = IsArray<number>      // false
+
+// infer pattern-matches inside a type and pulls a piece out
+type ElementOf<T> = T extends (infer U)[] ? U : never
+type C = ElementOf<string[]>            // string
+
+type AwaitedOnce<T> = T extends Promise<infer U> ? U : T
+type D = AwaitedOnce<Promise<number>>   // number
+
+// This is how ReturnType is defined in the standard library:
+type MyReturnType<T> = T extends (...args: never[]) => infer R ? R : never
+type E = MyReturnType<() => User>       // User
+
+// Conditional types distribute over unions automatically
+type NonNullish<T> = T extends null | undefined ? never : T
+type F = NonNullish<string | null | number>   // string | number
+
+type User = { id: number; name: string; email?: string }
+`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `type User = { id: number; name: string; email?: string }
+
+// Mapped types iterate over the keys of another type
+type ReadonlyDeepish<T> = { readonly [K in keyof T]: T[K] }
+type Nullable<T>        = { [K in keyof T]: T[K] | null }
+
+// Modifiers: + and - add or REMOVE readonly / optional
+type Required2<T> = { [K in keyof T]-?: T[K] }
+type Mutable<T>   = { -readonly [K in keyof T]: T[K] }
+
+type G = Required2<User>     // email is no longer optional
+
+// Key remapping with "as" — rename keys while mapping
+type Getters<T> = {
+  [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K]
+}
+type UserGetters = Getters<User>
+// { getId: () => number; getName: () => string; getEmail: () => string | undefined }
+
+// Filtering keys: map to never to drop them
+type OnlyStrings<T> = {
+  [K in keyof T as T[K] extends string ? K : never]: T[K]
+}
+type H = OnlyStrings<User>   // { name: string }
+`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Template literal types build strings at the type level
+type Method = 'get' | 'post' | 'delete'
+type Endpoint = 'users' | 'orders'
+
+type Route = \`/\${Endpoint}\`                      // "/users" | "/orders"
+type Handler = \`\${Method}\${Capitalize<Endpoint>}\`  // "getUsers" | "postUsers" | ...
+
+// Real use: type-safe event names
+type EventMap = {
+  click: { x: number; y: number }
+  keypress: { key: string }
+}
+
+class Emitter {
+  on<K extends keyof EventMap>(event: K, cb: (payload: EventMap[K]) => void) { /* ... */ }
+  emit<K extends keyof EventMap>(event: K, payload: EventMap[K]) { /* ... */ }
+}
+
+const bus = new Emitter()
+bus.on('click', p => console.log(p.x))     // p is inferred as { x, y }
+// bus.on('clik', ...)   -> error: not assignable to keyof EventMap
+// bus.emit('keypress', { x: 1 })  -> error: wrong payload shape
+
+// satisfies — check a value against a type WITHOUT widening it
+const config = {
+  port: 3000,
+  host: 'localhost',
+} satisfies Record<string, string | number>
+
+config.port.toFixed(0)   // still known to be number, not string | number
+`,
+        },
+        {
+          type: 'tip',
+          content: 'Reach for these when they remove real duplication — a shared shape across many API routes, a config object that must stay in sync with a type. A clever three-line conditional type that only you can read is worse than an explicit interface.',
+        },
+      ],
+    },
+    {
+      slug: 'modules-and-config',
+      title: 'Modules, Declaration Files & tsconfig',
+      intro: 'The type system is only half of TypeScript. The other half is the compiler configuration that decides how your code is found, checked, and emitted — and it is where most "but it works on my machine" problems live.',
+      sections: [
+        {
+          type: 'code',
+          language: 'json',
+          content: `{
+  "compilerOptions": {
+    "target": "ES2022",              // JS version to emit
+    "module": "ESNext",              // module syntax to emit
+    "moduleResolution": "bundler",   // how imports are resolved (use "node16" for Node)
+    "lib": ["ES2022", "DOM"],        // built-in APIs available
+
+    "strict": true,                  // turn this on. All of it. Day one.
+    "noUncheckedIndexedAccess": true,// arr[0] is T | undefined — catches real bugs
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,             // emit .d.ts files for library consumers
+    "sourceMap": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,            // do not type-check node_modules .d.ts files
+    "forceConsistentCasingInFileNames": true,
+
+    "paths": { "@/*": ["./src/*"] }  // import { x } from "@/utils"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Import and export forms
+export const VERSION = '1.0.0'                 // named export
+export function parse(input: string) { /* */ } // named export
+export default class Client {}                 // default export (one per file)
+
+export type { User } from './types'            // type-only re-export
+export * from './helpers'                      // re-export everything
+
+// Consuming
+import Client, { VERSION, parse } from './client'
+import type { User } from './types'            // erased at compile time
+import { type Config, loadConfig } from './config'  // inline type modifier
+
+// "import type" matters: it guarantees the import disappears from the output,
+// so importing a type never pulls a runtime module into your bundle.
+
+// Dynamic import — code splitting, loads only when the branch runs
+async function heavyWork() {
+  const { default: chart } = await import('./chart-library')
+  return chart.render()
+}
+`,
+        },
+        {
+          type: 'code',
+          language: 'typescript',
+          content: `// Declaration files (.d.ts) describe JavaScript that has no types.
+
+// types/legacy-lib.d.ts
+declare module 'legacy-lib' {
+  export interface Options { retries?: number }
+  export function connect(url: string, options?: Options): Promise<void>
+  export default function init(): void
+}
+
+// Augmenting an existing module's types
+declare module 'express' {
+  interface Request {
+    user?: { id: number; role: 'admin' | 'user' }   // your auth middleware adds this
+  }
+}
+
+// Global declarations — non-code assets and globals
+declare global {
+  interface Window { analytics?: { track(event: string): void } }
+  namespace NodeJS {
+    interface ProcessEnv {
+      DATABASE_URL: string
+      NODE_ENV: 'development' | 'production' | 'test'
+    }
+  }
+}
+declare module '*.svg' {
+  const content: string
+  export default content
+}
+
+export {}   // makes this file a module so "declare global" is legal
+`,
+        },
+        {
+          type: 'note',
+          content: 'Most popular packages ship their own types. If an import errors with "Could not find a declaration file", try npm i -D @types/<package> first — the DefinitelyTyped community maintains types for thousands of libraries. Write your own .d.ts only when neither exists.',
+        },
+        {
+          type: 'warning',
+          content: 'tsc checks types; bundlers like Vite and esbuild strip them without checking. That means a type error can still ship. Run "tsc --noEmit" in CI so your build actually fails when types are wrong.',
+        },
+      ],
+    },
   ],
 }

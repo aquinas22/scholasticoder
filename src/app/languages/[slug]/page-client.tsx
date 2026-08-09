@@ -6,6 +6,7 @@ import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useState } from 'react'
 import { CodeBlock } from '@/components/CodeBlock'
+import { getFieldGuide } from '@/content/field-guides'
 
 const SETUP_TABS = ['windows', 'mac', 'linux'] as const
 type SetupTab = typeof SETUP_TABS[number]
@@ -22,6 +23,7 @@ export default function LanguagePage() {
   if (!language) return notFound()
 
   const prog = getLangProgress(language.slug, language.lessons.length)
+  const fieldGuide = getFieldGuide(language.slug)
 
   return (
     <main style={{ maxWidth: 900, margin: '0 auto', padding: '3rem 1.5rem' }}>
@@ -173,6 +175,40 @@ export default function LanguagePage() {
           </div>
         </div>
       </div>
+
+      {fieldGuide && (
+        <section className="field-guide" aria-labelledby="field-guide-title">
+          <div className="field-guide-heading">
+            <div>
+              <p className="eyebrow"><span>F</span> Field guide</p>
+              <h2 id="field-guide-title">What you can do with {language.name}</h2>
+            </div>
+            <p>Use the ecosystem as a map, not a shopping list. Learn the core first, then reach for a tool when your project gives you a reason.</p>
+          </div>
+          <div className="field-guide-grid">
+            <article className="field-guide-card">
+              <span className="field-guide-number">I</span>
+              <h3>Practical uses</h3>
+              <ul>{fieldGuide.practicalUses.map(item => <li key={item}>{item}</li>)}</ul>
+            </article>
+            <article className="field-guide-card project-card">
+              <span className="field-guide-number">II</span>
+              <h3>Projects to build</h3>
+              <ol>{fieldGuide.projectIdeas.map((item, index) => <li key={item}><span>{index + 1}</span>{item}</li>)}</ol>
+            </article>
+            <article className="field-guide-card">
+              <span className="field-guide-number">III</span>
+              <h3>Common tools &amp; packages</h3>
+              <div className="ecosystem-tags">{fieldGuide.ecosystem.map(item => <span key={item}>{item}</span>)}</div>
+            </article>
+            <article className="field-guide-card">
+              <span className="field-guide-number">IV</span>
+              <h3>Notable software</h3>
+              <div className="software-list">{fieldGuide.popularSoftware.map(item => <span key={item}>{item}</span>)}</div>
+            </article>
+          </div>
+        </section>
+      )}
 
       {/* Setup */}
       <section style={{ marginBottom: '2.5rem' }}>

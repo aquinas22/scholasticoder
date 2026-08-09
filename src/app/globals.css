@@ -186,6 +186,27 @@ body::before {
 .monk-footer { border-top: 1px solid var(--border); padding: 2.5rem max(1.5rem, calc((100vw - 1160px) / 2)); display: flex; align-items: center; gap: 1rem; color: var(--text-muted); }
 .monk-footer p { margin: 0; line-height: 1.4; }.monk-footer strong { color: var(--text); }.monk-footer a { margin-left: auto; color: var(--accent); text-decoration: none; font-weight: 700; }
 
+.field-guide { margin: 0 0 3rem; }
+.field-guide-heading { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: end; margin-bottom: 1.25rem; }
+.field-guide-heading h2 { margin: .65rem 0 0; font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.05 Georgia, serif; letter-spacing: -.025em; }
+.field-guide-heading > p { margin: 0; color: var(--text-muted); font-size: .86rem; line-height: 1.65; }
+.field-guide-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.field-guide-card { position: relative; min-height: 220px; padding: 1.5rem; overflow: hidden; background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px solid var(--border); border-radius: 4px; }
+.field-guide-card::after { content: ''; position: absolute; inset: 6px; border: 1px solid color-mix(in srgb, var(--border) 42%, transparent); pointer-events: none; }
+.field-guide-number { position: absolute; top: 1rem; right: 1.2rem; color: color-mix(in srgb, var(--accent) 50%, var(--border)); font: italic 1rem Georgia, serif; }
+.field-guide-card h3 { position: relative; z-index: 1; margin: 0 0 1rem; font-family: var(--font-syne); font-size: 1rem; }
+.field-guide-card ul { position: relative; z-index: 1; margin: 0; padding: 0; list-style: none; }
+.field-guide-card ul li { position: relative; padding: .42rem 0 .42rem 1.1rem; color: var(--text-muted); font-size: .82rem; line-height: 1.4; border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent); }
+.field-guide-card ul li:last-child { border: 0; }
+.field-guide-card ul li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: 800; }
+.project-card ol { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; }
+.project-card li { display: flex; align-items: center; gap: .65rem; color: var(--text-muted); font-size: .82rem; }
+.project-card li > span { display: grid; place-items: center; width: 1.45rem; height: 1.45rem; flex: 0 0 auto; border: 1px solid var(--border); border-radius: 50%; color: var(--accent); font: .65rem var(--font-mono); }
+.ecosystem-tags { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: .45rem; }
+.ecosystem-tags span { padding: .38rem .6rem; border: 1px solid var(--border); border-radius: 3px; background: var(--card); color: var(--text); font: .7rem var(--font-mono); }
+.software-list { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+.software-list span { color: var(--text-muted); font-size: .82rem; padding-bottom: .45rem; border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent); }
+
 @media (max-width: 800px) {
   .monk-hero { min-height: 720px; align-items: flex-end; padding-bottom: 5rem; }
   .monk-hero-art { object-position: 64% center; }
@@ -201,6 +222,8 @@ body::before {
   .section-wrap, .monk-hero-content { width: min(100% - 2rem, 1160px); }
   .way-section, .paths-section { padding: 4.5rem 0; }
   .monk-footer { align-items: flex-start; flex-wrap: wrap; }.monk-footer a { width: 100%; margin: .5rem 0 0 46px; }
+  .field-guide-heading, .field-guide-grid { grid-template-columns: 1fr; }
+  .field-guide-heading { gap: 1rem; }
 }
 
 /* Selection */

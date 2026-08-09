@@ -23,7 +23,7 @@ export default function HomePage() {
         <Image src={monkHero} alt="A Benedictine monk studying code in a Romanesque abbey scriptorium" fill priority sizes="100vw" className="monk-hero-art" />
         <div className="monk-hero-wash" />
         <div className="monk-hero-content">
-          <p className="eyebrow"><span>SC</span> The open-source coding scriptorium</p>
+          <p className="eyebrow"><span aria-hidden="true">☧</span> The open-source coding scriptorium</p>
           <h1>Study the logic.<br /><em>Practice the craft.</em></h1>
           <p className="hero-copy">A quiet place for disciplined study. Follow carefully ordered paths through programming, the web, and computer science—without paywalls or distractions.</p>
           <div className="hero-actions">
@@ -74,7 +74,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="monk-footer"><span className="footer-seal">SC</span><p><strong>ScholastiCoder</strong><br /><em>Ora et labora.</em> Study deeply. Build patiently.</p><Link href="/languages">All disciplines →</Link></footer>
+      <footer className="monk-footer"><span className="footer-seal" aria-hidden="true">☧</span><p><strong>ScholastiCoder</strong><br /><em>Ora et labora.</em> Study deeply. Build patiently.</p><Link href="/languages">All disciplines →</Link></footer>
     </main>
   )
 }

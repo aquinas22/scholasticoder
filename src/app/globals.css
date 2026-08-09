@@ -121,7 +121,7 @@ body::before {
   background: var(--accent);
   border-radius: 4px;
   font-family: Georgia, serif;
-  font-size: .63rem;
+  font-size: 1.4rem;
   font-weight: 700;
   transform: rotate(-2deg);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, white 22%, transparent);
@@ -136,7 +136,7 @@ body::before {
 .monk-hero-content { width: min(1160px, calc(100% - 3rem)); margin: 0 auto; padding-bottom: 2rem; }
 .monk-hero-content > * { max-width: 650px; }
 .eyebrow { display: flex; align-items: center; gap: .65rem; color: var(--accent); font-family: var(--font-mono); font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-.eyebrow span { display: inline-grid; place-items: center; min-width: 1.65rem; min-height: 1.65rem; font-family: Georgia, serif; font-size: .7rem; border: 1px solid currentColor; padding: .18rem; line-height: 1; }
+.eyebrow span { display: inline-grid; place-items: center; min-width: 1.65rem; min-height: 1.65rem; font-family: Georgia, serif; font-size: 1.15rem; border: 1px solid currentColor; padding: .18rem; line-height: 1; }
 .monk-hero h1 { color: #25221c; font-family: var(--font-syne); font-weight: 700; font-size: clamp(3.5rem, 7vw, 6.4rem); letter-spacing: -.055em; line-height: .88; margin: 1.5rem 0; text-wrap: balance; }
 .dark .monk-hero h1 { color: #f3ebdb; }
 .monk-hero h1 em { color: var(--accent); font-family: Georgia, serif; font-weight: 400; }

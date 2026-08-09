@@ -49,7 +49,7 @@ export function Navigation() {
             gap: '0.4rem',
           }}
         >
-          <span className="nav-seal">学</span>
+          <span className="nav-seal">SC</span>
           <span>Scholasti<span style={{ color: 'var(--accent)' }}>Coder</span></span>
         </Link>
 

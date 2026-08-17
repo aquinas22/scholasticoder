@@ -1552,5 +1552,815 @@ pip install -e .          # install your own project in editable mode
         },
       ],
     },
+    {
+      slug: 'package-field-guide',
+      title: 'Python Package Field Guide',
+      intro: 'PyPI is a warehouse with half a million shelves. This field guide tells you which aisle to visit, which packages are worth learning, and what each one unlocks.',
+      sections: [
+        {
+          type: 'text',
+          content: 'Start with the standard library: pathlib, json, csv, sqlite3, argparse, logging, subprocess, tkinter, asyncio, and unittest already ship with Python. Add a third-party package when it meaningfully improves ergonomics or provides a capability Python does not include.',
+        },
+        {
+          type: 'code',
+          language: 'text',
+          content: `WEB & APIs
+requests / httpx    Friendly HTTP clients
+FastAPI             Typed, async APIs with automatic docs
+Flask               Small, flexible web applications
+Django              Full-stack sites with ORM, auth, and admin
+Beautiful Soup      Parse HTML you are allowed to collect
+
+DATA & SCIENCE
+numpy                Fast numerical arrays
+pandas / polars      Tables, cleaning, joins, and analytics
+matplotlib / seaborn Charts and statistical visualization
+scikit-learn         Classical machine learning
+Jupyter              Interactive notebooks
+
+AUTOMATION & APPS
+rich                 Color, tables, progress bars, tracebacks
+typer                Type-hinted command-line applications
+click                Mature composable CLI framework
+paramiko             SSH and SFTP automation
+Pillow               Image reading, conversion, and editing
+openpyxl             Read and write Excel .xlsx files
+
+QUALITY & SHIPPING
+pytest               Expressive testing
+ruff                 Very fast linting and formatting
+mypy / pyright       Static type checking
+pydantic             Runtime validation from type hints
+python-dotenv        Load local environment variables
+build / twine        Build and publish packages`,
+        },
+        {
+          type: 'code',
+          language: 'bash',
+          content: `# Explore before installing
+python -m pip index versions rich
+python -m pip show rich
+
+# Install into an active virtual environment
+python -m pip install requests rich typer
+
+# Record direct and transitive dependencies
+python -m pip freeze > requirements.txt
+python -m pip install -r requirements.txt
+
+# See outdated packages; update intentionally, not blindly
+python -m pip list --outdated
+python -m pip install --upgrade rich`,
+        },
+        {
+          type: 'tip',
+          content: 'Evaluate a package by its documentation, release history, supported Python versions, license, issue activity, dependency count, and security record. A famous package with current maintenance is usually safer than a clever package with one release from six years ago.',
+        },
+        {
+          type: 'warning',
+          content: 'Package names can be typosquatted. Copy install names from the project\'s official documentation, inspect unfamiliar projects on PyPI, and never paste secrets into code. Keep credentials in environment variables or a proper secret store.',
+        },
+        {
+          type: 'text',
+          content: 'Build ideas by difficulty — Beginner: file organizer, duplicate finder, image resizer, Markdown link checker, habit tracker, expense CSV reporter. Intermediate: weather dashboard, REST API client, SQLite inventory app, SFTP backup tool, log analyzer, desktop Pomodoro timer. Advanced: job queue, collaborative API, deployment dashboard, package dependency auditor, or local search engine.',
+        },
+      ],
+    },
+    {
+      slug: 'subprocess-automation',
+      title: 'Subprocess & System Automation',
+      intro: 'Python can coordinate the programs already on your computer. subprocess is the safe, modern bridge between Python and command-line tools.',
+      sections: [
+        {
+          type: 'text',
+          content: 'Use subprocess.run() for commands that finish. Pass arguments as a list, enable check=True so failures raise an exception, and use capture_output=True with text=True when you need the output as a string.',
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import subprocess
+
+result = subprocess.run(
+    ["python", "--version"],
+    capture_output=True,
+    text=True,
+    check=True,
+    timeout=10,
+)
+
+# Some programs print version information to stderr.
+version = result.stdout.strip() or result.stderr.strip()
+print(version)
+
+try:
+    subprocess.run(["git", "status", "--short"], check=True, timeout=15)
+except subprocess.TimeoutExpired:
+    print("The command took too long")
+except subprocess.CalledProcessError as error:
+    print(f"Command failed with exit code {error.returncode}")
+except FileNotFoundError:
+    print("The executable is not installed or not on PATH")`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from pathlib import Path
+import subprocess
+
+def convert_image(source: Path, destination: Path) -> None:
+    """Call ImageMagick without invoking a shell."""
+    source = source.resolve(strict=True)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        ["magick", str(source), "-resize", "1600x1600>", str(destination)],
+        check=True,
+        timeout=60,
+    )
+
+# Stream a long-running process one line at a time
+process = subprocess.Popen(
+    ["ping", "-c", "4", "example.com"],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True,
+)
+
+assert process.stdout is not None
+for line in process.stdout:
+    print(line, end="")
+
+exit_code = process.wait()
+if exit_code != 0:
+    raise RuntimeError(f"ping failed: {exit_code}")`,
+        },
+        {
+          type: 'warning',
+          content: 'Avoid shell=True, especially with user input. A list such as ["git", "show", revision] passes one exact argument at a time; a shell string can interpret semicolons, redirects, substitutions, and other syntax as new commands. Also set timeouts for tools that could hang.',
+        },
+        {
+          type: 'tip',
+          content: 'Projects to try: a Git repository health checker, FFmpeg batch converter, test runner dashboard, backup coordinator, or wrapper that gives a complicated CLI a friendly configuration file.',
+        },
+      ],
+    },
+    {
+      slug: 'tkinter-desktop-apps',
+      title: 'Tkinter Desktop Apps',
+      intro: 'Tkinter ships with most Python installations and turns a script into a real window. It is perfect for small utilities, internal tools, and learning event-driven programming.',
+      sections: [
+        {
+          type: 'text',
+          content: 'A GUI is event-driven: create widgets, connect callbacks, then enter mainloop(). Use ttk widgets for native-looking controls and grid() for layouts that resize cleanly. Keep one geometry manager per parent widget.',
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import tkinter as tk
+from tkinter import ttk, messagebox
+
+def convert() -> None:
+    try:
+        celsius = float(temperature.get())
+    except ValueError:
+        messagebox.showerror("Invalid temperature", "Enter a number.")
+        return
+    fahrenheit.set(f"{celsius * 9 / 5 + 32:.1f} °F")
+
+root = tk.Tk()
+root.title("Temperature Converter")
+root.minsize(360, 160)
+
+frame = ttk.Frame(root, padding=20)
+frame.grid(sticky="nsew")
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+frame.columnconfigure(1, weight=1)
+
+temperature = tk.StringVar()
+fahrenheit = tk.StringVar(value="—")
+
+ttk.Label(frame, text="Celsius").grid(row=0, column=0, padx=6, pady=6)
+entry = ttk.Entry(frame, textvariable=temperature)
+entry.grid(row=0, column=1, sticky="ew", padx=6, pady=6)
+ttk.Button(frame, text="Convert", command=convert).grid(row=1, column=0, columnspan=2, pady=8)
+ttk.Label(frame, textvariable=fahrenheit, font=("TkDefaultFont", 16)).grid(row=2, column=0, columnspan=2)
+
+entry.focus()
+root.bind("<Return>", lambda event: convert())
+root.mainloop()`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# Useful dialogs and a scrollable list
+from tkinter import filedialog
+
+path = filedialog.askopenfilename(
+    title="Open a text file",
+    filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+)
+
+tree = ttk.Treeview(root, columns=("size",), show="tree headings")
+tree.heading("#0", text="Name")
+tree.heading("size", text="Bytes")
+tree.insert("", "end", text="notes.txt", values=(2048,))
+
+# Schedule work without freezing the window
+def update_clock():
+    clock.configure(text=time.strftime("%H:%M:%S"))
+    root.after(1000, update_clock)
+
+# For slow network/file work, use a worker thread and send the
+# result back with root.after(...). Never update widgets from that thread.`,
+        },
+        {
+          type: 'tip',
+          content: 'Great Tkinter builds: Pomodoro timer, Markdown note app, bulk file renamer, image contact-sheet maker, SQLite address book, download queue, budget tracker, or a friendly front end for one of your command-line scripts.',
+        },
+        {
+          type: 'note',
+          content: 'On some Linux distributions Tkinter is a separate OS package such as python3-tk. Test availability with: python -m tkinter. PyInstaller can bundle a finished app, but build separately on each target operating system.',
+        },
+      ],
+    },
+    {
+      slug: 'paramiko-ssh',
+      title: 'Paramiko: SSH & SFTP',
+      intro: 'Paramiko lets Python securely run commands and transfer files over SSH. Use it for systems you own or are explicitly authorized to administer.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install paramiko
+
+# Prefer an SSH key protected by a passphrase
+ssh-keygen -t ed25519 -C "automation"
+# Add the public key to the authorized server by an approved method`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from pathlib import Path
+import os
+import paramiko
+
+host = os.environ["DEPLOY_HOST"]
+user = os.environ["DEPLOY_USER"]
+key_path = Path.home() / ".ssh" / "id_ed25519"
+
+client = paramiko.SSHClient()
+# Load known_hosts and reject unknown or changed host keys.
+client.load_system_host_keys()
+client.set_missing_host_key_policy(paramiko.RejectPolicy())
+
+try:
+    client.connect(
+        hostname=host,
+        username=user,
+        key_filename=str(key_path),
+        timeout=10,
+        banner_timeout=10,
+        auth_timeout=10,
+    )
+    stdin, stdout, stderr = client.exec_command("uptime", timeout=15)
+    exit_code = stdout.channel.recv_exit_status()
+    output = stdout.read().decode().strip()
+    errors = stderr.read().decode().strip()
+    if exit_code != 0:
+        raise RuntimeError(errors or f"remote exit code {exit_code}")
+    print(output)
+finally:
+    client.close()`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# SFTP uses the same encrypted SSH connection
+with paramiko.SSHClient() as client:
+    client.load_system_host_keys()
+    client.connect(host, username=user, key_filename=str(key_path))
+    with client.open_sftp() as sftp:
+        sftp.put("report.csv", "/srv/reports/report.csv")
+        sftp.get("/srv/reports/result.json", "result.json")
+        for item in sftp.listdir_attr("/srv/reports"):
+            print(item.filename, item.st_size)
+
+# For many hosts, put connection logic in a function, collect a result
+# object per host, limit concurrency, and log failures without abandoning
+# the rest of the fleet.`,
+        },
+        {
+          type: 'warning',
+          content: 'Never use AutoAddPolicy in production just to silence host-key errors—it trusts the first key presented and weakens protection against impersonation. Provision known_hosts deliberately. Do not hard-code passwords or private keys, and do not concatenate untrusted text into remote shell commands.',
+        },
+        {
+          type: 'tip',
+          content: 'Build an authorized server inventory collector, SFTP backup verifier, disk-space monitor, deployment smoke tester, or multi-host log fetcher. Make dry-run mode, audit logs, timeouts, and per-host error reporting standard features.',
+        },
+      ],
+    },
+    {
+      slug: 'requests-and-apis',
+      title: 'Requests, HTTP & APIs',
+      intro: 'Most useful programs eventually talk to another service. Requests makes HTTP readable while still exposing the timeouts, headers, status codes, and sessions that reliable clients need.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install requests`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import requests
+
+url = "https://api.github.com/repos/python/cpython"
+headers = {"Accept": "application/vnd.github+json"}
+
+try:
+    response = requests.get(url, headers=headers, timeout=(3.05, 15))
+    response.raise_for_status()
+    repository = response.json()
+except requests.Timeout:
+    print("The service took too long to respond")
+except requests.HTTPError as error:
+    print(f"HTTP failure: {error.response.status_code}")
+except requests.RequestException as error:
+    print(f"Network failure: {error}")
+else:
+    print(repository["full_name"], repository["stargazers_count"])
+
+# Query parameters are encoded safely for you
+requests.get(
+    "https://api.example.com/search",
+    params={"q": "python tips", "page": 2},
+    timeout=10,
+)`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import os
+import requests
+
+# A Session reuses connections and shared settings
+with requests.Session() as session:
+    session.headers.update({
+        "Authorization": f"Bearer {os.environ['API_TOKEN']}",
+        "User-Agent": "inventory-tool/1.0",
+    })
+    response = session.post(
+        "https://api.example.com/items",
+        json={"name": "keyboard", "quantity": 3},
+        timeout=15,
+    )
+    response.raise_for_status()
+    created = response.json()
+
+# Stream large downloads instead of loading them all into memory
+with requests.get(download_url, stream=True, timeout=30) as response:
+    response.raise_for_status()
+    with open("download.bin", "wb") as output:
+        for chunk in response.iter_content(chunk_size=64 * 1024):
+            output.write(chunk)`,
+        },
+        {
+          type: 'tip',
+          content: 'Always set a timeout; Requests has no default timeout. Handle rate-limit headers, retry only safe operations with backoff, validate response data, and keep API tokens out of source control. Try building a transit checker, GitHub dashboard, currency tracker, or API-to-CSV exporter.',
+        },
+      ],
+    },
+    {
+      slug: 'pandas-data-tutorial',
+      title: 'Pandas: Practical Data Analysis',
+      intro: 'Pandas turns rows and columns into programmable objects. It shines when a spreadsheet is too repetitive but a database would be overkill.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install pandas matplotlib openpyxl`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `import pandas as pd
+
+sales = pd.read_csv(
+    "sales.csv",
+    parse_dates=["date"],
+    dtype={"region": "category"},
+)
+
+print(sales.head())
+print(sales.info())
+print(sales.describe(numeric_only=True))
+print(sales.isna().sum())
+
+# Clean deliberately: inspect missing values before choosing a policy.
+sales["quantity"] = sales["quantity"].fillna(0).astype("int64")
+sales = sales.dropna(subset=["price"])
+sales["revenue"] = sales["quantity"] * sales["price"]
+sales["month"] = sales["date"].dt.to_period("M")
+
+summary = (
+    sales.groupby(["month", "region"], observed=True)
+    .agg(revenue=("revenue", "sum"), orders=("order_id", "nunique"))
+    .reset_index()
+    .sort_values("revenue", ascending=False)
+)
+
+summary.to_csv("monthly-sales.csv", index=False)
+summary.to_excel("monthly-sales.xlsx", index=False)`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# Join two datasets using a shared key
+customers = pd.read_csv("customers.csv")
+enriched = sales.merge(
+    customers[["customer_id", "segment"]],
+    on="customer_id",
+    how="left",
+    validate="many_to_one",
+)
+
+# Vectorized operations beat row-by-row Python loops
+enriched["large_order"] = enriched["revenue"].gt(500)
+
+# Plot and save a chart
+monthly = sales.set_index("date").resample("ME")["revenue"].sum()
+axis = monthly.plot(title="Monthly Revenue", ylabel="Revenue")
+axis.figure.tight_layout()
+axis.figure.savefig("revenue.png", dpi=150)`,
+        },
+        {
+          type: 'tip',
+          content: 'Use notebooks for exploration, then move repeatable cleaning into functions and scripts. Build a bank-statement categorizer, survey analyzer, sports dashboard, gradebook reporter, or data-quality checker. For data too large for memory, investigate Polars, DuckDB, or a database.',
+        },
+      ],
+    },
+    {
+      slug: 'rich-typer-cli',
+      title: 'Build Polished CLIs with Typer & Rich',
+      intro: 'A good command-line app has help text, validation, readable errors, and useful output. Typer and Rich supply those details without burying your actual program.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install "typer>=0.12" rich`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from pathlib import Path
+from typing import Annotated
+import typer
+from rich.console import Console
+from rich.table import Table
+
+app = typer.Typer(help="Inspect text files.", no_args_is_help=True)
+console = Console()
+
+@app.command()
+def stats(
+    path: Annotated[Path, typer.Argument(exists=True, dir_okay=False)],
+    words: Annotated[bool, typer.Option("--words/--no-words")] = True,
+) -> None:
+    """Show line, word, and character counts."""
+    text = path.read_text(encoding="utf-8")
+    table = Table(title=path.name)
+    table.add_column("Metric")
+    table.add_column("Count", justify="right")
+    table.add_row("Lines", str(len(text.splitlines())))
+    if words:
+        table.add_row("Words", str(len(text.split())))
+    table.add_row("Characters", str(len(text)))
+    console.print(table)
+
+if __name__ == "__main__":
+    app()`,
+        },
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python texttool.py --help
+python texttool.py stats README.md
+
+# Add a console entry point in pyproject.toml:
+# [project.scripts]
+# texttool = "texttool:app"
+
+# Then install your project and run it anywhere:
+python -m pip install -e .
+texttool stats README.md`,
+        },
+        {
+          type: 'text',
+          content: 'Rich also provides progress bars, syntax highlighting, Markdown rendering, logging handlers, prompts, trees, and improved tracebacks. Keep a plain or JSON output mode for scripts and CI; beautiful terminal output should not make automation brittle.',
+        },
+        {
+          type: 'tip',
+          content: 'Build a project scaffolder, disk-usage explorer, changelog generator, bookmark manager, secret scanner, batch image tool, or a client for your favorite web API. Add --dry-run before any command that changes or deletes data.',
+        },
+      ],
+    },
+    {
+      slug: 'fastapi-pydantic',
+      title: 'FastAPI & Pydantic: Build an API',
+      intro: 'FastAPI combines type hints, validation, async support, and automatic documentation. Pydantic turns untrusted JSON into validated Python objects.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install "fastapi[standard]"
+fastapi dev main.py
+# Open http://127.0.0.1:8000/docs for interactive API documentation`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `# main.py
+from typing import Annotated
+from fastapi import FastAPI, HTTPException, Query, status
+from pydantic import BaseModel, Field
+
+app = FastAPI(title="Book API")
+
+class BookCreate(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    author: str = Field(min_length=1, max_length=120)
+    pages: int = Field(gt=0, le=20_000)
+
+class Book(BookCreate):
+    id: int
+
+books: dict[int, Book] = {}
+
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+@app.get("/books", response_model=list[Book])
+def list_books(
+    search: Annotated[str | None, Query(max_length=100)] = None,
+) -> list[Book]:
+    results = list(books.values())
+    if search:
+        needle = search.casefold()
+        results = [book for book in results if needle in book.title.casefold()]
+    return results
+
+@app.post("/books", response_model=Book, status_code=status.HTTP_201_CREATED)
+def create_book(payload: BookCreate) -> Book:
+    book = Book(id=len(books) + 1, **payload.model_dump())
+    books[book.id] = book
+    return book`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `@app.get("/books/{book_id}", response_model=Book)
+def get_book(book_id: int) -> Book:
+    if book_id not in books:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return books[book_id]
+
+@app.delete("/books/{book_id}", status_code=204)
+def delete_book(book_id: int) -> None:
+    if books.pop(book_id, None) is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+# test_main.py
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+def test_create_and_read_book():
+    created = client.post("/books", json={
+        "title": "The Left Hand of Darkness",
+        "author": "Ursula K. Le Guin",
+        "pages": 304,
+    })
+    assert created.status_code == 201
+    book_id = created.json()["id"]
+    assert client.get(f"/books/{book_id}").json()["pages"] == 304`,
+        },
+        {
+          type: 'tip',
+          content: 'Replace the in-memory dictionary with a database before production. Add authentication, CORS rules, structured logging, migrations, rate limits, and tests deliberately. Build a recipe API, reading tracker, webhook receiver, URL shortener, or backend for your Tkinter app.',
+        },
+        {
+          type: 'warning',
+          content: 'Validation is not authorization. A valid request can still come from the wrong user. Never put secrets in URLs, return internal tracebacks, or trust a user-supplied file path or database filter without enforcing access rules.',
+        },
+      ],
+    },
+    {
+      slug: 'sqlalchemy-databases',
+      title: 'SQLAlchemy: Python & Databases',
+      intro: 'SQLAlchemy maps Python objects to relational data while still letting you use the power of SQL. Start with SQLite locally; move to PostgreSQL when deployment needs it.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install sqlalchemy
+# For PostgreSQL later: python -m pip install "psycopg[binary]"`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from datetime import datetime
+from sqlalchemy import DateTime, String, create_engine, select
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
+
+class Base(DeclarativeBase):
+    pass
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(200))
+    done: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+engine = create_engine("sqlite:///tasks.db", echo=False)
+Base.metadata.create_all(engine)
+
+with Session(engine) as session:
+    session.add_all([Task(title="Learn SQLAlchemy"), Task(title="Build an app")])
+    session.commit()
+
+with Session(engine) as session:
+    statement = select(Task).where(Task.done.is_(False)).order_by(Task.created_at)
+    for task in session.scalars(statement):
+        print(task.id, task.title)`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `def complete_task(task_id: int) -> bool:
+    with Session(engine) as session:
+        task = session.get(Task, task_id)
+        if task is None:
+            return False
+        task.done = True
+        session.commit()
+        return True
+
+def delete_completed() -> int:
+    with Session(engine) as session:
+        completed = list(session.scalars(select(Task).where(Task.done.is_(True))))
+        for task in completed:
+            session.delete(task)
+        session.commit()
+        return len(completed)`,
+        },
+        {
+          type: 'tip',
+          content: 'Use Alembic for schema migrations once your model changes after release. Keep sessions short, commit explicit, index columns you filter frequently, and inspect generated SQL when performance matters. Build an inventory system, journal, bookmark manager, or job tracker.',
+        },
+        {
+          type: 'warning',
+          content: 'Do not build SQL by concatenating user input. SQLAlchemy expressions bind values safely. Keep database URLs in environment variables, use least-privilege database accounts, and back up data before migrations.',
+        },
+      ],
+    },
+    {
+      slug: 'pillow-images',
+      title: 'Pillow: Image Automation',
+      intro: 'Pillow is the practical toolkit for resizing, cropping, converting, compositing, and inspecting images. One careful script can replace hours of repetitive editing.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install pillow`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from pathlib import Path
+from PIL import Image, ImageOps
+
+source_dir = Path("originals")
+output_dir = Path("thumbnails")
+output_dir.mkdir(exist_ok=True)
+
+for path in source_dir.glob("*.*"):
+    try:
+        with Image.open(path) as image:
+            # Correct phone-camera orientation using EXIF metadata.
+            image = ImageOps.exif_transpose(image)
+            image.thumbnail((800, 800), Image.Resampling.LANCZOS)
+            if image.mode not in ("RGB", "L"):
+                image = image.convert("RGB")
+            destination = output_dir / f"{path.stem}.jpg"
+            image.save(destination, quality=85, optimize=True)
+            print(f"Wrote {destination}")
+    except (OSError, ValueError) as error:
+        print(f"Skipped {path}: {error}")`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from PIL import Image, ImageDraw, ImageFont
+
+with Image.open("photo.jpg").convert("RGBA") as photo:
+    overlay = Image.new("RGBA", photo.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    font = ImageFont.truetype("DejaVuSans.ttf", 36)
+    text = "© Example Studio"
+    box = draw.textbbox((0, 0), text, font=font)
+    width = box[2] - box[0]
+    x, y = photo.width - width - 24, photo.height - 60
+    draw.rounded_rectangle((x - 12, y - 8, photo.width - 12, photo.height - 10), fill=(0, 0, 0, 130), radius=8)
+    draw.text((x, y), text, font=font, fill="white")
+    Image.alpha_composite(photo, overlay).convert("RGB").save("watermarked.jpg", quality=90)`,
+        },
+        {
+          type: 'tip',
+          content: 'Build a thumbnail pipeline, avatar cropper, contact sheet, meme generator, receipt preprocessor, wallpaper maker, or duplicate-image finder. Preserve originals, write to a separate directory, and test color modes and transparency.',
+        },
+        {
+          type: 'warning',
+          content: 'Images are untrusted input too. Keep Pillow current, limit upload sizes and pixel dimensions, catch decompression-bomb warnings, and never overwrite originals until the output has been verified.',
+        },
+      ],
+    },
+    {
+      slug: 'openpyxl-excel',
+      title: 'OpenPyXL: Automate Excel',
+      intro: 'OpenPyXL reads and writes modern Excel workbooks. It is ideal for reports that people need to open, filter, print, and pass around.',
+      sections: [
+        {
+          type: 'code',
+          language: 'bash',
+          content: `python -m pip install openpyxl`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from openpyxl.utils import get_column_letter
+
+rows = [
+    ("Product", "Units", "Unit Price"),
+    ("Keyboard", 12, 79.99),
+    ("Mouse", 25, 29.50),
+    ("Monitor", 7, 249.00),
+]
+
+workbook = Workbook()
+sheet = workbook.active
+sheet.title = "Sales"
+
+for row in rows:
+    sheet.append(row)
+
+sheet["D1"] = "Revenue"
+for row_number in range(2, sheet.max_row + 1):
+    sheet.cell(row=row_number, column=4, value=f"=B{row_number}*C{row_number}")
+    sheet.cell(row=row_number, column=3).number_format = '$#,##0.00'
+    sheet.cell(row=row_number, column=4).number_format = '$#,##0.00'
+
+for cell in sheet[1]:
+    cell.font = Font(bold=True, color="FFFFFF")
+    cell.fill = PatternFill("solid", fgColor="2563EB")
+
+sheet.freeze_panes = "A2"
+sheet.auto_filter.ref = sheet.dimensions
+for column, width in enumerate((22, 12, 14, 14), start=1):
+    sheet.column_dimensions[get_column_letter(column)].width = width
+
+workbook.save("sales-report.xlsx")`,
+        },
+        {
+          type: 'code',
+          language: 'python',
+          content: `from openpyxl import load_workbook
+
+# data_only=True reads cached formula results, not formula text.
+workbook = load_workbook("sales-report.xlsx", data_only=False)
+sheet = workbook["Sales"]
+
+for product, units, price, formula in sheet.iter_rows(min_row=2, values_only=True):
+    print(product, units, price, formula)
+
+# For very large workbooks:
+# load_workbook("huge.xlsx", read_only=True)
+# Workbook(write_only=True)`,
+        },
+        {
+          type: 'tip',
+          content: 'Build an invoice generator, attendance report, gradebook exporter, inventory template, timesheet checker, or monthly KPI workbook. Use pandas when the main job is analysis; use OpenPyXL when workbook formatting and Excel features are the product.',
+        },
+        {
+          type: 'warning',
+          content: 'OpenPyXL does not calculate formulas; Excel or another spreadsheet engine does. Also guard against formula injection when exporting untrusted text: values beginning with =, +, -, or @ may be interpreted as formulas by spreadsheet software.',
+        },
+      ],
+    },
   ],
 }

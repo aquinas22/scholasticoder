@@ -646,3 +646,17 @@ body::before {
 .lesson-prose > p, .challenge-prompt { font-family: var(--font-serif); font-size: 1.18rem !important; line-height: 1.7 !important; }
 .sc-quiz-q { font-family: var(--font-serif); font-size: 1.15rem; }
 .dark ::selection { background: var(--gold); color: #1a1408; }
+.sc-quiz-answered { color: #00b372; text-transform: none; letter-spacing: 0; }
+.stat-row { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 800px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+
+/* Practice shell */
+.shell-task { margin: .35rem 0 0; color: var(--text-muted); font-size: .9rem; line-height: 1.5; max-width: 70ch; }
+.shell-screen { overflow: auto; padding: .9rem 1rem; background: #121216; color: #e5e2d8; font: .82rem/1.6 var(--font-mono); cursor: text; }
+.shell-line { white-space: pre-wrap; word-break: break-word; }
+.shell-line.is-command { color: #f0ead8; }
+.shell-line.is-stderr { color: #ff7b72; }
+.shell-line.is-info { color: #8fb4ff; font-style: italic; }
+.shell-input-row { display: flex; gap: .5rem; align-items: baseline; }
+.shell-prompt { color: #9ccf6b; white-space: nowrap; }
+.shell-input-row input { flex: 1; min-width: 40px; background: transparent; border: 0; outline: 0; color: #f0ead8; font: inherit; padding: 0; }

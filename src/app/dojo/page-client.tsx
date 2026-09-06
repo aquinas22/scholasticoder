@@ -2,11 +2,12 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { CodeLab, Runtime } from '@/components/CodeLab'
+import { ShellLab } from '@/components/ShellLab'
 import { challenges } from '@/content/challenges'
 import { useProgress } from '@/hooks/useProgress'
 import { pythonRuntime, usePythonRuntime } from '@/lib/python-runtime'
 
-interface Example { title: string; runtime: Runtime; code: string }
+interface Example { title: string; runtime: Runtime | 'shell'; code: string }
 
 const EXAMPLES: Example[] = [
   {
@@ -45,13 +46,23 @@ const EXAMPLES: Example[] = [
     code: `# Scientific packages such as numpy and pandas are fetched on demand.\nimport numpy as np\n\nm = np.arange(1, 10).reshape(3, 3)\nprint(m)\nprint("determinant:", round(np.linalg.det(m), 3))\nprint("column means:", m.mean(axis=0))\n`,
   },
   {
+    title: 'TypeScript',
+    runtime: 'typescript',
+    code: `// TypeScript is compiled in your browser, then run. Types are erased, not checked.\ninterface Monk {\n  name: string\n  pages: number\n  skills?: string[]\n}\n\nfunction busiest(monks: Monk[]): Monk | undefined {\n  return [...monks].sort((a, b) => b.pages - a.pages)[0]\n}\n\nconst abbey: Monk[] = [\n  { name: 'Bede', pages: 412, skills: ['history'] },\n  { name: 'Hild', pages: 88 },\n]\nconsole.log(busiest(abbey)?.name)\n`,
+  },
+  {
+    title: 'Shell',
+    runtime: 'shell',
+    code: '',
+  },
+  {
     title: 'JavaScript, too',
     runtime: 'javascript',
     code: `// The dojo also runs JavaScript in an isolated worker.\nconst monks = [{ name: 'Bede', pages: 12 }, { name: 'Alcuin', pages: 30 }]\nconst total = monks.reduce((sum, m) => sum + m.pages, 0)\nconsole.log('Total pages:', total)\nconsole.log(monks.map(m => m.name.toUpperCase()))\n\nconst wait = ms => new Promise(r => setTimeout(r, ms))\nawait wait(200)\nconsole.log('Top-level await works here.')\n`,
   },
 ]
 
-function encodeShare(runtime: Runtime, code: string) {
+function encodeShare(runtime: Runtime | 'shell', code: string) {
   const bytes = new TextEncoder().encode(code)
   let bin = ''
   bytes.forEach(b => { bin += String.fromCharCode(b) })
@@ -59,7 +70,7 @@ function encodeShare(runtime: Runtime, code: string) {
 }
 
 function decodeShare(hash: string): { runtime: Runtime; code: string } | null {
-  const m = hash.replace(/^#/, '').match(/^(python|javascript):(.+)$/)
+  const m = hash.replace(/^#/, '').match(/^(python|javascript|typescript):(.+)$/)
   if (!m) return null
   try {
     const b64 = m[2].replace(/-/g, '+').replace(/_/g, '/')
@@ -91,6 +102,7 @@ export default function DojoClient() {
 
   const current = shared ?? example
   const share = async () => {
+    if (current.runtime === 'shell') return
     const url = `${location.origin}${location.pathname}#${encodeShare(current.runtime, editorCode.current)}`
     try {
       await navigator.clipboard.writeText(url)
@@ -124,18 +136,22 @@ export default function DojoClient() {
       </header>
 
       <div className="dojo-examples" role="tablist" aria-label="Example programs">
-        {shared && <button role="tab" aria-selected className="dojo-tab is-active"><span className="dojo-tab-rt">{shared.runtime === 'python' ? 'Py' : 'JS'}</span>Shared program</button>}
+        {shared && <button role="tab" aria-selected className="dojo-tab is-active"><span className="dojo-tab-rt">{shared.runtime === 'python' ? 'Py' : shared.runtime === 'typescript' ? 'TS' : 'JS'}</span>Shared program</button>}
         {EXAMPLES.map((ex, i) => (
           <button key={ex.title} role="tab" aria-selected={!shared && i === active} className={`dojo-tab ${!shared && i === active ? 'is-active' : ''}`} onClick={() => { setShared(null); setActive(i); history.replaceState(null, '', location.pathname) }}>
-            <span className="dojo-tab-rt">{ex.runtime === 'python' ? 'Py' : 'JS'}</span>{ex.title}
+            <span className="dojo-tab-rt">{ex.runtime === 'python' ? 'Py' : ex.runtime === 'typescript' ? 'TS' : ex.runtime === 'shell' ? '$' : 'JS'}</span>{ex.title}
           </button>
         ))}
-        <button type="button" className="dojo-tab dojo-share" onClick={share} title="Copy a link that opens this program">
+        {current.runtime !== 'shell' && <button type="button" className="dojo-tab dojo-share" onClick={share} title="Copy a link that opens this program">
           {shareState === 'copied' ? '✓ Link copied' : shareState === 'failed' ? 'Could not copy' : '⛓ Share this program'}
-        </button>
+        </button>}
       </div>
 
-      <CodeLab key={shared ? 'shared' : active} runtime={current.runtime} code={current.code} minLines={14} onCodeChange={c => { editorCode.current = c }} />
+      {current.runtime === 'shell' ? (
+        <ShellLab key="shell" height={420} intro={['A simulated bash shell with its own little file system. Try: ls, tree, cat data/monks.csv | cut -d , -f 1 | sort', 'Type help for the full command list.']} />
+      ) : (
+        <CodeLab key={shared ? 'shared' : active} runtime={current.runtime} code={current.code} minLines={14} onCodeChange={c => { editorCode.current = c }} />
+      )}
 
       <section className="dojo-notes">
         <div>
@@ -146,6 +162,7 @@ export default function DojoClient() {
             <li>Files: open(), pathlib and os all write to a private in-memory disk.</li>
             <li>numpy, pandas, scipy, sympy, matplotlib (data only), pillow, sqlalchemy, pydantic and other pure-Python packages, fetched on first import.</li>
             <li>Top-level await, and asyncio.run() is translated for you.</li>
+            <li>TypeScript is compiled with the real compiler (types erased), JavaScript runs in a worker, and the Shell tab is a simulated bash with pipes, redirection and a small file system.</li>
           </ul>
         </div>
         <div>

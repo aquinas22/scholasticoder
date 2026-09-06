@@ -4,6 +4,8 @@ import { pythonPractice } from './python-practice'
 import { pythonExtraLessons } from './languages/python-extra'
 import { jsPractice } from './js-practice'
 import { sqlPractice } from './sql-practice'
+import { tsPractice } from './ts-practice'
+import { shellPractice } from './shell-practice'
 import { python } from './languages/python'
 import { javascript } from './languages/javascript'
 import { rust } from './languages/rust'
@@ -93,9 +95,22 @@ for (const lesson of javascript.lessons) {
   const practice = jsPractice[lesson.slug]
   if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
 }
+for (const lesson of typescript.lessons) {
+  const practice = tsPractice[lesson.slug]
+  if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
 for (const lesson of sql.lessons) {
   const practice = sqlPractice[lesson.slug]
   if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
+
+for (const [langSlug, byLesson] of Object.entries(shellPractice)) {
+  const lang = languages.find(l => l.slug === langSlug)
+  if (!lang) continue
+  for (const lesson of lang.lessons) {
+    const practice = byLesson[lesson.slug]
+    if (practice && !lesson.sections.some(s => s.type === 'shell')) lesson.sections.push(...practice)
+  }
 }
 
 // SQL lessons run on SQLite in the browser. Blocks that need PostgreSQL features stay read-only,
@@ -137,11 +152,11 @@ export function getLesson(languageSlug: string, lessonSlug: string) {
 export type { Language, Lesson, Section } from './types'
 
 export const totalLessons = languages.reduce((sum, l) => sum + l.lessons.length, 0)
-export const totalExercises = languages.reduce((sum, l) => sum + l.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise').length, 0), 0)
+export const totalExercises = languages.reduce((sum, l) => sum + l.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise' || s.type === 'shell').length, 0), 0)
 export function countExercises(language: Language) {
-  return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise').length, 0)
+  return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise' || s.type === 'shell').length, 0)
 }
 export function countRunnable(language: Language) {
-  const runnable = new Set(['python', 'javascript', 'js', 'html', 'css', 'sql'])
+  const runnable = new Set(['python', 'javascript', 'js', 'html', 'css', 'sql', 'typescript', 'ts'])
   return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && runnable.has(s.language ?? language.slug)).length, 0)
 }

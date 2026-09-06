@@ -4,6 +4,7 @@ import { CodeBlock } from './CodeBlock'
 import { CodeLab } from './CodeLab'
 import { LiveHtml } from './LiveHtml'
 import { Quiz } from './Quiz'
+import { ShellLab } from './ShellLab'
 import { runtimeFor } from '@/lib/runnable'
 
 interface Props { section: Section; index: number; languageSlug: string; lessonSlug: string }
@@ -22,7 +23,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
   if (section.type === 'code') {
     const lang = section.language ?? languageSlug
     const runtime = section.runnable === false ? null : runtimeFor(lang)
-    if (runtime === 'python' || runtime === 'javascript' || runtime === 'sql') {
+    if (runtime === 'python' || runtime === 'javascript' || runtime === 'sql' || runtime === 'typescript') {
       return <CodeLab runtime={runtime} code={section.content} compact />
     }
     if (runtime === 'html' || runtime === 'css') {
@@ -41,7 +42,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
       <div style={{ marginBottom: '1.9rem' }}>
         <p style={{ marginBottom: '0.75rem', lineHeight: 1.75, fontSize: '0.98rem', color: 'var(--text)' }}>{section.content}</p>
         <CodeLab
-          runtime={(() => { const r = runtimeFor(section.language ?? languageSlug); return r === 'javascript' || r === 'sql' ? r : 'python' })()}
+          runtime={(() => { const r = runtimeFor(section.language ?? languageSlug); return r === 'javascript' || r === 'sql' || r === 'typescript' ? r : 'python' })()}
           id={`${languageSlug}/${lessonSlug}/${index}`}
           title={ex.title}
           code={ex.starter}
@@ -55,8 +56,17 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
     )
   }
 
+  if (section.type === 'shell' && section.shell) {
+    const sh = section.shell
+    return (
+      <div style={{ marginBottom: '1.9rem' }}>
+        <ShellLab id={`${languageSlug}/${lessonSlug}/${index}`} title={sh.title} task={section.content} intro={sh.intro} checks={sh.checks} hints={sh.hints} solution={sh.solution} />
+      </div>
+    )
+  }
+
   if (section.type === 'quiz' && section.quiz) {
-    return <Quiz question={section.content} quiz={section.quiz} />
+    return <Quiz question={section.content} quiz={section.quiz} id={`quiz:${languageSlug}/${lessonSlug}/${index}`} />
   }
 
   if (section.type === 'note' || section.type === 'warning' || section.type === 'tip') {

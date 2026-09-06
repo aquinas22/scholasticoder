@@ -4,8 +4,8 @@
 
 ## What is inside
 
-- **Run code in the browser.** Every Python code block has a Run button, backed by a real CPython interpreter ([Pyodide](https://pyodide.org)) running in a Web Worker. JavaScript blocks run in an isolated worker, SQL blocks run on SQLite ([sql.js](https://sql.js.org)) against a seeded sample database, and HTML and CSS blocks get a live sandboxed preview.
-- **Graded exercises.** Python, JavaScript and SQL lessons end with exercises that are checked automatically, with progressive hints and a reference solution. Quick-check quizzes reinforce the ideas.
+- **Run code in the browser.** Every Python code block has a Run button, backed by a real CPython interpreter ([Pyodide](https://pyodide.org)) running in a Web Worker. JavaScript blocks run in an isolated worker, TypeScript is compiled with the real compiler (types erased) then run the same way, SQL blocks run on SQLite ([sql.js](https://sql.js.org)) against a seeded sample database, and HTML and CSS blocks get a live sandboxed preview.
+- **Graded exercises.** Python, JavaScript, TypeScript and SQL lessons end with exercises that are checked automatically, with progressive hints and a reference solution. The Terminal and Bash paths have exercises in a **simulated shell** (`src/lib/shell-sim.ts`) with a virtual file system, pipes, redirection, globs and tab completion. Quick-check quizzes reinforce the ideas and count toward progress.
 - **The Dojo** (`/dojo`): a Python and JavaScript playground with example programs, program input for `input()`, a virtual file system, on-demand scientific packages, and shareable links.
 - **The challenge ladder** (`/challenges`): 34 problems from FizzBuzz to Dijkstra and a Markdown parser, in four tiers.
 - **Progress** (`/progress`) is stored in the browser (localStorage). No accounts, no tracking. A **glossary** (`/glossary`) links every term to the path that teaches it.
@@ -27,11 +27,12 @@ The site is a static Next.js export deployed to GitHub Pages by `.github/workflo
 | Path | Purpose |
 | --- | --- |
 | `src/content/languages/*.ts` | One file per learning path: setup, lessons, sections |
-| `src/content/python-practice.ts`, `js-practice.ts`, `sql-practice.ts` | Exercises and quizzes merged into the Python, JavaScript and SQL lessons |
+| `src/content/python-practice.ts`, `js-practice.ts`, `ts-practice.ts`, `sql-practice.ts`, `shell-practice.ts` | Exercises and quizzes merged into the Python, JavaScript, TypeScript, SQL, Terminal and Bash lessons |
 | `src/content/languages/python-extra.ts` | Additional Python lessons (strings, regex, JSON, collections, recursion, debugging) |
 | `src/content/challenges.ts` | The challenge ladder |
 | `src/content/glossary.ts` | Glossary entries |
 | `src/lib/sql-seed.ts` | The sample database every SQL block queries |
+| `src/lib/shell-sim.ts` | The simulated bash shell used by shell exercises and the Dojo |
 | `src/lib/themes.ts` | Colour palettes |
 | `src/content/cheatsheets.ts`, `field-guides.ts` | Per-path reference material |
 | `public/workers/python-worker.js` | The Pyodide worker that runs learner code |
@@ -58,4 +59,4 @@ The site is a static Next.js export deployed to GitHub Pages by `.github/workflo
 
 JavaScript checks use `assert`, `assert.equal` and `assert.deepEqual` in the learner's scope. SQL checks are queries that must return a truthy value; the learner's last result set is available as the temp table `_result`.
 
-Code sections default to runnable when their language is Python, JavaScript, SQL, HTML or CSS; set `runnable: false` on blocks that need a real machine (sockets, GUIs, subprocesses, PostgreSQL-only syntax).
+Shell exercises use `type: 'shell'` with check functions that receive the simulator state. Code sections default to runnable when their language is Python, JavaScript, TypeScript, SQL, HTML or CSS; set `runnable: false` on blocks that need a real machine (sockets, GUIs, subprocesses, PostgreSQL-only syntax).

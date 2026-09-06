@@ -6,10 +6,11 @@ import { OutputPanel, OutputChunk, OutputTable } from './OutputPanel'
 import { pythonRuntime, usePythonRuntime, TestResult } from '@/lib/python-runtime'
 import { runJavaScript } from '@/lib/js-runtime'
 import { runSql, resetSqlDatabase } from '@/lib/sql-runtime'
+import { transpileTypeScript } from '@/lib/ts-runtime'
 import { useProgress } from '@/hooks/useProgress'
 import type { TestCase } from '@/content/types'
 
-export type Runtime = 'python' | 'javascript' | 'sql'
+export type Runtime = 'python' | 'javascript' | 'sql' | 'typescript'
 
 interface Props {
   runtime: Runtime
@@ -64,7 +65,9 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
   const done = id ? isExerciseDone(id) : false
   const isPython = runtime === 'python'
   const isSql = runtime === 'sql'
+  const isTs = runtime === 'typescript'
   const pathname = usePathname()
+  const [tsVersion, setTsVersion] = useState('')
 
   const append = useCallback((kind: OutputChunk['kind'], text: string) => {
     setChunks(prev => {
@@ -99,7 +102,21 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
       for (const n of r.notices) append('info', n.text + '\n')
       result = r
     } else {
-      const job = runJavaScript(code, handlers, 8000, withTests ? tests : undefined)
+      let js = code
+      if (isTs) {
+        setRunStatus('Compiling TypeScript…')
+        const t = await transpileTypeScript(code)
+        if (!t.ok) {
+          setRunning(false)
+          setMs(0)
+          append('error', t.error + '\n')
+          if (withTests && tests) setResults(tests.map(x => ({ name: x.name, passed: false, message: 'The program did not compile.' })))
+          return
+        }
+        js = t.js
+        setTsVersion(t.version)
+      }
+      const job = runJavaScript(js, handlers, 8000, withTests ? tests?.map(x => ({ ...x })) : undefined, isTs ? code : undefined)
       stopRef.current = job.stop
       result = await job.promise
     }
@@ -120,7 +137,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
         onPass?.()
       }
     }
-  }, [running, code, stdin, tests, isPython, isSql, pathname, append, id, markExerciseDone, onPass])
+  }, [running, code, stdin, tests, isPython, isSql, isTs, pathname, append, id, markExerciseDone, onPass])
 
   useEffect(() => {
     if (!justPassed) return
@@ -139,7 +156,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
 
   const statusChip = isPython
     ? py.status === 'ready' ? `Python ${py.version}` : py.status === 'loading' ? (py.statusText || 'Loading Python…') : py.status === 'running' ? 'running' : py.status === 'error' ? 'Python unavailable' : 'Python (loads on first run)'
-    : isSql ? 'SQLite · sample database' : 'JavaScript sandbox'
+    : isSql ? 'SQLite · sample database' : isTs ? (tsVersion ? `TypeScript ${tsVersion} · types erased, not checked` : 'TypeScript (compiler loads on first run)') : 'JavaScript sandbox'
 
   const passed = results ? results.filter(r => r.passed).length : 0
 
@@ -155,7 +172,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
         </header>
       )}
 
-      <CodeEditor value={code} onChange={c => { setCode(c); onCodeChange?.(c) }} language={runtime} onRun={tests ? check : run} minLines={minLines ?? (compact ? 3 : 10)} ariaLabel={title ? `${title} editor` : 'Code editor'} />
+      <CodeEditor value={code} onChange={c => { setCode(c); onCodeChange?.(c) }} language={runtime === 'typescript' ? 'typescript' : runtime} onRun={tests ? check : run} minLines={minLines ?? (compact ? 3 : 10)} ariaLabel={title ? `${title} editor` : 'Code editor'} />
 
       <div className="sc-lab-toolbar">
         <div className="sc-lab-actions">

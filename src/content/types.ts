@@ -1,5 +1,5 @@
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced'
-export type SectionType = 'text' | 'code' | 'note' | 'warning' | 'tip' | 'exercise' | 'quiz'
+export type SectionType = 'text' | 'code' | 'note' | 'warning' | 'tip' | 'exercise' | 'quiz' | 'shell'
 
 /** A single automated check. `check` is Python (or JavaScript) that runs in the learner's namespace after their code.
  *  It passes when it does not raise. The captured program output is available as `_out`. */
@@ -35,6 +35,17 @@ export interface Quiz {
   language?: string
 }
 
+/** A shell exercise: the learner works in the simulated terminal; checks inspect its state. */
+export interface ShellExercise {
+  title: string
+  /** Lines shown in the terminal before the learner starts. */
+  intro?: string[]
+  hints?: string[]
+  /** One way to do it, shown on request. */
+  solution?: string
+  checks: Array<{ name: string; check: (state: import('../lib/shell-sim').ShellState, lastOutput: string) => boolean | string }>
+}
+
 export interface Section {
   type: SectionType
   /** Body text, code, or (for exercise/quiz) the prompt. */
@@ -44,6 +55,7 @@ export interface Section {
   runnable?: boolean
   exercise?: Exercise
   quiz?: Quiz
+  shell?: ShellExercise
 }
 
 export interface Lesson {

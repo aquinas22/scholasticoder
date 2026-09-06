@@ -349,8 +349,8 @@ export default function LanguagePage() {
                     {lesson.intro.slice(0, 80)}{lesson.intro.length > 80 ? '…' : ''}
                   </div>
                 </div>
-                {lesson.sections.some(sec => sec.type === 'exercise') && (
-                  <span className="interactive-pill" style={{ flexShrink: 0 }}>{lesson.sections.filter(sec => sec.type === 'exercise').length} ex</span>
+                {lesson.sections.some(sec => sec.type === 'exercise' || sec.type === 'shell') && (
+                  <span className="interactive-pill" style={{ flexShrink: 0 }}>{lesson.sections.filter(sec => sec.type === 'exercise' || sec.type === 'shell').length} ex</span>
                 )}
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', flexShrink: 0 }}>→</div>
               </Link>

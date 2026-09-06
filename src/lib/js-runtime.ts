@@ -59,10 +59,10 @@ function cleanStack(text: string) {
     .trim()
 }
 
-export function runJavaScript(code: string, handlers: JsRunHandlers = {}, timeoutMs = 8000, tests?: JsTestCase[]): { promise: Promise<JsRunResult>; stop: () => void } {
+export function runJavaScript(code: string, handlers: JsRunHandlers = {}, timeoutMs = 8000, tests?: JsTestCase[], originalSource?: string): { promise: Promise<JsRunResult>; stop: () => void } {
   // Checks run inside the same function scope as the learner's code so their const/let/function declarations are visible.
   const testBlock = tests && tests.length
-    ? `\n;{ const _out = __captured; const _src = ${JSON.stringify(code)}; const __results = [];\n` +
+    ? `\n;{ const _out = __captured; const _src = ${JSON.stringify(originalSource ?? code)}; const __results = [];\n` +
       tests.map(t => `try { await (async () => { ${t.check}\n })(); __results.push({ name: ${JSON.stringify(t.name)}, passed: true, message: '' }) } catch (e) { __results.push({ name: ${JSON.stringify(t.name)}, passed: false, message: e && e.message ? String(e.message) : String(e) }) }\n`).join('') +
       `postMessage({ kind: 'tests', results: __results }) }\n`
     : ''

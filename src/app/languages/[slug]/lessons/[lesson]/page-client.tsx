@@ -44,7 +44,7 @@ export default function LessonPage() {
   if (!result || !lesson || !language) return notFound()
   const done = isComplete(language.slug, lesson.slug)
   const lessonIndex = language.lessons.findIndex(l => l.slug === lesson.slug)
-  const exerciseCount = lesson.sections.filter(s => s.type === 'exercise').length
+  const exerciseCount = lesson.sections.filter(s => s.type === 'exercise' || s.type === 'shell').length
   const runnableCount = lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && RUNNABLE_LANGS.has(s.language ?? language.slug)).length
   const solved = countExercises(`${language.slug}/${lesson.slug}/`)
 

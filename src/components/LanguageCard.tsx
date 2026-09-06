@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { Language } from '@/content/types'
 import { ProgressBar } from './ProgressBar'
+import { countExercises, countRunnable } from '@/content'
 
 interface Props {
   language: Language
@@ -25,6 +26,8 @@ export function LanguageCard({ language, completed }: Props) {
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0
   const started = completed > 0
   const done = completed === total && total > 0
+  const exercises = countExercises(language)
+  const runnable = countRunnable(language)
 
   return (
     <Link
@@ -115,9 +118,11 @@ export function LanguageCard({ language, completed }: Props) {
             >
               {DIFFICULTY_LABEL[language.difficulty]}
             </span>
-            {done && (
+            {done ? (
               <span style={{ fontSize: '0.7rem', color: 'var(--accent)' }}>✓ Complete</span>
-            )}
+            ) : (exercises > 0 || runnable > 0) ? (
+              <span className="interactive-pill">▶ {exercises > 0 ? `${exercises} exercises` : 'runnable'}</span>
+            ) : null}
           </div>
         </div>
 

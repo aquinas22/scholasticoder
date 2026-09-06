@@ -1,5 +1,6 @@
 import { Language } from './types'
 import { cheatsheets } from './cheatsheets'
+import { pythonPractice } from './python-practice'
 import { python } from './languages/python'
 import { javascript } from './languages/javascript'
 import { rust } from './languages/rust'
@@ -68,6 +69,17 @@ export const languages: Language[] = [
   asm,
 ]
 
+// Python lessons that demonstrate desktop windows, subprocesses, network sockets or web servers
+// cannot run inside the browser sandbox, so their code blocks are shown without a Run button.
+const LOCAL_ONLY_PYTHON_LESSONS = new Set(['subprocess-automation', 'tkinter-desktop-apps', 'paramiko-ssh', 'requests-and-apis', 'rich-typer-cli', 'fastapi-pydantic', 'sqlalchemy-databases', 'openpyxl-excel', 'pillow-images', 'testing-and-tooling'])
+for (const lesson of python.lessons) {
+  if (LOCAL_ONLY_PYTHON_LESSONS.has(lesson.slug)) {
+    for (const section of lesson.sections) if (section.type === 'code') section.runnable = false
+  }
+  const practice = pythonPractice[lesson.slug]
+  if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
+
 // Append each track's cheatsheet as its final lesson.
 for (const lang of languages) {
   const sheet = cheatsheets[lang.slug]
@@ -95,3 +107,13 @@ export function getLesson(languageSlug: string, lessonSlug: string) {
 }
 
 export type { Language, Lesson, Section } from './types'
+
+export const totalLessons = languages.reduce((sum, l) => sum + l.lessons.length, 0)
+export const totalExercises = languages.reduce((sum, l) => sum + l.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise').length, 0), 0)
+export function countExercises(language: Language) {
+  return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise').length, 0)
+}
+export function countRunnable(language: Language) {
+  const runnable = new Set(['python', 'javascript', 'js', 'html', 'css'])
+  return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && runnable.has(s.language ?? language.slug)).length, 0)
+}

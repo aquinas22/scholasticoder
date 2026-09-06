@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ScholastiCoder
 
-## Getting Started
+**The open-source coding scriptorium.** Free, interactive lessons across 32 languages and computer-science paths, with an emphasis on Python. Live at **https://aquinas22.github.io/scholasticoder/**.
 
-First, run the development server:
+## What is inside
+
+- **Run code in the browser.** Every Python code block has a Run button, backed by a real CPython interpreter ([Pyodide](https://pyodide.org)) running in a Web Worker. JavaScript blocks run in an isolated worker; HTML and CSS blocks get a live sandboxed preview.
+- **Graded exercises.** The core Python lessons end with exercises that are checked automatically, with progressive hints and a reference solution. Quick-check quizzes reinforce the ideas.
+- **The Dojo** (`/dojo`): a blank Python playground with example programs, program input for `input()`, a virtual file system, and on-demand scientific packages (numpy, pandas, …).
+- **The challenge ladder** (`/challenges`): 26 problems from FizzBuzz to a recursive-descent calculator, in three tiers.
+- **Progress** is stored in the browser (localStorage). No accounts, no tracking.
+
+## Develop
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000/scholasticoder/
+npm run lint
+npm run build      # static export to ./out
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site is a static Next.js export deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Path | Purpose |
+| --- | --- |
+| `src/content/languages/*.ts` | One file per learning path: setup, lessons, sections |
+| `src/content/python-practice.ts` | Exercises and quizzes merged into the Python lessons |
+| `src/content/challenges.ts` | The challenge ladder |
+| `src/content/cheatsheets.ts`, `field-guides.ts` | Per-path reference material |
+| `public/workers/python-worker.js` | The Pyodide worker that runs learner code |
 
-## Learn More
+### Writing an exercise
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+{
+  type: 'exercise',
+  content: 'Prompt shown to the learner.',
+  exercise: {
+    title: 'Short name',
+    starter: 'def solve():\n    ...\n',
+    solution: 'def solve():\n    return 42\n',
+    hints: ['First nudge', 'Second nudge'],
+    tests: [
+      // `check` is Python executed in the learner's namespace after their program.
+      // `_out` holds everything they printed; `_src` holds their source.
+      { name: 'Returns 42', check: 'assert solve() == 42' },
+    ],
+  },
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Code sections default to runnable when their language is Python, JavaScript, HTML or CSS; set `runnable: false` on blocks that need a real machine (sockets, GUIs, subprocesses).

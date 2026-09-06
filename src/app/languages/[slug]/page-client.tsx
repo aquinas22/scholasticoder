@@ -1,7 +1,7 @@
 'use client'
 import { notFound, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { getLanguage } from '@/content'
+import { getLanguage, countExercises, countRunnable } from '@/content'
 import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useState } from 'react'
@@ -17,13 +17,16 @@ export default function LanguagePage() {
   const slug = params.slug as string
   const language = getLanguage(slug)
 
-  const { isComplete, getLangProgress } = useProgress()
+  const { isComplete, getLangProgress, countExercises: countExercises_done } = useProgress()
   const [setupTab, setSetupTab] = useState<SetupTab>('windows')
 
   if (!language) return notFound()
 
   const prog = getLangProgress(language.slug, language.lessons.length)
   const fieldGuide = getFieldGuide(language.slug)
+  const exercises = countExercises(language)
+  const runnable = countRunnable(language)
+  const solved = countExercises_done(language.slug)
 
   return (
     <main style={{ maxWidth: 900, margin: '0 auto', padding: '3rem 1.5rem' }}>
@@ -176,6 +179,22 @@ export default function LanguagePage() {
         </div>
       </div>
 
+      {(exercises > 0 || runnable > 0) && (
+        <section className="interactive-banner" aria-label="Interactive features">
+          <div>
+            <p className="eyebrow"><span>▶</span> Interactive path</p>
+            <h2>{runnable > 0 ? `${runnable} runnable examples` : ''}{runnable > 0 && exercises > 0 ? ' and ' : ''}{exercises > 0 ? `${exercises} graded exercises` : ''}, right here in the browser.</h2>
+            <p>Every code block below has a Run button. Edit it, break it, run it again. {exercises > 0 ? `Exercises are checked automatically — you have solved ${solved} of ${exercises} so far.` : ''}</p>
+          </div>
+          {language.slug === 'python' && (
+            <div className="interactive-banner-links">
+              <Link href="/dojo" className="button-primary">Open the Dojo <span>→</span></Link>
+              <Link href="/challenges" className="button-ghost">Challenge ladder</Link>
+            </div>
+          )}
+        </section>
+      )}
+
       {fieldGuide && (
         <section className="field-guide" aria-labelledby="field-guide-title">
           <div className="field-guide-heading">
@@ -327,6 +346,9 @@ export default function LanguagePage() {
                     {lesson.intro.slice(0, 80)}{lesson.intro.length > 80 ? '…' : ''}
                   </div>
                 </div>
+                {lesson.sections.some(sec => sec.type === 'exercise') && (
+                  <span className="interactive-pill" style={{ flexShrink: 0 }}>{lesson.sections.filter(sec => sec.type === 'exercise').length} ex</span>
+                )}
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', flexShrink: 0 }}>→</div>
               </Link>
             )

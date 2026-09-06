@@ -27,7 +27,14 @@ const firaCode = Fira_Code({
 
 export const metadata: Metadata = {
   title: 'ScholastiCoder — Learn to code. Actually learn it.',
-  description: 'Free lessons in 32 languages & CS topics — Python, JavaScript, TypeScript, SQL, Git, Rust, Go, Swift, Kotlin, and more, plus how computers, the internet, and compilers actually work. No paywalls, no accounts, no nonsense.',
+  description: 'Free, interactive coding lessons: run Python in your browser, solve graded exercises, and climb a challenge ladder. 32 paths across Python, JavaScript, TypeScript, SQL, Git, Rust, Go, and how computers really work. No paywalls, no accounts.',
+  metadataBase: new URL('https://aquinas22.github.io/scholasticoder/'),
+  openGraph: {
+    title: 'ScholastiCoder — the open-source coding scriptorium',
+    description: 'Run Python in your browser, solve graded exercises, and study 32 learning paths for free.',
+    type: 'website',
+    images: ['/art/benedictine-coding-monk-hero.png'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

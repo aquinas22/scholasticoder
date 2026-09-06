@@ -1,5 +1,5 @@
 'use client'
-import { languages } from '@/content'
+import { languages, totalLessons, totalExercises } from '@/content'
 import { LanguageCard } from '@/components/LanguageCard'
 import { useProgress } from '@/hooks/useProgress'
 
@@ -18,10 +18,10 @@ export default function LanguagesPage() {
           letterSpacing: '-0.02em',
         }}
       >
-        All Languages
+        All Paths
       </h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        12 languages, 0 paywalls.
+        {languages.length} learning paths, {totalLessons} lessons, {totalExercises} graded exercises, 0 paywalls.
       </p>
 
       <div

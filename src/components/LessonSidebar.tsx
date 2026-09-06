@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Language } from '@/content/types'
 import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from './ProgressBar'
+import { toRoman } from '@/lib/roman'
 
 interface Props {
   language: Language
@@ -48,8 +49,8 @@ export function LessonSidebar({ language, currentLessonSlug }: Props) {
               onMouseEnter={e => { if (!current) e.currentTarget.style.background = 'var(--card)' }}
               onMouseLeave={e => { if (!current) e.currentTarget.style.background = 'transparent' }}
             >
-              <span style={{ width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 700, flexShrink: 0, background: done ? language.accentColor : current ? `${language.accentColor}30` : 'var(--card)', border: `1px solid ${done ? language.accentColor : current ? `${language.accentColor}60` : 'var(--border)'}`, color: done ? language.textOnAccent : current ? language.accentColor : 'var(--text-muted)' }}>
-                {done ? '✓' : idx + 1}
+              <span className="lesson-numeral" style={{ minWidth: 26, height: 22, padding: '0 5px', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, flexShrink: 0, fontFamily: 'var(--font-cormorant), Georgia, serif', letterSpacing: '0.02em', background: done ? language.accentColor : current ? `${language.accentColor}30` : 'var(--card)', border: `1px solid ${done ? language.accentColor : current ? `${language.accentColor}60` : 'var(--border)'}`, color: done ? language.textOnAccent : current ? language.accentColor : 'var(--text-muted)' }}>
+                {done ? '✓' : toRoman(idx + 1)}
               </span>
               <span style={{ fontSize: '0.85rem', color: 'var(--text)', fontWeight: current ? 600 : 450, lineHeight: 1.35, opacity: done && !current ? 0.6 : 1 }}>{lesson.title}</span>
             </Link>

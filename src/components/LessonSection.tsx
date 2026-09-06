@@ -22,7 +22,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
   if (section.type === 'code') {
     const lang = section.language ?? languageSlug
     const runtime = section.runnable === false ? null : runtimeFor(lang)
-    if (runtime === 'python' || runtime === 'javascript') {
+    if (runtime === 'python' || runtime === 'javascript' || runtime === 'sql') {
       return <CodeLab runtime={runtime} code={section.content} compact />
     }
     if (runtime === 'html' || runtime === 'css') {
@@ -41,7 +41,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
       <div style={{ marginBottom: '1.9rem' }}>
         <p style={{ marginBottom: '0.75rem', lineHeight: 1.75, fontSize: '0.98rem', color: 'var(--text)' }}>{section.content}</p>
         <CodeLab
-          runtime={runtimeFor(section.language ?? languageSlug) === 'javascript' ? 'javascript' : 'python'}
+          runtime={(() => { const r = runtimeFor(section.language ?? languageSlug); return r === 'javascript' || r === 'sql' ? r : 'python' })()}
           id={`${languageSlug}/${lessonSlug}/${index}`}
           title={ex.title}
           code={ex.starter}

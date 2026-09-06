@@ -1,6 +1,6 @@
 import type { TestCase } from './types'
 
-export type ChallengeTier = 'novice' | 'apprentice' | 'journeyman'
+export type ChallengeTier = 'novice' | 'apprentice' | 'journeyman' | 'master'
 
 export interface Challenge {
   slug: string
@@ -17,8 +17,8 @@ export interface Challenge {
   hints: string[]
 }
 
-export const TIER_LABEL: Record<ChallengeTier, string> = { novice: 'Novice', apprentice: 'Apprentice', journeyman: 'Journeyman' }
-export const TIER_COLOR: Record<ChallengeTier, string> = { novice: '#22c55e', apprentice: '#f59e0b', journeyman: '#ef4444' }
+export const TIER_LABEL: Record<ChallengeTier, string> = { novice: 'Novice', apprentice: 'Apprentice', journeyman: 'Journeyman', master: 'Master' }
+export const TIER_COLOR: Record<ChallengeTier, string> = { novice: '#22c55e', apprentice: '#f59e0b', journeyman: '#ef4444', master: '#a855f7' }
 
 /** The Python challenge ladder. Every check runs in the browser against the learner's namespace. */
 export const challenges: Challenge[] = [
@@ -453,6 +453,144 @@ export const challenges: Challenge[] = [
       { name: 'Rows are sorted and formatted', check: `out = report([Item("washer", 100, 0.05), Item("bolt", 40, 0.25)]).splitlines()\nassert out[0] == "bolt          40    10.00", repr(out[0])\nassert out[1] == "washer       100     5.00", repr(out[1])` },
       { name: 'Total line', check: `out = report([Item("washer", 100, 0.05), Item("bolt", 40, 0.25)]).splitlines()\nassert out[-1] == "TOTAL               15.00", repr(out[-1])` },
       { name: 'Empty inventory', check: `assert report([]) == "TOTAL                0.00"` },
+    ],
+  },
+  // ─────────────────────────────── Master ───────────────────────────────
+  {
+    slug: 'game-of-life',
+    title: "Conway's Game of Life",
+    tier: 'master',
+    tags: ['grids', 'simulation'],
+    prompt: 'Write step(grid) that returns the next generation of a Game of Life grid (a list of lists of 0/1). A live cell with two or three live neighbours survives; a dead cell with exactly three comes alive; everything else dies. Cells outside the grid count as dead.',
+    examples: ['A blinker [[0,1,0],[0,1,0],[0,1,0]] becomes [[0,0,0],[1,1,1],[0,0,0]]'],
+    starter: `def step(grid):\n    ...\n\n\nfor row in step([[0, 1, 0], [0, 1, 0], [0, 1, 0]]):\n    print("".join("█" if c else "·" for c in row))\n`,
+    solution: `def step(grid):\n    rows, cols = len(grid), len(grid[0]) if grid else 0\n    def neighbours(r, c):\n        total = 0\n        for dr in (-1, 0, 1):\n            for dc in (-1, 0, 1):\n                if (dr or dc) and 0 <= r + dr < rows and 0 <= c + dc < cols:\n                    total += grid[r + dr][c + dc]\n        return total\n    new = []\n    for r in range(rows):\n        row = []\n        for c in range(cols):\n            n = neighbours(r, c)\n            row.append(1 if n == 3 or (grid[r][c] and n == 2) else 0)\n        new.append(row)\n    return new\n\n\nfor row in step([[0, 1, 0], [0, 1, 0], [0, 1, 0]]):\n    print("".join("█" if c else "·" for c in row))\n`,
+    hints: ['Write a helper that counts the eight neighbours with bounds checks.', 'Build a brand-new grid; never update cells in place while reading them.'],
+    tests: [
+      { name: 'Blinker oscillates', check: `assert step([[0, 1, 0], [0, 1, 0], [0, 1, 0]]) == [[0, 0, 0], [1, 1, 1], [0, 0, 0]]\nassert step(step([[0, 1, 0], [0, 1, 0], [0, 1, 0]])) == [[0, 1, 0], [0, 1, 0], [0, 1, 0]]` },
+      { name: 'Block is stable', check: `block = [[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]]\nassert step(block) == block` },
+      { name: 'Lonely cells die, empty grid stays empty', check: `assert step([[1, 0], [0, 0]]) == [[0, 0], [0, 0]]\nassert step([[0, 0], [0, 0]]) == [[0, 0], [0, 0]]` },
+      { name: 'Input is not mutated', check: `g = [[0, 1, 0], [0, 1, 0], [0, 1, 0]]\nstep(g)\nassert g == [[0, 1, 0], [0, 1, 0], [0, 1, 0]]` },
+    ],
+  },
+  {
+    slug: 'topological-sort',
+    title: 'Topological sort',
+    tier: 'master',
+    tags: ['graphs', 'algorithms'],
+    prompt: 'Write build_order(deps) where deps maps each task to the list of tasks it depends on. Return a list containing every task exactly once, such that each task comes after all of its dependencies. Raise ValueError if there is a cycle. When several orders are valid, any one is accepted.',
+    examples: ['build_order({"app": ["lib", "utils"], "lib": ["utils"], "utils": []}) → ["utils", "lib", "app"]'],
+    starter: `def build_order(deps):\n    ...\n\n\nprint(build_order({"app": ["lib", "utils"], "lib": ["utils"], "utils": []}))\n`,
+    solution: `def build_order(deps):\n    order, state = [], {}   # state: 1 = visiting, 2 = done\n\n    def visit(node):\n        if state.get(node) == 2:\n            return\n        if state.get(node) == 1:\n            raise ValueError(f"cycle involving {node}")\n        state[node] = 1\n        for dep in deps.get(node, []):\n            visit(dep)\n        state[node] = 2\n        order.append(node)\n\n    for node in deps:\n        visit(node)\n    return order\n\n\nprint(build_order({"app": ["lib", "utils"], "lib": ["utils"], "utils": []}))\n`,
+    hints: ['Depth-first search: visit dependencies first, then append the node (post-order).', 'Track visiting vs done states; hitting a visiting node again means a cycle.'],
+    tests: [
+      { name: 'Simple chain', check: `deps = {"app": ["lib", "utils"], "lib": ["utils"], "utils": []}\norder = build_order(deps)\nassert sorted(order) == ["app", "lib", "utils"]\nfor t, ds in deps.items():\n    for d in ds:\n        assert order.index(d) < order.index(t), f"{d} must precede {t}"` },
+      { name: 'Larger graph respects every edge', check: `deps = {"a": ["b", "c"], "b": ["d"], "c": ["d", "e"], "d": [], "e": ["f"], "f": []}\norder = build_order(deps)\nassert len(order) == 6 and set(order) == set(deps)\nfor t, ds in deps.items():\n    for d in ds:\n        assert order.index(d) < order.index(t)` },
+      { name: 'Dependencies not listed as keys still appear', check: `order = build_order({"a": ["z"]})\nassert order.index("z") < order.index("a")` },
+      { name: 'Cycle raises ValueError', check: `try:\n    build_order({"a": ["b"], "b": ["a"]})\nexcept ValueError:\n    pass\nelse:\n    raise AssertionError("expected ValueError for a cycle")` },
+    ],
+  },
+  {
+    slug: 'trie-autocomplete',
+    title: 'Trie autocomplete',
+    tier: 'master',
+    tags: ['classes', 'data structures'],
+    prompt: 'Implement Trie with insert(word), contains(word) and starts_with(prefix), which returns every inserted word beginning with the prefix in alphabetical order. Store the words in a tree of dictionaries, one level per character.',
+    starter: `class Trie:\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        ...\n\n    def contains(self, word):\n        ...\n\n    def starts_with(self, prefix):\n        ...\n\n\nt = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nprint(t.contains("mass"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
+    solution: `class Trie:\n    END = "$"\n\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        node = self.root\n        for ch in word:\n            node = node.setdefault(ch, {})\n        node[self.END] = True\n\n    def _find(self, prefix):\n        node = self.root\n        for ch in prefix:\n            if ch not in node:\n                return None\n            node = node[ch]\n        return node\n\n    def contains(self, word):\n        node = self._find(word)\n        return node is not None and self.END in node\n\n    def starts_with(self, prefix):\n        node = self._find(prefix)\n        if node is None:\n            return []\n        words = []\n\n        def walk(n, path):\n            if self.END in n:\n                words.append(path)\n            for ch in sorted(k for k in n if k != self.END):\n                walk(n[ch], path + ch)\n\n        walk(node, prefix)\n        return words\n\n\nt = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nprint(t.contains("mass"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
+    hints: ['Mark the end of a word with a special key such as "$" so "mat" is not confused with "matins".', 'starts_with: walk to the prefix node, then collect words depth-first in sorted key order.'],
+    tests: [
+      { name: 'contains distinguishes words from prefixes', check: `t = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nassert t.contains("mass") and t.contains("matins")\nassert not t.contains("mat") and not t.contains("vespers")` },
+      { name: 'starts_with returns sorted matches', check: `t = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nassert t.starts_with("ma") == ["mass", "matins", "matter"]\nassert t.starts_with("m") == ["mass", "matins", "matter", "monk"]` },
+      { name: 'No matches and empty prefix', check: `t = Trie()\nt.insert("a"); t.insert("b")\nassert t.starts_with("z") == []\nassert t.starts_with("") == ["a", "b"]` },
+      { name: 'Uses nested dicts', check: `t = Trie()\nt.insert("ab")\nassert isinstance(t.root, dict) and "a" in t.root and "b" in t.root["a"]` },
+    ],
+  },
+  {
+    slug: 'word-wrap',
+    title: 'Word wrap',
+    tier: 'master',
+    tags: ['strings', 'greedy'],
+    prompt: 'Write wrap(text, width) that breaks text into lines no longer than width characters, breaking only at spaces, greedily fitting as many words per line as possible. Words longer than width go on their own line unbroken. Return the list of lines.',
+    examples: ['wrap("ora et labora ora et lege", 10) → ["ora et", "labora ora", "et lege"]'],
+    starter: `def wrap(text, width):\n    ...\n\n\nfor line in wrap("ora et labora ora et lege", 10):\n    print(f"|{line:<10}|")\n`,
+    solution: `def wrap(text, width):\n    lines, current = [], []\n    length = 0\n    for word in text.split():\n        extra = len(word) if not current else len(word) + 1\n        if current and length + extra > width:\n            lines.append(" ".join(current))\n            current, length = [word], len(word)\n        else:\n            current.append(word)\n            length += extra\n    if current:\n        lines.append(" ".join(current))\n    return lines\n\n\nfor line in wrap("ora et labora ora et lege", 10):\n    print(f"|{line:<10}|")\n`,
+    hints: ['Keep the words of the current line and its length; adding a word costs its length plus one space.', 'When a word does not fit, flush the current line and start a new one with that word.'],
+    tests: [
+      { name: 'Greedy fit', check: `assert wrap("ora et labora ora et lege", 10) == ["ora et", "labora ora", "et lege"]` },
+      { name: 'Never exceeds width', check: `text = "the quick brown fox jumps over the lazy dog " * 5\nfor w in (8, 12, 20):\n    assert all(len(l) <= w for l in wrap(text, w))\n    assert " ".join(wrap(text, w)).split() == text.split()` },
+      { name: 'Long words stand alone', check: `assert wrap("a supercalifragilistic b", 5) == ["a", "supercalifragilistic", "b"]` },
+      { name: 'Empty text', check: `assert wrap("", 10) == []` },
+    ],
+  },
+  {
+    slug: 'flatten-json',
+    title: 'Flatten JSON',
+    tier: 'master',
+    tags: ['recursion', 'dicts'],
+    prompt: 'Write flatten_json(obj) that turns nested dicts and lists into a single-level dict whose keys are dotted paths. List elements use their index as a key segment. Scalars keep their values.',
+    examples: ['flatten_json({"a": {"b": 1, "c": [10, 20]}, "d": "x"}) → {"a.b": 1, "a.c.0": 10, "a.c.1": 20, "d": "x"}'],
+    starter: `def flatten_json(obj):\n    ...\n\n\nprint(flatten_json({"a": {"b": 1, "c": [10, 20]}, "d": "x"}))\n`,
+    solution: `def flatten_json(obj):\n    out = {}\n\n    def walk(value, path):\n        if isinstance(value, dict):\n            for k, v in value.items():\n                walk(v, f"{path}.{k}" if path else str(k))\n        elif isinstance(value, list):\n            for i, v in enumerate(value):\n                walk(v, f"{path}.{i}" if path else str(i))\n        else:\n            out[path] = value\n\n    walk(obj, "")\n    return out\n\n\nprint(flatten_json({"a": {"b": 1, "c": [10, 20]}, "d": "x"}))\n`,
+    hints: ['Recurse with the path built so far; join segments with dots.', 'Only write to the output dict when you reach a scalar.'],
+    tests: [
+      { name: 'Nested dicts and lists', check: `assert flatten_json({"a": {"b": 1, "c": [10, 20]}, "d": "x"}) == {"a.b": 1, "a.c.0": 10, "a.c.1": 20, "d": "x"}` },
+      { name: 'Deep nesting', check: `assert flatten_json({"x": {"y": {"z": [{"w": True}]}}}) == {"x.y.z.0.w": True}` },
+      { name: 'Scalars and None preserved', check: `assert flatten_json({"n": None, "f": 1.5}) == {"n": None, "f": 1.5}` },
+      { name: 'Empty input', check: `assert flatten_json({}) == {}` },
+    ],
+  },
+  {
+    slug: 'sudoku-validator',
+    title: 'Sudoku validator',
+    tier: 'master',
+    tags: ['grids', 'sets'],
+    prompt: 'Write is_valid_sudoku(board) for a 9×9 grid of integers where 0 means empty. Return True if no row, column or 3×3 box contains a repeated digit 1–9. Empty cells never conflict.',
+    starter: `def is_valid_sudoku(board):\n    ...\n\n\nboard = [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]\nprint(is_valid_sudoku(board))\n`,
+    solution: `def is_valid_sudoku(board):\n    rows = [set() for _ in range(9)]\n    cols = [set() for _ in range(9)]\n    boxes = [set() for _ in range(9)]\n    for r in range(9):\n        for c in range(9):\n            v = board[r][c]\n            if v == 0:\n                continue\n            b = (r // 3) * 3 + c // 3\n            if v in rows[r] or v in cols[c] or v in boxes[b]:\n                return False\n            rows[r].add(v); cols[c].add(v); boxes[b].add(v)\n    return True\n\n\nboard = [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]\nprint(is_valid_sudoku(board))\n`,
+    hints: ['Keep a set of seen digits per row, per column and per box.', 'The box index for cell (r, c) is (r // 3) * 3 + c // 3.'],
+    tests: [
+      { name: 'Valid partial board', check: `board = [[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]\nassert is_valid_sudoku(board) is True` },
+      { name: 'Row conflict', check: `b = [[0] * 9 for _ in range(9)]\nb[0][0] = 7; b[0][8] = 7\nassert is_valid_sudoku(b) is False` },
+      { name: 'Column conflict', check: `b = [[0] * 9 for _ in range(9)]\nb[1][4] = 2; b[7][4] = 2\nassert is_valid_sudoku(b) is False` },
+      { name: 'Box conflict', check: `b = [[0] * 9 for _ in range(9)]\nb[0][0] = 4; b[2][2] = 4\nassert is_valid_sudoku(b) is False` },
+      { name: 'Empty board is valid', check: `assert is_valid_sudoku([[0] * 9 for _ in range(9)]) is True` },
+    ],
+  },
+  {
+    slug: 'dijkstra',
+    title: "Dijkstra's shortest path",
+    tier: 'master',
+    tags: ['graphs', 'heapq'],
+    prompt: 'Write shortest_path(graph, start, end) for a weighted graph given as {node: {neighbour: weight}}. Return (distance, path) with the path as a list of nodes, or (None, []) if end is unreachable. Use heapq for the priority queue.',
+    examples: ['shortest_path({"A": {"B": 1, "C": 4}, "B": {"C": 2, "D": 5}, "C": {"D": 1}, "D": {}}, "A", "D") → (4, ["A", "B", "C", "D"])'],
+    starter: `import heapq\n\n\ndef shortest_path(graph, start, end):\n    ...\n\n\ng = {"A": {"B": 1, "C": 4}, "B": {"C": 2, "D": 5}, "C": {"D": 1}, "D": {}}\nprint(shortest_path(g, "A", "D"))\n`,
+    solution: `import heapq\n\n\ndef shortest_path(graph, start, end):\n    dist = {start: 0}\n    prev = {}\n    heap = [(0, start)]\n    while heap:\n        d, node = heapq.heappop(heap)\n        if d > dist.get(node, float("inf")):\n            continue\n        if node == end:\n            break\n        for nxt, w in graph.get(node, {}).items():\n            nd = d + w\n            if nd < dist.get(nxt, float("inf")):\n                dist[nxt] = nd\n                prev[nxt] = node\n                heapq.heappush(heap, (nd, nxt))\n    if end not in dist:\n        return (None, [])\n    path, cur = [], end\n    while cur != start:\n        path.append(cur)\n        cur = prev[cur]\n    path.append(start)\n    return (dist[end], path[::-1])\n\n\ng = {"A": {"B": 1, "C": 4}, "B": {"C": 2, "D": 5}, "C": {"D": 1}, "D": {}}\nprint(shortest_path(g, "A", "D"))\n`,
+    hints: ['Pop the closest unsettled node from the heap; relax each neighbour.', 'Record prev[neighbour] = node whenever you improve a distance, then walk prev backwards from end.'],
+    tests: [
+      { name: 'Classic example', check: `g = {"A": {"B": 1, "C": 4}, "B": {"C": 2, "D": 5}, "C": {"D": 1}, "D": {}}\nassert shortest_path(g, "A", "D") == (4, ["A", "B", "C", "D"])` },
+      { name: 'Start equals end', check: `assert shortest_path({"A": {}}, "A", "A") == (0, ["A"])` },
+      { name: 'Unreachable', check: `assert shortest_path({"A": {"B": 1}, "B": {}, "C": {}}, "A", "C") == (None, [])` },
+      { name: 'Prefers longer path with lower weight', check: `g = {"S": {"A": 10, "B": 1}, "A": {"T": 1}, "B": {"C": 1}, "C": {"T": 1}, "T": {}}\nassert shortest_path(g, "S", "T") == (3, ["S", "B", "C", "T"])` },
+      { name: 'Uses heapq', check: `assert "heapq" in _src` },
+    ],
+  },
+  {
+    slug: 'mini-markdown',
+    title: 'Mini Markdown',
+    tier: 'master',
+    tags: ['parsing', 'strings'],
+    prompt: 'Write to_html(md) that converts a tiny Markdown subset: lines starting with # or ## become <h1>/<h2>; lines starting with "- " form a <ul> of <li>; any other non-empty line is a <p>. Inline, **bold** becomes <strong> and *italic* becomes <em>. Blank lines separate blocks. Return the HTML lines joined with newlines.',
+    examples: ['to_html("# Rule\\n\\n- pray\\n- work") → "<h1>Rule</h1>\\n<ul>\\n<li>pray</li>\\n<li>work</li>\\n</ul>"'],
+    starter: `import re\n\n\ndef inline(text):\n    return text\n\n\ndef to_html(md):\n    ...\n\n\nprint(to_html("# The Rule\\n\\nOra **et** labora.\\n\\n- pray\\n- *work*"))\n`,
+    solution: `import re\n\n\ndef inline(text):\n    text = re.sub(r"\\*\\*(.+?)\\*\\*", r"<strong>\\1</strong>", text)\n    text = re.sub(r"\\*(.+?)\\*", r"<em>\\1</em>", text)\n    return text\n\n\ndef to_html(md):\n    out, in_list = [], False\n    for line in md.split("\\n"):\n        stripped = line.strip()\n        if stripped.startswith("- "):\n            if not in_list:\n                out.append("<ul>")\n                in_list = True\n            out.append(f"<li>{inline(stripped[2:])}</li>")\n            continue\n        if in_list:\n            out.append("</ul>")\n            in_list = False\n        if not stripped:\n            continue\n        if stripped.startswith("## "):\n            out.append(f"<h2>{inline(stripped[3:])}</h2>")\n        elif stripped.startswith("# "):\n            out.append(f"<h1>{inline(stripped[2:])}</h1>")\n        else:\n            out.append(f"<p>{inline(stripped)}</p>")\n    if in_list:\n        out.append("</ul>")\n    return "\\n".join(out)\n\n\nprint(to_html("# The Rule\\n\\nOra **et** labora.\\n\\n- pray\\n- *work*"))\n`,
+    hints: ['Handle bold before italic so ** is not eaten by the single-star rule; use non-greedy .+?', 'Track whether you are inside a list so you can open <ul> on the first item and close it when the list ends.'],
+    tests: [
+      { name: 'Headings and paragraphs', check: `assert to_html("# Rule\\n\\n## Chapter\\n\\nOra et labora.") == "<h1>Rule</h1>\\n<h2>Chapter</h2>\\n<p>Ora et labora.</p>"` },
+      { name: 'Lists open and close', check: `assert to_html("- pray\\n- work\\n\\nAmen") == "<ul>\\n<li>pray</li>\\n<li>work</li>\\n</ul>\\n<p>Amen</p>"` },
+      { name: 'Inline bold and italic', check: `assert inline("**bold** and *italic*") == "<strong>bold</strong> and <em>italic</em>"\nassert to_html("a **b** c") == "<p>a <strong>b</strong> c</p>"` },
+      { name: 'Trailing list is closed', check: `assert to_html("- one").endswith("</ul>")` },
+      { name: 'Empty input', check: `assert to_html("") == ""` },
     ],
   },
 ]

@@ -44,10 +44,11 @@ async def _sc_exec(code, ns):
         return ''.join(traceback.format_exception(type(e), e, tb))
     return None
 
-def _sc_run_tests(ns, tests_json, captured):
+def _sc_run_tests(ns, tests_json, captured, src):
     tests = json.loads(tests_json)
     results = []
     ns['_out'] = captured
+    ns['_src'] = src
     for t in tests:
         try:
             exec(t['check'], ns)
@@ -93,7 +94,7 @@ async function run({ id, code, stdin, tests }) {
     }
     let testResults
     if (tests) {
-      const raw = pyodide.runPython('_sc_run_tests')(ns, JSON.stringify(tests), captured)
+      const raw = pyodide.runPython('_sc_run_tests')(ns, JSON.stringify(tests), captured, code)
       testResults = JSON.parse(raw)
     }
     post({ type: 'done', id, ok: true, tests: testResults, ms: Math.round(performance.now() - started) })

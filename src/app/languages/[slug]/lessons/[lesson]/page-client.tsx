@@ -1,6 +1,8 @@
 'use client'
-import { notFound, useParams } from 'next/navigation'
+import { notFound, useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useEffect } from 'react'
+import { recordLastVisited } from '@/hooks/useLastVisited'
 import { getLesson } from '@/content'
 import { useProgress } from '@/hooks/useProgress'
 import { LessonSidebar } from '@/components/LessonSidebar'
@@ -14,10 +16,32 @@ export default function LessonPage() {
 
   const result = getLesson(languageSlug, lessonSlug)
   const { isComplete, markComplete, markIncomplete, countExercises } = useProgress()
+  const router = useRouter()
 
-  if (!result) return notFound()
+  const lesson = result?.lesson
+  const language = result?.language
+  const prev = result?.prev ?? null
+  const next = result?.next ?? null
 
-  const { lesson, language, prev, next } = result
+  useEffect(() => {
+    if (!lesson || !language) return
+    recordLastVisited({ href: `/languages/${language.slug}/lessons/${lesson.slug}`, title: lesson.title, language: language.name })
+  }, [lesson, language])
+
+  // ← and → move between lessons when focus is not inside an editor or input.
+  useEffect(() => {
+    if (!language) return
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (e.altKey || e.ctrlKey || e.metaKey || (t && (t.tagName === 'TEXTAREA' || t.tagName === 'INPUT' || t.isContentEditable))) return
+      if (e.key === 'ArrowRight' && next) router.push(`/languages/${language.slug}/lessons/${next.slug}`)
+      if (e.key === 'ArrowLeft' && prev) router.push(`/languages/${language.slug}/lessons/${prev.slug}`)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [language, prev, next, router])
+
+  if (!result || !lesson || !language) return notFound()
   const done = isComplete(language.slug, lesson.slug)
   const lessonIndex = language.lessons.findIndex(l => l.slug === lesson.slug)
   const exerciseCount = lesson.sections.filter(s => s.type === 'exercise').length
@@ -57,7 +81,7 @@ export default function LessonPage() {
           </p>
         </header>
 
-        <div className="lesson-prose" style={{ marginBottom: '3rem' }}>
+        <div className="lesson-prose has-dropcap" style={{ marginBottom: '3rem' }}>
           {lesson.sections.map((section, idx) => (
             <LessonSection key={idx} section={section} index={idx} languageSlug={language.slug} lessonSlug={lesson.slug} />
           ))}
@@ -68,7 +92,7 @@ export default function LessonPage() {
             onClick={() => (done ? markIncomplete(language.slug, lesson.slug) : markComplete(language.slug, lesson.slug))}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem', borderRadius: 8, border: `1px solid ${done ? language.accentColor : 'var(--border)'}`, background: done ? `${language.accentColor}18` : 'var(--card)', color: done ? language.accentColor : 'var(--text-muted)', fontSize: '0.88rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
           >
-            {done ? '✓ Completed' : '○ Mark as Complete'}
+            {done ? '✠ Completed — Deo gratias' : '○ Mark as complete'}
           </button>
           {exerciseCount > 0 && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -77,6 +101,7 @@ export default function LessonPage() {
           )}
         </div>
 
+        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.6rem' }}><kbd className="key-hint">←</kbd> <kbd className="key-hint">→</kbd> move between lessons</p>
         <nav style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }} aria-label="Lesson navigation">
           {prev ? (
             <Link href={`/languages/${language.slug}/lessons/${prev.slug}`} className="lesson-nav-card">

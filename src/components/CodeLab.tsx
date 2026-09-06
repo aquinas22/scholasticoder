@@ -1,13 +1,15 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { CodeEditor } from './CodeEditor'
-import { OutputPanel, OutputChunk } from './OutputPanel'
+import { OutputPanel, OutputChunk, OutputTable } from './OutputPanel'
 import { pythonRuntime, usePythonRuntime, TestResult } from '@/lib/python-runtime'
 import { runJavaScript } from '@/lib/js-runtime'
+import { runSql, resetSqlDatabase } from '@/lib/sql-runtime'
 import { useProgress } from '@/hooks/useProgress'
 import type { TestCase } from '@/content/types'
 
-export type Runtime = 'python' | 'javascript'
+export type Runtime = 'python' | 'javascript' | 'sql'
 
 interface Props {
   runtime: Runtime
@@ -23,6 +25,7 @@ interface Props {
   /** Compact mode is used inline in lessons: no title bar, output only appears after the first run. */
   compact?: boolean
   onPass?: () => void
+  onCodeChange?: (code: string) => void
 }
 
 const FRIENDLY_ERRORS: Array<[RegExp, string]> = [
@@ -40,11 +43,13 @@ function friendly(error: string): string | null {
   return null
 }
 
-export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin = '', tests, hints = [], solution, minLines, compact = false, onPass }: Props) {
+export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin = '', tests, hints = [], solution, minLines, compact = false, onPass, onCodeChange }: Props) {
   const [code, setCode] = useState(initial)
   const [stdin, setStdin] = useState(initialStdin)
   const [showStdin, setShowStdin] = useState(!!initialStdin)
   const [chunks, setChunks] = useState<OutputChunk[]>([])
+  const [tables, setTables] = useState<OutputTable[]>([])
+  const [copied, setCopied] = useState(false)
   const [running, setRunning] = useState(false)
   const [ms, setMs] = useState<number | null>(null)
   const [results, setResults] = useState<TestResult[] | null>(null)
@@ -58,6 +63,8 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
   const { markExerciseDone, isExerciseDone } = useProgress()
   const done = id ? isExerciseDone(id) : false
   const isPython = runtime === 'python'
+  const isSql = runtime === 'sql'
+  const pathname = usePathname()
 
   const append = useCallback((kind: OutputChunk['kind'], text: string) => {
     setChunks(prev => {
@@ -70,6 +77,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
   const execute = useCallback(async (withTests: boolean) => {
     if (running) return
     setChunks([])
+    setTables([])
     setResults(null)
     setMs(null)
     setRunning(true)
@@ -84,8 +92,14 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
     if (isPython) {
       stopRef.current = () => pythonRuntime.stop()
       result = await pythonRuntime.run(code, { ...handlers, stdin, tests: withTests ? tests : undefined })
+    } else if (isSql) {
+      setRunStatus('Loading SQL engine…')
+      const r = await runSql(code, pathname ?? 'global', withTests ? tests : undefined)
+      setTables(r.tables.map(t => ({ columns: t.columns, rows: t.rows, caption: t.statement.split('\n').find(l => l.trim() && !l.trim().startsWith('--'))?.trim().slice(0, 90) })))
+      for (const n of r.notices) append('info', n.text + '\n')
+      result = r
     } else {
-      const job = runJavaScript(code, handlers)
+      const job = runJavaScript(code, handlers, 8000, withTests ? tests : undefined)
       stopRef.current = job.stop
       result = await job.promise
     }
@@ -106,7 +120,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
         onPass?.()
       }
     }
-  }, [running, code, stdin, tests, isPython, append, id, markExerciseDone, onPass])
+  }, [running, code, stdin, tests, isPython, isSql, pathname, append, id, markExerciseDone, onPass])
 
   useEffect(() => {
     if (!justPassed) return
@@ -117,11 +131,15 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
   const run = () => void execute(false)
   const check = () => void execute(true)
   const stop = () => { stopRef.current?.() }
-  const reset = () => { setCode(initial); setChunks([]); setResults(null); setMs(null); setShowSolution(false) }
+  const reset = () => { setCode(initial); setChunks([]); setTables([]); setResults(null); setMs(null); setShowSolution(false) }
+  const resetDb = async () => { await resetSqlDatabase(pathname ?? 'global'); setChunks([{ kind: 'info', text: 'Database reset to the sample data.\n' }]); setTables([]); setMs(null) }
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 1600) } catch {}
+  }
 
   const statusChip = isPython
     ? py.status === 'ready' ? `Python ${py.version}` : py.status === 'loading' ? (py.statusText || 'Loading Python…') : py.status === 'running' ? 'running' : py.status === 'error' ? 'Python unavailable' : 'Python (loads on first run)'
-    : 'JavaScript sandbox'
+    : isSql ? 'SQLite · sample database' : 'JavaScript sandbox'
 
   const passed = results ? results.filter(r => r.passed).length : 0
 
@@ -137,7 +155,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
         </header>
       )}
 
-      <CodeEditor value={code} onChange={setCode} language={runtime} onRun={tests ? check : run} minLines={minLines ?? (compact ? 3 : 10)} ariaLabel={title ? `${title} editor` : 'Code editor'} />
+      <CodeEditor value={code} onChange={c => { setCode(c); onCodeChange?.(c) }} language={runtime} onRun={tests ? check : run} minLines={minLines ?? (compact ? 3 : 10)} ariaLabel={title ? `${title} editor` : 'Code editor'} />
 
       <div className="sc-lab-toolbar">
         <div className="sc-lab-actions">
@@ -148,6 +166,8 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
           )}
           {tests && !running && <button type="button" className="sc-btn sc-btn-check" onClick={check}>✓ Check answer</button>}
           <button type="button" className="sc-btn sc-btn-ghost" onClick={reset} title="Restore the original code">↺ Reset</button>
+          <button type="button" className="sc-btn sc-btn-ghost" onClick={copy} title="Copy the code">{copied ? '✓ Copied' : '⧉ Copy'}</button>
+          {isSql && <button type="button" className="sc-btn sc-btn-ghost" onClick={resetDb} title="Recreate the sample tables">⌂ Reset database</button>}
           {isPython && <button type="button" className={`sc-btn sc-btn-ghost ${showStdin ? 'is-on' : ''}`} onClick={() => setShowStdin(s => !s)} title="Lines fed to input(), one per call">⌨ Program input</button>}
           {hints.length > 0 && hintsShown < hints.length && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setHintsShown(h => h + 1)}>💡 Hint {hintsShown + 1}/{hints.length}</button>}
           {solution && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setShowSolution(s => !s)}>{showSolution ? 'Hide solution' : 'Show solution'}</button>}
@@ -169,7 +189,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
       )}
 
       {(everRan || !compact) && (
-        <OutputPanel chunks={chunks} running={running} statusText={runStatus} ms={ms} emptyHint={tests ? 'Press Run to try your code, then Check answer to grade it.' : 'Press Run (or Ctrl+Enter) to execute this code in your browser.'} />
+        <OutputPanel chunks={chunks} tables={tables} running={running} statusText={runStatus} ms={ms} emptyHint={tests ? 'Press Run to try your code, then Check answer to grade it.' : isSql ? 'Press Run to query the sample database. Tables: students, courses, enrollments, customers, products, orders, order_items, employees, daily_sales, accounts, users.' : 'Press Run (or Ctrl+Enter) to execute this code in your browser.'} />
       )}
 
       {results && (

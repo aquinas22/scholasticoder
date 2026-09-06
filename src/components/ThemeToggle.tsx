@@ -1,49 +1,55 @@
 'use client'
-import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useTheme } from './Providers'
+import { palettes } from '@/lib/themes'
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { palette, setPalette } = useTheme()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc) }
+  }, [open])
 
-  if (!mounted) {
-    return (
-      <button
-        className="w-9 h-9 rounded-lg flex items-center justify-center"
-        aria-label="Toggle theme"
-        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
-      />
-    )
-  }
-
-  const isDark = resolvedTheme === 'dark'
+  const groups: Array<{ id: 'scriptorium' | 'editor'; label: string }> = [{ id: 'scriptorium', label: 'Scriptorium' }, { id: 'editor', label: 'Editor classics' }]
 
   return (
-    <button
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-      style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        color: 'var(--text)',
-      }}
-    >
-      {isDark ? (
-        // Sun icon
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="4"/>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-        </svg>
-      ) : (
-        // Moon icon
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
+    <div className="theme-picker" ref={ref}>
+      <button type="button" className="theme-trigger" onClick={() => setOpen(o => !o)} aria-haspopup="listbox" aria-expanded={open} aria-label="Choose a colour theme" title="Colour theme">
+        <span className="theme-swatch" aria-hidden />
+        <span className="theme-trigger-label">Theme</span>
+      </button>
+      {open && (
+        <div className="theme-menu" role="listbox" aria-label="Colour themes">
+          {groups.map(g => (
+            <div key={g.id} className="theme-group">
+              <div className="theme-group-label">{g.label}</div>
+              {palettes.filter(p => p.group === g.id).map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="option"
+                  aria-selected={palette === p.id}
+                  className={`theme-option ${palette === p.id ? 'is-active' : ''}`}
+                  onClick={() => { setPalette(p.id); setOpen(false) }}
+                >
+                  <span className="theme-dots" aria-hidden style={{ background: p.vars['--bg'], borderColor: p.vars['--border'] }}>
+                    <i style={{ background: p.vars['--accent'] }} /><i style={{ background: p.vars['--syn-keyword'] }} /><i style={{ background: p.vars['--syn-string'] }} />
+                  </span>
+                  <span className="theme-option-text"><strong>{p.name}</strong><small>{p.note}</small></span>
+                  {palette === p.id && <span className="theme-check" aria-hidden>✓</span>}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
       )}
-    </button>
+    </div>
   )
 }

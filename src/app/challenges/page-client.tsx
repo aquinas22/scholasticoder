@@ -4,11 +4,12 @@ import { challenges, ChallengeTier, TIER_COLOR, TIER_LABEL } from '@/content/cha
 import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from '@/components/ProgressBar'
 
-const TIERS: ChallengeTier[] = ['novice', 'apprentice', 'journeyman']
+const TIERS: ChallengeTier[] = ['novice', 'apprentice', 'journeyman', 'master']
 const TIER_BLURB: Record<ChallengeTier, string> = {
   novice: 'Loops, strings and conditionals. Finish the first four Python lessons and you have everything you need.',
   apprentice: 'Dictionaries, sorting, recursion and classic algorithms. Expect to think for a few minutes before typing.',
   journeyman: 'Data structures, parsers and decorators. Each one is a small piece of real software.',
+  master: 'Simulations, graphs, tries and parsers. Bring a notebook; these reward thinking before typing.',
 }
 
 export default function ChallengesClient() {

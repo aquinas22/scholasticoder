@@ -52,6 +52,7 @@ export default function HomePage() {
         <a className="scroll-seal" href="#way" aria-label="Scroll to learning approach">↓</a>
       </section>
 
+      <div className="folio-rule" aria-hidden="true"><span>❦</span></div>
       <section id="way" className="way-section section-wrap">
         <div className="section-heading centered">
           <p className="eyebrow"><span>V</span> The scholastic method</p>
@@ -87,6 +88,7 @@ export default function HomePage() {
         <TempleTerminal />
       </section>
 
+      <div className="folio-rule" aria-hidden="true"><span>✠</span></div>
       <section id="paths" className="paths-section section-wrap">
         <div className="section-heading">
           <p className="eyebrow"><span>C</span> The codex</p>
@@ -101,7 +103,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="monk-footer"><span className="footer-seal" aria-hidden="true">☧</span><p><strong>ScholastiCoder</strong><br /><em>Ora et labora.</em> Study deeply. Build patiently.</p><Link href="/languages">All disciplines →</Link></footer>
     </main>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CodeLab, Runtime } from '@/components/CodeLab'
 import { challenges } from '@/content/challenges'
 import { useProgress } from '@/hooks/useProgress'
@@ -51,14 +51,56 @@ const EXAMPLES: Example[] = [
   },
 ]
 
+function encodeShare(runtime: Runtime, code: string) {
+  const bytes = new TextEncoder().encode(code)
+  let bin = ''
+  bytes.forEach(b => { bin += String.fromCharCode(b) })
+  return `${runtime}:${btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`
+}
+
+function decodeShare(hash: string): { runtime: Runtime; code: string } | null {
+  const m = hash.replace(/^#/, '').match(/^(python|javascript):(.+)$/)
+  if (!m) return null
+  try {
+    const b64 = m[2].replace(/-/g, '+').replace(/_/g, '/')
+    const bin = atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4))
+    const bytes = Uint8Array.from(bin, ch => ch.charCodeAt(0))
+    return { runtime: m[1] as Runtime, code: new TextDecoder().decode(bytes) }
+  } catch {
+    return null
+  }
+}
+
 export default function DojoClient() {
   const [active, setActive] = useState(0)
+  const [shared, setShared] = useState<{ runtime: Runtime; code: string } | null>(null)
+  const [shareState, setShareState] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const editorCode = useRef<string>(EXAMPLES[0].code)
   const py = usePythonRuntime()
   const { exercisesDone } = useProgress()
   const solved = challenges.filter(c => exercisesDone.includes(`challenge/${c.slug}`)).length
   const example = EXAMPLES[active]
 
   useEffect(() => { pythonRuntime.warm().catch(() => {}) }, [])
+  useEffect(() => {
+    const fromHash = decodeShare(window.location.hash)
+    // Loading a shared program from the URL happens once, after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (fromHash) setShared(fromHash)
+  }, [])
+
+  const current = shared ?? example
+  const share = async () => {
+    const url = `${location.origin}${location.pathname}#${encodeShare(current.runtime, editorCode.current)}`
+    try {
+      await navigator.clipboard.writeText(url)
+      history.replaceState(null, '', `#${encodeShare(current.runtime, editorCode.current)}`)
+      setShareState('copied')
+    } catch {
+      setShareState('failed')
+    }
+    setTimeout(() => setShareState('idle'), 1800)
+  }
 
   return (
     <main className="dojo-shell section-wrap">
@@ -82,14 +124,18 @@ export default function DojoClient() {
       </header>
 
       <div className="dojo-examples" role="tablist" aria-label="Example programs">
+        {shared && <button role="tab" aria-selected className="dojo-tab is-active"><span className="dojo-tab-rt">{shared.runtime === 'python' ? 'Py' : 'JS'}</span>Shared program</button>}
         {EXAMPLES.map((ex, i) => (
-          <button key={ex.title} role="tab" aria-selected={i === active} className={`dojo-tab ${i === active ? 'is-active' : ''}`} onClick={() => setActive(i)}>
+          <button key={ex.title} role="tab" aria-selected={!shared && i === active} className={`dojo-tab ${!shared && i === active ? 'is-active' : ''}`} onClick={() => { setShared(null); setActive(i); history.replaceState(null, '', location.pathname) }}>
             <span className="dojo-tab-rt">{ex.runtime === 'python' ? 'Py' : 'JS'}</span>{ex.title}
           </button>
         ))}
+        <button type="button" className="dojo-tab dojo-share" onClick={share} title="Copy a link that opens this program">
+          {shareState === 'copied' ? '✓ Link copied' : shareState === 'failed' ? 'Could not copy' : '⛓ Share this program'}
+        </button>
       </div>
 
-      <CodeLab key={active} runtime={example.runtime} code={example.code} minLines={14} />
+      <CodeLab key={shared ? 'shared' : active} runtime={current.runtime} code={current.code} minLines={14} onCodeChange={c => { editorCode.current = c }} />
 
       <section className="dojo-notes">
         <div>

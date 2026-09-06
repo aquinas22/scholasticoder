@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
-import { Rajdhani, Barlow_Semi_Condensed, Fira_Code } from 'next/font/google'
+import { Rajdhani, Barlow_Semi_Condensed, Fira_Code, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { Navigation } from '@/components/Navigation'
+import { SiteFooter } from '@/components/SiteFooter'
+import { paletteBootScript, paletteCss } from '@/lib/themes'
 
 const rajdhani = Rajdhani({
   subsets: ['latin'],
@@ -15,6 +17,14 @@ const barlowSemiCondensed = Barlow_Semi_Condensed({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-dm-sans',
+  display: 'swap',
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-cormorant',
   display: 'swap',
 })
 
@@ -39,11 +49,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${rajdhani.variable} ${barlowSemiCondensed.variable} ${firaCode.variable}`}>
+    <html lang="en" suppressHydrationWarning data-palette="scriptorium" className="dark">
+      <head>
+        <style id="palettes" dangerouslySetInnerHTML={{ __html: paletteCss() }} />
+        <script dangerouslySetInnerHTML={{ __html: paletteBootScript }} />
+      </head>
+      <body className={`${rajdhani.variable} ${barlowSemiCondensed.variable} ${firaCode.variable} ${cormorant.variable}`}>
         <Providers>
           <Navigation />
           {children}
+          <SiteFooter />
         </Providers>
       </body>
     </html>

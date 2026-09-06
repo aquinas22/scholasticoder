@@ -4,11 +4,12 @@
 
 ## What is inside
 
-- **Run code in the browser.** Every Python code block has a Run button, backed by a real CPython interpreter ([Pyodide](https://pyodide.org)) running in a Web Worker. JavaScript blocks run in an isolated worker; HTML and CSS blocks get a live sandboxed preview.
-- **Graded exercises.** The core Python lessons end with exercises that are checked automatically, with progressive hints and a reference solution. Quick-check quizzes reinforce the ideas.
-- **The Dojo** (`/dojo`): a blank Python playground with example programs, program input for `input()`, a virtual file system, and on-demand scientific packages (numpy, pandas, …).
-- **The challenge ladder** (`/challenges`): 26 problems from FizzBuzz to a recursive-descent calculator, in three tiers.
-- **Progress** is stored in the browser (localStorage). No accounts, no tracking.
+- **Run code in the browser.** Every Python code block has a Run button, backed by a real CPython interpreter ([Pyodide](https://pyodide.org)) running in a Web Worker. JavaScript blocks run in an isolated worker, SQL blocks run on SQLite ([sql.js](https://sql.js.org)) against a seeded sample database, and HTML and CSS blocks get a live sandboxed preview.
+- **Graded exercises.** Python, JavaScript and SQL lessons end with exercises that are checked automatically, with progressive hints and a reference solution. Quick-check quizzes reinforce the ideas.
+- **The Dojo** (`/dojo`): a Python and JavaScript playground with example programs, program input for `input()`, a virtual file system, on-demand scientific packages, and shareable links.
+- **The challenge ladder** (`/challenges`): 34 problems from FizzBuzz to Dijkstra and a Markdown parser, in four tiers.
+- **Progress** (`/progress`) is stored in the browser (localStorage). No accounts, no tracking. A **glossary** (`/glossary`) links every term to the path that teaches it.
+- **Themes.** Scriptorium, Vellum, Illuminated and Vespers palettes in the monastic spirit, plus editor classics: Gruvbox, Tokyo Night, Catppuccin, Nord, Dracula, Solarized, One Dark, Rosé Pine, Monokai, GitHub. Defined in `src/lib/themes.ts`; every palette recolours the code editors too.
 
 ## Develop
 
@@ -26,8 +27,12 @@ The site is a static Next.js export deployed to GitHub Pages by `.github/workflo
 | Path | Purpose |
 | --- | --- |
 | `src/content/languages/*.ts` | One file per learning path: setup, lessons, sections |
-| `src/content/python-practice.ts` | Exercises and quizzes merged into the Python lessons |
+| `src/content/python-practice.ts`, `js-practice.ts`, `sql-practice.ts` | Exercises and quizzes merged into the Python, JavaScript and SQL lessons |
+| `src/content/languages/python-extra.ts` | Additional Python lessons (strings, regex, JSON, collections, recursion, debugging) |
 | `src/content/challenges.ts` | The challenge ladder |
+| `src/content/glossary.ts` | Glossary entries |
+| `src/lib/sql-seed.ts` | The sample database every SQL block queries |
+| `src/lib/themes.ts` | Colour palettes |
 | `src/content/cheatsheets.ts`, `field-guides.ts` | Per-path reference material |
 | `public/workers/python-worker.js` | The Pyodide worker that runs learner code |
 
@@ -51,4 +56,6 @@ The site is a static Next.js export deployed to GitHub Pages by `.github/workflo
 }
 ```
 
-Code sections default to runnable when their language is Python, JavaScript, HTML or CSS; set `runnable: false` on blocks that need a real machine (sockets, GUIs, subprocesses).
+JavaScript checks use `assert`, `assert.equal` and `assert.deepEqual` in the learner's scope. SQL checks are queries that must return a truthy value; the learner's last result set is available as the temp table `_result`.
+
+Code sections default to runnable when their language is Python, JavaScript, SQL, HTML or CSS; set `runnable: false` on blocks that need a real machine (sockets, GUIs, subprocesses, PostgreSQL-only syntax).

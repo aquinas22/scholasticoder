@@ -7,6 +7,7 @@ import { ProgressBar } from '@/components/ProgressBar'
 import { useState } from 'react'
 import { CodeBlock } from '@/components/CodeBlock'
 import { getFieldGuide } from '@/content/field-guides'
+import { toRoman } from '@/lib/roman'
 
 const SETUP_TABS = ['windows', 'mac', 'linux'] as const
 type SetupTab = typeof SETUP_TABS[number]
@@ -316,21 +317,23 @@ export default function LanguagePage() {
               >
                 <div
                   style={{
-                    width: 32,
+                    minWidth: 36,
                     height: 32,
-                    borderRadius: '50%',
+                    padding: '0 8px',
+                    borderRadius: 16,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.75rem',
+                    fontSize: '0.8rem',
                     fontWeight: 700,
+                    fontFamily: 'var(--font-cormorant), Georgia, serif',
                     flexShrink: 0,
                     background: done ? language.accentColor : 'var(--card)',
                     border: `1px solid ${done ? language.accentColor : 'var(--border)'}`,
                     color: done ? language.textOnAccent : 'var(--text-muted)',
                   }}
                 >
-                  {done ? '✓' : idx + 1}
+                  {done ? '✓' : toRoman(idx + 1)}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text)' }}>

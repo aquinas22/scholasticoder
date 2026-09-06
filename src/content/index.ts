@@ -1,6 +1,9 @@
 import { Language } from './types'
 import { cheatsheets } from './cheatsheets'
 import { pythonPractice } from './python-practice'
+import { pythonExtraLessons } from './languages/python-extra'
+import { jsPractice } from './js-practice'
+import { sqlPractice } from './sql-practice'
 import { python } from './languages/python'
 import { javascript } from './languages/javascript'
 import { rust } from './languages/rust'
@@ -71,6 +74,12 @@ export const languages: Language[] = [
 
 // Python lessons that demonstrate desktop windows, subprocesses, network sockets or web servers
 // cannot run inside the browser sandbox, so their code blocks are shown without a Run button.
+// Extra Python lessons slot in after the core sequence, before the package tutorials.
+{
+  const at = python.lessons.findIndex(l => l.slug === 'package-field-guide')
+  if (at !== -1 && !python.lessons.some(l => l.slug === pythonExtraLessons[0].slug)) python.lessons.splice(at, 0, ...pythonExtraLessons)
+}
+
 const LOCAL_ONLY_PYTHON_LESSONS = new Set(['subprocess-automation', 'tkinter-desktop-apps', 'paramiko-ssh', 'requests-and-apis', 'rich-typer-cli', 'fastapi-pydantic', 'sqlalchemy-databases', 'openpyxl-excel', 'pillow-images', 'testing-and-tooling'])
 for (const lesson of python.lessons) {
   if (LOCAL_ONLY_PYTHON_LESSONS.has(lesson.slug)) {
@@ -78,6 +87,25 @@ for (const lesson of python.lessons) {
   }
   const practice = pythonPractice[lesson.slug]
   if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
+
+for (const lesson of javascript.lessons) {
+  const practice = jsPractice[lesson.slug]
+  if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
+for (const lesson of sql.lessons) {
+  const practice = sqlPractice[lesson.slug]
+  if (practice && !lesson.sections.some(s => s.type === 'exercise')) lesson.sections.push(...practice)
+}
+
+// SQL lessons run on SQLite in the browser. Blocks that need PostgreSQL features stay read-only,
+// and the sample database is described in src/lib/sql-seed.ts.
+const POSTGRES_ONLY = /DATE_TRUNC|INTERVAL|BIGSERIAL|TIMESTAMPTZ|NUMERIC\(|EXPLAIN ANALYZE|USING GIN|INCLUDE \(|NOT VALID|ALTER COLUMN|pg_|CHAR\(2\)|NOW\(\)|cursor\.execute/
+for (const lesson of sql.lessons) {
+  for (const section of lesson.sections) {
+    if (section.type !== 'code') continue
+    if ((section.language ?? 'sql') !== 'sql' || POSTGRES_ONLY.test(section.content)) section.runnable = false
+  }
 }
 
 // Append each track's cheatsheet as its final lesson.
@@ -114,6 +142,6 @@ export function countExercises(language: Language) {
   return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise').length, 0)
 }
 export function countRunnable(language: Language) {
-  const runnable = new Set(['python', 'javascript', 'js', 'html', 'css'])
+  const runnable = new Set(['python', 'javascript', 'js', 'html', 'css', 'sql'])
   return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && runnable.has(s.language ?? language.slug)).length, 0)
 }

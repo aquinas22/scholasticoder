@@ -7,7 +7,9 @@ export interface JsRunHandlers {
   onStderr?: (text: string) => void
 }
 
-export interface JsRunResult { ok: boolean; error?: string; ms: number; stopped?: boolean }
+export interface JsTestResult { name: string; passed: boolean; message: string }
+export interface JsRunResult { ok: boolean; error?: string; ms: number; stopped?: boolean; tests?: JsTestResult[] }
+export interface JsTestCase { name: string; check: string }
 
 const PRELUDE = `
 const __fmt = (v, depth = 0) => {
@@ -32,7 +34,8 @@ const __fmt = (v, depth = 0) => {
   }
   return String(v)
 }
-const __send = (kind, args) => postMessage({ kind, text: args.map(a => __fmt(a)).join(' ') + '\\n' })
+let __captured = ''
+const __send = (kind, args) => { const text = args.map(a => __fmt(a)).join(' ') + '\\n'; if (kind === 'stdout') __captured += text; postMessage({ kind, text }) }
 const console = {
   log: (...a) => __send('stdout', a), info: (...a) => __send('stdout', a), debug: (...a) => __send('stdout', a),
   warn: (...a) => __send('stderr', a), error: (...a) => __send('stderr', a),
@@ -56,8 +59,14 @@ function cleanStack(text: string) {
     .trim()
 }
 
-export function runJavaScript(code: string, handlers: JsRunHandlers = {}, timeoutMs = 8000): { promise: Promise<JsRunResult>; stop: () => void } {
-  const source = `${PRELUDE}\n;(async function __sc_main() {\n${code}\n})().then(() => postMessage({ kind: 'done' })).catch(err => postMessage({ kind: 'error', text: err && err.stack ? err.stack : String(err) }))`
+export function runJavaScript(code: string, handlers: JsRunHandlers = {}, timeoutMs = 8000, tests?: JsTestCase[]): { promise: Promise<JsRunResult>; stop: () => void } {
+  // Checks run inside the same function scope as the learner's code so their const/let/function declarations are visible.
+  const testBlock = tests && tests.length
+    ? `\n;{ const _out = __captured; const _src = ${JSON.stringify(code)}; const __results = [];\n` +
+      tests.map(t => `try { await (async () => { ${t.check}\n })(); __results.push({ name: ${JSON.stringify(t.name)}, passed: true, message: '' }) } catch (e) { __results.push({ name: ${JSON.stringify(t.name)}, passed: false, message: e && e.message ? String(e.message) : String(e) }) }\n`).join('') +
+      `postMessage({ kind: 'tests', results: __results }) }\n`
+    : ''
+  const source = `${PRELUDE}\nconst assert = (cond, msg) => { if (!cond) throw new Error(msg || 'Assertion failed') }\nassert.equal = (a, b, msg) => { if (a !== b) throw new Error(msg || ('expected ' + __fmt(b, 1) + ' but got ' + __fmt(a, 1))) }\nassert.deepEqual = (a, b, msg) => { const x = JSON.stringify(a), y = JSON.stringify(b); if (x !== y) throw new Error(msg || ('expected ' + y + ' but got ' + x)) }\n;(async function __sc_main() {\n${code}\n${testBlock}})().then(() => postMessage({ kind: 'done' })).catch(err => postMessage({ kind: 'error', text: err && err.stack ? err.stack : String(err) }))`
   const blob = new Blob([source], { type: 'text/javascript' })
   const url = URL.createObjectURL(blob)
   let worker: Worker | null = null
@@ -78,12 +87,14 @@ export function runJavaScript(code: string, handlers: JsRunHandlers = {}, timeou
     finish({ ok: false, error: String((err as Error).message), ms: 0 })
     return { promise, stop: () => {} }
   }
+  let testResults: JsTestResult[] | undefined
   worker.onmessage = e => {
-    const { kind, text } = e.data as { kind: string; text?: string }
+    const { kind, text, results } = e.data as { kind: string; text?: string; results?: JsTestResult[] }
     if (kind === 'stdout') handlers.onStdout?.(text ?? '')
     else if (kind === 'stderr') handlers.onStderr?.(text ?? '')
-    else if (kind === 'error') finish({ ok: false, error: cleanStack(text ?? 'Error'), ms: Math.round(performance.now() - started) })
-    else if (kind === 'done') finish({ ok: true, ms: Math.round(performance.now() - started) })
+    else if (kind === 'tests') testResults = results
+    else if (kind === 'error') finish({ ok: false, error: cleanStack(text ?? 'Error'), ms: Math.round(performance.now() - started), tests: tests ? (testResults ?? tests.map(t => ({ name: t.name, passed: false, message: 'Your code threw an error before this check could run.' }))) : undefined })
+    else if (kind === 'done') finish({ ok: true, ms: Math.round(performance.now() - started), tests: testResults })
   }
   worker.onerror = e => {
     // Syntax errors surface here, before any code runs.

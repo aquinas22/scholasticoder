@@ -38,6 +38,7 @@ export function SiteFooter() {
           <div>
             <h3>Reference</h3>
             <Link href="/method">The method</Link>
+            <Link href="/questions">Disputed questions</Link>
             <Link href="/glossary">Glossary</Link>
             <Link href="/editors">Editors</Link>
             <a href="https://github.com/aquinas22/scholasticoder" target="_blank" rel="noreferrer">Source on GitHub</a>

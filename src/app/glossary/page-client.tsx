@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { glossary } from '@/content/glossary'
 import { getLanguage } from '@/content'
+import { CodeBlock } from '@/components/CodeBlock'
 
 export default function GlossaryClient() {
   const [query, setQuery] = useState('')
@@ -16,7 +17,7 @@ export default function GlossaryClient() {
         <div>
           <p className="eyebrow"><span>G</span> Glossarium</p>
           <h1>The words, explained.</h1>
-          <p>{glossary.length} terms in plain language, each pointing to the path where it is taught properly. Search by word, alias or idea.</p>
+          <p>{glossary.length} terms in plain language, most with a worked example, each pointing to the path where it is taught properly. The same words are clickable inside lessons.</p>
         </div>
         <label className="glossary-search">
           <span>Search</span>
@@ -35,6 +36,7 @@ export default function GlossaryClient() {
                 <dt>{e.term}{e.aliases && e.aliases.length > 0 && <span className="glossary-aliases">also: {e.aliases.join(', ')}</span>}</dt>
                 <dd>
                   {e.definition}
+                  {e.example && <span className="glossary-example"><CodeBlock code={e.example.code} language={e.example.language} /></span>}
                   {e.paths && e.paths.length > 0 && (
                     <span className="glossary-paths">
                       {e.paths.map(p => { const lang = getLanguage(p); return lang ? <Link key={p} href={`/languages/${p}`} style={{ color: lang.accentColor }}>{lang.name}</Link> : null })}

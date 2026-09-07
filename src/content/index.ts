@@ -8,6 +8,8 @@ import { tsPractice } from './ts-practice'
 import { shellPractice } from './shell-practice'
 import { quaestiones } from './quaestiones'
 import { quaestionesWeb } from './quaestiones-web'
+import { quaestionesTools } from './quaestiones-tools'
+import { quaestionesSystems } from './quaestiones-systems'
 import { python } from './languages/python'
 import { javascript } from './languages/javascript'
 import { rust } from './languages/rust'
@@ -116,7 +118,7 @@ for (const [langSlug, byLesson] of Object.entries(shellPractice)) {
 }
 
 // Disputed questions go after the reading and before the exercises.
-for (const source of [quaestiones, quaestionesWeb]) {
+for (const source of [quaestiones, quaestionesWeb, quaestionesTools, quaestionesSystems]) {
   for (const [langSlug, byLesson] of Object.entries(source)) {
     const lang = languages.find(l => l.slug === langSlug)
     if (!lang) continue
@@ -174,6 +176,18 @@ export const totalExercises = languages.reduce((sum, l) => sum + l.lessons.reduc
 export function countExercises(language: Language) {
   return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'exercise' || s.type === 'shell').length, 0)
 }
+export interface QuaestioRef { languageSlug: string; languageName: string; accentColor: string; lessonSlug: string; lessonTitle: string; index: number; question: string; objections: number }
+
+/** Every disputed question on the site, in path then lesson order. */
+export const allQuaestiones: QuaestioRef[] = languages.flatMap(l =>
+  l.lessons.flatMap(lesson =>
+    lesson.sections
+      .map((s, index) => ({ s, index }))
+      .filter(x => x.s.type === 'quaestio' && x.s.quaestio)
+      .map(x => ({ languageSlug: l.slug, languageName: l.name, accentColor: l.accentColor, lessonSlug: lesson.slug, lessonTitle: lesson.title, index: x.index, question: x.s.quaestio!.question, objections: x.s.quaestio!.objections.length }))
+  )
+)
+
 export function countRunnable(language: Language) {
   const runnable = new Set(['python', 'javascript', 'js', 'html', 'css', 'sql', 'typescript', 'ts'])
   return language.lessons.reduce((n, lesson) => n + lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && runnable.has(s.language ?? language.slug)).length, 0)

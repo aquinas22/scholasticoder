@@ -4,6 +4,7 @@ import { notFound, useParams } from 'next/navigation'
 import { CodeLab } from '@/components/CodeLab'
 import { challenges, getChallenge, TIER_COLOR, TIER_LABEL } from '@/content/challenges'
 import { useProgress } from '@/hooks/useProgress'
+import { TermScope, RichText } from '@/components/Term'
 
 export default function ChallengeClient() {
   const params = useParams()
@@ -18,6 +19,7 @@ export default function ChallengeClient() {
   const solved = isExerciseDone(`challenge/${challenge.slug}`)
 
   return (
+    <TermScope scopeKey={`challenge/${challenge.slug}`}>
     <main className="section-wrap challenge-shell">
       <nav style={{ marginBottom: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }} aria-label="Breadcrumb">
         <Link href="/dojo" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Dojo</Link>
@@ -34,7 +36,7 @@ export default function ChallengeClient() {
           {solved && <span className="interactive-pill">✓ solved</span>}
         </div>
         <h1>{challenge.title}</h1>
-        <p className="challenge-prompt">{challenge.prompt}</p>
+        <p className="challenge-prompt"><RichText text={challenge.prompt} blockId="prompt" /></p>
         {challenge.examples && (
           <div className="challenge-examples">
             <span className="sc-lab-kicker">Examples</span>
@@ -59,5 +61,6 @@ export default function ChallengeClient() {
         {next ? <Link href={`/challenges/${next.slug}`} className="lesson-nav-card is-next"><span>Next →</span><strong>{next.title}</strong></Link> : <Link href="/challenges" className="lesson-nav-card is-next"><span>Top of the ladder</span><strong>Back to all challenges →</strong></Link>}
       </nav>
     </main>
+    </TermScope>
   )
 }

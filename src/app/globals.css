@@ -735,3 +735,19 @@ body::before {
 .method-article dd { margin: .15rem 0 0; color: var(--text-muted); line-height: 1.6; font-size: .95rem; }
 .method-article > p { font-family: var(--font-serif); font-size: 1.12rem; line-height: 1.65; }
 .inline-link { color: var(--accent); font-weight: 700; text-decoration: none; }
+
+/* Tabula quaestionum */
+.questions-shell { padding: 3rem 0 5rem; }
+.quaestio-group { margin-top: 2.2rem; }
+.quaestio-group h2 { display: flex; align-items: baseline; gap: .8rem; margin: 0 0 .8rem; font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700; }
+.quaestio-group h2 a { color: inherit; text-decoration: none; }
+.quaestio-group h2 span { color: var(--text-muted); font-family: var(--font-mono); font-size: .68rem; font-weight: 400; }
+.quaestio-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+.quaestio-list a { display: flex; gap: .9rem; align-items: flex-start; padding: .7rem .9rem; border: 1px solid var(--border); border-radius: 4px; background: color-mix(in srgb, var(--surface) 88%, transparent); text-decoration: none; color: var(--text); transition: border-color .15s, transform .15s; }
+.quaestio-list a:hover { border-color: color-mix(in srgb, var(--rubric) 55%, var(--border)); transform: translateX(2px); }
+.quaestio-num { display: grid; place-items: center; min-width: 2rem; height: 1.6rem; padding: 0 .35rem; border: 1px solid var(--border); border-radius: 3px; color: var(--rubric); font-family: var(--font-serif); font-size: .8rem; font-weight: 700; }
+.quaestio-text { display: grid; gap: .15rem; }
+.quaestio-text strong { font-family: var(--font-serif); font-size: 1.08rem; font-weight: 600; line-height: 1.35; }
+.quaestio-text small { color: var(--text-muted); font-size: .74rem; }
+.glossary-example { display: block; max-width: 46rem; margin-top: .6rem; }
+.glossary-example .sc-codeblock pre { font-size: .78rem; padding: .8rem 1rem; }

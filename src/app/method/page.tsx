@@ -51,7 +51,8 @@ export default function MethodPage() {
       </section>
 
       <div className="hero-actions">
-        <Link href="/languages/python/lessons/variables" className="button-primary">See a disputation <span>→</span></Link>
+        <Link href="/questions" className="button-primary">All disputed questions <span>→</span></Link>
+        <Link href="/languages/python/lessons/variables" className="button-ghost">See one in a lesson</Link>
         <Link href="/glossary" className="button-ghost">Browse the glossary</Link>
       </div>
     </main>

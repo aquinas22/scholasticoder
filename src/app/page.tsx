@@ -11,9 +11,9 @@ import { TempleTerminal } from '@/components/TempleTerminal'
 import { useProgress } from '@/hooks/useProgress'
 
 const paths = [
-  { mark: 'I', title: 'Choose a discipline', copy: 'Begin with Python or JavaScript, pursue the web arts, or descend into systems and computer science.' },
-  { mark: 'II', title: 'Study the text', copy: 'Focused lessons define each idea, demonstrate it in real code, and annotate the errors that matter.' },
-  { mark: 'III', title: 'Practice the craft', copy: 'Run every example in the browser, solve graded exercises with instant feedback, and climb the challenge ladder.' },
+  { mark: 'L', title: 'Lectio', copy: 'Read the text: each idea defined, then shown in code you can run and change on the spot. Click any underlined word for a definition and an example.' },
+  { mark: 'D', title: 'Disputatio', copy: 'Every lesson poses its question in the manner of the Summa — "Whether a variable has a type?" — states the strongest objections, lets you judge them, then answers.' },
+  { mark: 'E', title: 'Exercitatio', copy: 'Prove it by doing: graded exercises in Python, JavaScript, TypeScript, SQL and the shell, with hints, checks and a reference solution.' },
 ]
 
 const HOME_DEMO = `# This is real Python 3, running in your browser. Edit it and press Run.
@@ -56,8 +56,8 @@ export default function HomePage() {
       <section id="way" className="way-section section-wrap">
         <div className="section-heading centered">
           <p className="eyebrow"><span>V</span> The scholastic method</p>
-          <h2>Understand. Question. Build.</h2>
-          <p>Definitions before abstractions. Questions before assumptions. Practice after understanding. Each path leads from first principles to working knowledge.</p>
+          <h2>Read. Dispute. Practise.</h2>
+          <p>Taught in the manner of the medieval schools: the reading, the disputed question with its objections and replies, and the practice that proves understanding. <Link href="/method" className="inline-link">How the method works →</Link></p>
         </div>
         <div className="way-grid">
           {paths.map(path => <article className="way-card" key={path.mark}><span className="brush-mark">{path.mark}</span><h3>{path.title}</h3><p>{path.copy}</p></article>)}

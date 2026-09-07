@@ -660,3 +660,78 @@ body::before {
 .shell-input-row { display: flex; gap: .5rem; align-items: baseline; }
 .shell-prompt { color: #9ccf6b; white-space: nowrap; }
 .shell-input-row input { flex: 1; min-width: 40px; background: transparent; border: 0; outline: 0; color: #f0ead8; font: inherit; padding: 0; }
+
+/* Clickable key words */
+.term { position: relative; display: inline; }
+.term-word { all: unset; cursor: pointer; border-bottom: 1px dotted color-mix(in srgb, var(--rubric) 70%, transparent); color: inherit; transition: color .15s, border-color .15s; }
+.term-word:hover, .term-word.is-open { color: var(--rubric); border-bottom-style: solid; }
+.term-word:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.term-pop { position: absolute; left: 0; z-index: 40; width: min(30rem, calc(100vw - 2rem)); padding: .9rem 1rem 1rem; border: 1px solid color-mix(in srgb, var(--rubric) 40%, var(--border)); border-radius: 8px; background: var(--surface); box-shadow: 0 18px 50px rgba(0,0,0,.35); display: grid; gap: .6rem; font-family: var(--font-dm-sans, sans-serif); font-size: .9rem; line-height: 1.55; font-style: normal; text-align: left; }
+.term-pop.is-below { top: calc(100% + 8px); }
+.term-pop.is-above { bottom: calc(100% + 8px); }
+.term-pop::before { content: ''; position: absolute; inset: 5px; border: 1px solid color-mix(in srgb, var(--border) 50%, transparent); border-radius: 5px; pointer-events: none; }
+.term-pop-head { display: flex; align-items: baseline; gap: .6rem; }
+.term-pop-head strong { font-family: var(--font-serif); font-size: 1.25rem; font-weight: 700; }
+.term-close { all: unset; margin-left: auto; cursor: pointer; padding: 0 .3rem; color: var(--text-muted); font-size: 1.1rem; line-height: 1; }
+.term-close:hover { color: var(--text); }
+.term-def { color: var(--text); }
+.term-example { display: block; font-size: .78rem; }
+.term-example .sc-codeblock pre { font-size: .76rem; padding: .7rem .9rem; }
+.term-example .sc-codeblock-bar { height: 28px; }
+.term-links { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .8rem; font-weight: 600; }
+.term-links a { text-decoration: none; color: var(--accent); }
+@media (max-width: 640px) { .term-pop { position: fixed; left: 1rem; right: 1rem; width: auto; top: auto !important; bottom: 1rem !important; max-height: 70vh; overflow: auto; } }
+
+/* ───────────────────────── Disputatio (Summa-style questions) ───────────────────────── */
+.disputatio { margin: 0 0 2rem; padding: 1.5rem 1.6rem 1.6rem; border: 1px solid var(--border); border-radius: 4px; background: color-mix(in srgb, var(--surface) 88%, transparent); position: relative; }
+.disputatio::after { content: ''; position: absolute; inset: 7px; border: 1px solid color-mix(in srgb, var(--border) 48%, transparent); pointer-events: none; }
+.disputatio.is-done { border-color: color-mix(in srgb, var(--gold) 55%, var(--border)); }
+.disputatio > * { position: relative; z-index: 1; }
+.disp-head h3 { margin: .4rem 0 .5rem; font-family: var(--font-serif); font-size: 1.7rem; font-weight: 700; line-height: 1.15; letter-spacing: -.01em; }
+.disp-how { margin: 0 0 1.2rem; color: var(--text-muted); font-family: var(--font-serif); font-style: italic; font-size: 1.02rem; line-height: 1.5; }
+.disp-label { color: var(--rubric); font: 700 .66rem var(--font-mono); letter-spacing: .14em; text-transform: uppercase; margin-bottom: .3rem; }
+.disp-objections { list-style: none; margin: 0 0 1.2rem; padding: 0; display: grid; gap: .9rem; }
+.disp-objection { padding: .9rem 1rem 1rem; border-left: 3px solid color-mix(in srgb, var(--rubric) 55%, var(--border)); background: color-mix(in srgb, var(--card) 70%, transparent); border-radius: 0 6px 6px 0; }
+.disp-claim { margin: 0 0 .6rem; font-family: var(--font-serif); font-size: 1.12rem; line-height: 1.55; }
+.disp-judge { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; color: var(--text-muted); font-size: .84rem; }
+.disp-reply { margin-top: .6rem; padding-top: .7rem; border-top: 1px dashed var(--border); }
+.disp-reply p { margin: 0 0 .6rem; line-height: 1.7; font-size: .97rem; }
+.disp-verdict { margin-bottom: .5rem; font-size: .82rem; font-weight: 700; }
+.judged-right .disp-verdict { color: #00b372; }
+.judged-wrong .disp-verdict { color: #d9482b; }
+.disp-sedcontra { margin: 0 0 1.2rem; padding: .9rem 1rem; border: 1px solid color-mix(in srgb, var(--gold) 55%, var(--border)); border-radius: 6px; background: color-mix(in srgb, var(--gold) 8%, transparent); }
+.disp-sedcontra p { margin: 0; font-family: var(--font-serif); font-size: 1.12rem; line-height: 1.55; font-style: italic; }
+.disp-respondeo p { font-family: var(--font-serif); font-size: 1.15rem; line-height: 1.7; margin: 0 0 .9rem; }
+.disp-respondeo p.has-initial::first-letter { float: left; margin: .1em .1em 0 0; color: var(--rubric); font-size: 3.2em; font-weight: 700; line-height: .8; }
+.disp-score { color: var(--text-muted); font-size: .9rem !important; font-style: italic; }
+.disp-locked { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: .8rem 1rem; border: 1px dashed var(--border); border-radius: 6px; color: var(--text-muted); font-size: .88rem; }
+.disp-locked p { margin: 0; }
+
+/* Lesson parts: Lectio · Disputatio · Exercitatio · Examen */
+.lesson-part { margin: 2.6rem 0 1.2rem; display: flex; align-items: center; gap: .9rem; }
+.lesson-part::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+.lesson-part-mark { display: grid; place-items: center; width: 2rem; height: 2rem; border: 1px solid var(--rubric); color: var(--rubric); font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; box-shadow: inset 0 0 0 2px var(--bg), inset 0 0 0 3px var(--rubric); }
+.lesson-part h2 { margin: 0; font-family: var(--font-serif); font-size: 1.35rem; font-weight: 700; letter-spacing: .01em; }
+.lesson-part small { color: var(--text-muted); font-size: .78rem; font-style: italic; }
+.ordo { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.5rem; padding: 0; list-style: none; }
+.ordo li a { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .7rem; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); font-size: .76rem; text-decoration: none; }
+.ordo li a:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+.ordo li a b { color: var(--rubric); font-family: var(--font-serif); }
+
+/* Method page */
+.method-shell { padding: 3rem 0 5rem; max-width: 860px; }
+.method-head h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1; letter-spacing: -.03em; margin: .8rem 0 1rem; }
+.method-head > p { font-family: var(--font-serif); font-size: 1.22rem; line-height: 1.6; color: var(--text); margin: 0 0 2.5rem; }
+.method-steps { list-style: none; margin: 0 0 3rem; padding: 0; display: grid; gap: 1rem; }
+.method-steps li { display: flex; gap: 1.1rem; align-items: flex-start; padding: 1.2rem 1.3rem; border: 1px solid var(--border); border-radius: 4px; background: color-mix(in srgb, var(--surface) 88%, transparent); position: relative; }
+.method-steps li::after { content: ''; position: absolute; inset: 6px; border: 1px solid color-mix(in srgb, var(--border) 45%, transparent); pointer-events: none; }
+.method-steps h2 { margin: 0 0 .35rem; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 700; }
+.method-steps h2 small { color: var(--text-muted); font-size: .8rem; font-style: italic; font-weight: 400; }
+.method-steps p { margin: 0; color: var(--text-muted); line-height: 1.65; font-size: .95rem; }
+.method-article { margin: 0 0 2.5rem; }
+.method-article h2 { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 700; margin: 0 0 1rem; }
+.method-article dl { margin: 0 0 1.2rem; display: grid; gap: .7rem; }
+.method-article dt { color: var(--rubric); font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; font-style: italic; }
+.method-article dd { margin: .15rem 0 0; color: var(--text-muted); line-height: 1.6; font-size: .95rem; }
+.method-article > p { font-family: var(--font-serif); font-size: 1.12rem; line-height: 1.65; }
+.inline-link { color: var(--accent); font-weight: 700; text-decoration: none; }

@@ -7,7 +7,7 @@ const LINKS = [
   { href: '/languages', label: 'Paths' },
   { href: '/dojo', label: 'Dojo', accent: true },
   { href: '/challenges', label: 'Challenges' },
-  { href: '/editors', label: 'Editors' },
+  { href: '/glossary', label: 'Glossary' },
 ]
 
 export function Navigation() {

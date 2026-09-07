@@ -8,6 +8,7 @@ import { useProgress } from '@/hooks/useProgress'
 import { LessonSidebar } from '@/components/LessonSidebar'
 import { LessonSection } from '@/components/LessonSection'
 import { RUNNABLE_LANGS } from '@/lib/runnable'
+import { TermScope, RichText } from '@/components/Term'
 
 export default function LessonPage() {
   const params = useParams()
@@ -48,7 +49,17 @@ export default function LessonPage() {
   const runnableCount = lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && RUNNABLE_LANGS.has(s.language ?? language.slug)).length
   const solved = countExercises(`${language.slug}/${lesson.slug}/`)
 
+  // The scholastic order: reading, disputed question, practice, examination.
+  const PART_DEFS = [
+    { id: 'lectio', mark: 'L', title: 'Lectio', blurb: 'the reading', types: ['text', 'code', 'note', 'warning', 'tip'] },
+    { id: 'disputatio', mark: 'D', title: 'Disputatio', blurb: 'the disputed question', types: ['quaestio'] },
+    { id: 'exercitatio', mark: 'E', title: 'Exercitatio', blurb: 'practice with checks', types: ['exercise', 'shell'] },
+    { id: 'examen', mark: 'X', title: 'Examen', blurb: 'quick checks', types: ['quiz'] },
+  ]
+  const parts = PART_DEFS.map(def => ({ ...def, items: lesson.sections.map((section, idx) => ({ section, idx })).filter(x => def.types.includes(x.section.type)) })).filter(p => p.items.length > 0)
+
   return (
+    <TermScope scopeKey={`${language.slug}/${lesson.slug}`}>
     <div className="lesson-shell">
       <LessonSidebar language={language} currentLessonSlug={lesson.slug} />
 
@@ -77,15 +88,29 @@ export default function LessonPage() {
           </h1>
 
           <p style={{ background: `${language.accentColor}0e`, borderLeft: `3px solid ${language.accentColor}`, borderRadius: '0 8px 8px 0', padding: '0.85rem 1.1rem', fontSize: '0.97rem', color: 'var(--text)', fontStyle: 'italic', lineHeight: 1.7, margin: 0, opacity: 0.9 }}>
-            {lesson.intro}
+            <RichText text={lesson.intro} blockId="intro" />
           </p>
         </header>
 
-        <div className="lesson-prose has-dropcap" style={{ marginBottom: '3rem' }}>
-          {lesson.sections.map((section, idx) => (
-            <LessonSection key={idx} section={section} index={idx} languageSlug={language.slug} lessonSlug={lesson.slug} />
-          ))}
-        </div>
+        {parts.length > 1 && (
+          <ul className="ordo" aria-label="Order of the lesson">
+            {parts.map(p => <li key={p.id}><a href={`#${p.id}`}><b>{p.mark}</b>{p.title}</a></li>)}
+          </ul>
+        )}
+
+        {parts.map((part, pi) => (
+          <div key={part.id} id={part.id} className={pi === 0 ? 'lesson-prose has-dropcap' : 'lesson-prose'} style={{ marginBottom: pi === parts.length - 1 ? '3rem' : 0 }}>
+            {parts.length > 1 && (
+              <div className="lesson-part">
+                <span className="lesson-part-mark" aria-hidden>{part.mark}</span>
+                <h2>{part.title} <small>{part.blurb}</small></h2>
+              </div>
+            )}
+            {part.items.map(({ section, idx }) => (
+              <LessonSection key={idx} section={section} index={idx} languageSlug={language.slug} lessonSlug={lesson.slug} />
+            ))}
+          </div>
+        ))}
 
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem', marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
@@ -123,5 +148,6 @@ export default function LessonPage() {
         </nav>
       </main>
     </div>
+    </TermScope>
   )
 }

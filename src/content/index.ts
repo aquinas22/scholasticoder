@@ -6,6 +6,8 @@ import { jsPractice } from './js-practice'
 import { sqlPractice } from './sql-practice'
 import { tsPractice } from './ts-practice'
 import { shellPractice } from './shell-practice'
+import { quaestiones } from './quaestiones'
+import { quaestionesWeb } from './quaestiones-web'
 import { python } from './languages/python'
 import { javascript } from './languages/javascript'
 import { rust } from './languages/rust'
@@ -110,6 +112,22 @@ for (const [langSlug, byLesson] of Object.entries(shellPractice)) {
   for (const lesson of lang.lessons) {
     const practice = byLesson[lesson.slug]
     if (practice && !lesson.sections.some(s => s.type === 'shell')) lesson.sections.push(...practice)
+  }
+}
+
+// Disputed questions go after the reading and before the exercises.
+for (const source of [quaestiones, quaestionesWeb]) {
+  for (const [langSlug, byLesson] of Object.entries(source)) {
+    const lang = languages.find(l => l.slug === langSlug)
+    if (!lang) continue
+    for (const lesson of lang.lessons) {
+      const q = byLesson[lesson.slug]
+      if (!q || lesson.sections.some(s => s.type === 'quaestio')) continue
+      const at = lesson.sections.findIndex(s => s.type === 'exercise' || s.type === 'quiz' || s.type === 'shell')
+      const section = { type: 'quaestio' as const, content: q.question, quaestio: q }
+      if (at === -1) lesson.sections.push(section)
+      else lesson.sections.splice(at, 0, section)
+    }
   }
 }
 

@@ -5,6 +5,8 @@ import { CodeLab } from './CodeLab'
 import { LiveHtml } from './LiveHtml'
 import { Quiz } from './Quiz'
 import { ShellLab } from './ShellLab'
+import { RichText } from './Term'
+import { Disputatio } from './Disputatio'
 import { runtimeFor } from '@/lib/runnable'
 
 interface Props { section: Section; index: number; languageSlug: string; lessonSlug: string }
@@ -17,7 +19,7 @@ const CALLOUT = {
 
 export function LessonSection({ section, index, languageSlug, lessonSlug }: Props) {
   if (section.type === 'text') {
-    return <p style={{ marginBottom: '1.4rem', lineHeight: 1.8, fontSize: '1rem', color: 'var(--text)' }}>{section.content}</p>
+    return <p style={{ marginBottom: '1.4rem', lineHeight: 1.8, fontSize: '1rem', color: 'var(--text)' }}><RichText text={section.content} blockId={`s${index}`} /></p>
   }
 
   if (section.type === 'code') {
@@ -40,7 +42,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
     const ex = section.exercise
     return (
       <div style={{ marginBottom: '1.9rem' }}>
-        <p style={{ marginBottom: '0.75rem', lineHeight: 1.75, fontSize: '0.98rem', color: 'var(--text)' }}>{section.content}</p>
+        <p style={{ marginBottom: '0.75rem', lineHeight: 1.75, fontSize: '0.98rem', color: 'var(--text)' }}><RichText text={section.content} blockId={`s${index}`} /></p>
         <CodeLab
           runtime={(() => { const r = runtimeFor(section.language ?? languageSlug); return r === 'javascript' || r === 'sql' || r === 'typescript' ? r : 'python' })()}
           id={`${languageSlug}/${lessonSlug}/${index}`}
@@ -54,6 +56,10 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
         />
       </div>
     )
+  }
+
+  if (section.type === 'quaestio' && section.quaestio) {
+    return <Disputatio quaestio={section.quaestio} id={`quaestio:${languageSlug}/${lessonSlug}/${index}`} blockId={`s${index}`} />
   }
 
   if (section.type === 'shell' && section.shell) {
@@ -75,7 +81,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
       <div style={{ background: c.bg, border: `1px solid ${c.border}`, borderLeft: `3px solid ${c.color}`, borderRadius: '0 8px 8px 0', padding: '0.9rem 1.1rem', marginBottom: '1.75rem', fontSize: '0.92rem', lineHeight: 1.7, color: 'var(--text)' }}>
         <span style={{ display: 'inline-block', color: c.color, fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{c.label}</span>
         <br />
-        {section.content}
+        <RichText text={section.content} blockId={`s${index}`} />
       </div>
     )
   }

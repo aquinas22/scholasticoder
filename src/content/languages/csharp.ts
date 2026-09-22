@@ -5,7 +5,7 @@ export const csharp: Language = {
   name: 'C#',
   tagline: 'Java, but Microsoft-flavored. Honestly, quite good.',
   description: 'C# is a modern, statically typed language from Microsoft built on the .NET platform. It\'s the language of Unity game development, Windows desktop apps, and enterprise backends. It evolves rapidly and has some genuinely excellent features.',
-  accentColor: '#512BD4',
+  accentColor: '#7C5FE0',
   textOnAccent: '#fff',
   icon: 'C#',
   difficulty: 'intermediate',

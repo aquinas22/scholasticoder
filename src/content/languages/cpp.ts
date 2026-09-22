@@ -5,7 +5,7 @@ export const cpp: Language = {
   name: 'C++',
   tagline: 'C, but with more ways to shoot yourself in the foot. And classes.',
   description: 'C++ is C with object-oriented programming, templates, and a standard library that actually does things. It\'s complex, but it\'s used for game engines, browsers, trading systems, and anything where performance is non-negotiable.',
-  accentColor: '#00599C',
+  accentColor: '#2E86D6',
   textOnAccent: '#fff',
   icon: 'C++',
   difficulty: 'advanced',

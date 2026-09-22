@@ -5,7 +5,7 @@ export const compilers: Language = {
   name: 'Compilers',
   tagline: 'How text becomes a running program.',
   description: "A compiler is a program that reads your code and writes an equivalent program in another language — usually machine code. Understanding the pipeline (lexing, parsing, type checking, optimization, code generation) demystifies error messages, explains what optimizers can and can't do, and covers the ideas behind every linter, formatter, and transpiler you use daily.",
-  accentColor: '#9C27B0',
+  accentColor: '#B84FCB',
   textOnAccent: '#fff',
   icon: 'Cc',
   difficulty: 'advanced',

@@ -5,7 +5,7 @@ export const lua: Language = {
   name: 'Lua',
   tagline: 'Tiny language, giant reach — games, mods, embedded everywhere.',
   description: "Lua is a scripting language so small (the whole interpreter is ~300KB) that apps embed it to make themselves scriptable. Roblox, World of Warcraft addons, Neovim configs, Redis scripts — all Lua. It's one of the friendliest first languages, and the standard path into game scripting.",
-  accentColor: '#000080',
+  accentColor: '#6068C8',
   textOnAccent: '#fff',
   icon: 'Lu',
   difficulty: 'beginner',

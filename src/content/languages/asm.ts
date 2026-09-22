@@ -5,7 +5,7 @@ export const asm: Language = {
   name: 'Assembly',
   tagline: 'The last language between you and the hardware.',
   description: "Assembly language is a thin layer above raw machine code. Every other programming language compiles down to this. Learning it means seeing exactly what the CPU does — registers, memory, jumps, the stack. It's tedious, unforgiving, and makes everything else feel like a luxury. We teach x86-64 NASM on Linux, the most common flavor for desktop/server work.",
-  accentColor: '#6E4C9F',
+  accentColor: '#8E6EC0',
   textOnAccent: '#fff',
   icon: 'As',
   difficulty: 'advanced',

@@ -5,7 +5,7 @@ export const css: Language = {
   name: 'CSS',
   tagline: 'It\'s not a programming language. (It\'s not a programming language.) We\'ll keep saying it.',
   description: 'CSS (Cascading Style Sheets) controls how HTML looks. Colors, fonts, layout, animations, responsiveness — CSS does all of it. It\'s deceptively powerful: the basics are easy to learn, mastering it takes years.',
-  accentColor: '#1572B6',
+  accentColor: '#2580C4',
   textOnAccent: '#fff',
   icon: 'CSS',
   difficulty: 'beginner',

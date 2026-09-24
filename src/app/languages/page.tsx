@@ -1,20 +1,18 @@
 'use client'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { languages, totalLessons, totalExercises, countExercises } from '@/content'
+import { languages, totalLessons, totalExercises, countExercises, getLanguage } from '@/content'
 import { LanguageCard } from '@/components/LanguageCard'
 import { useProgress } from '@/hooks/useProgress'
+import { COURSE_GROUPS } from '@/lib/categories'
 import type { Difficulty } from '@/content/types'
 
 const FILTERS: Array<{ id: string; label: string; test: (slug: string, difficulty: Difficulty, exercises: number) => boolean }> = [
   { id: 'all', label: 'All', test: () => true },
-  { id: 'interactive', label: '▶ Interactive', test: (_s, _d, ex) => ex > 0 },
   { id: 'beginner', label: 'Beginner', test: (_s, d) => d === 'beginner' },
   { id: 'intermediate', label: 'Intermediate', test: (_s, d) => d === 'intermediate' },
   { id: 'advanced', label: 'Advanced', test: (_s, d) => d === 'advanced' },
-  { id: 'web', label: 'Web', test: s => ['html', 'css', 'javascript', 'typescript', 'react', 'vue', 'nodejs', 'tailwind', 'vite', 'php'].includes(s) },
-  { id: 'systems', label: 'Systems & CS', test: s => ['c', 'cpp', 'rust', 'go', 'asm', 'computer-architecture', 'operating-systems', 'compilers', 'dsa', 'internet'].includes(s) },
-  { id: 'tools', label: 'Tools', test: s => ['git', 'bash', 'powershell', 'terminal', 'sql'].includes(s) },
+  { id: 'interactive', label: 'Has exercises', test: (_s, _d, ex) => ex > 0 },
 ]
 
 export default function LanguagesPage() {
@@ -25,53 +23,63 @@ export default function LanguagesPage() {
 
   const visible = useMemo(() => {
     const f = FILTERS.find(x => x.id === filter) ?? FILTERS[0]
-    return languages.filter(l => f.test(l.slug, l.difficulty, countExercises(l)) && (!q || l.name.toLowerCase().includes(q) || l.tagline.toLowerCase().includes(q) || l.usedFor.some(u => u.toLowerCase().includes(q))))
+    return new Set(languages.filter(l => f.test(l.slug, l.difficulty, countExercises(l)) && (!q || l.name.toLowerCase().includes(q) || l.tagline.toLowerCase().includes(q) || l.usedFor.some(u => u.toLowerCase().includes(q)))).map(l => l.slug))
   }, [q, filter])
 
   const lessonHits = useMemo(() => {
     if (q.length < 3) return []
-    const hits: Array<{ lang: string; slug: string; title: string; href: string }> = []
+    const hits: Array<{ lang: string; title: string; href: string }> = []
     for (const l of languages) for (const lesson of l.lessons) {
-      if (lesson.title.toLowerCase().includes(q) || lesson.intro.toLowerCase().includes(q)) hits.push({ lang: l.name, slug: l.slug, title: lesson.title, href: `/languages/${l.slug}/lessons/${lesson.slug}` })
+      if (lesson.title.toLowerCase().includes(q) || lesson.intro.toLowerCase().includes(q)) hits.push({ lang: l.name, title: lesson.title, href: `/languages/${l.slug}/lessons/${lesson.slug}` })
       if (hits.length >= 12) return hits
     }
     return hits
   }, [q])
 
   return (
-    <main style={{ maxWidth: 1200, margin: '0 auto', padding: '3rem 1.5rem' }}>
-      <p className="eyebrow"><span>C</span> The codex</p>
-      <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2.2rem, 5vw, 3.4rem)', fontWeight: 400, color: 'var(--text)', margin: '.6rem 0 .5rem', letterSpacing: '-0.03em', lineHeight: 1 }}>
-        All paths.
-      </h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-        {languages.length} learning paths, {totalLessons} lessons, {totalExercises} graded exercises, 0 paywalls.
-      </p>
+    <main className="wrap page">
+      <header className="page-head">
+        <h1>Courses</h1>
+        <p>{languages.length} courses, {totalLessons} lessons and {totalExercises} checked exercises, all free. Not sure where to begin? <Link className="text-link" href="/languages/python">Start with Python</Link>.</p>
+      </header>
 
-      <label className="path-search">
-        <span>Search paths and lessons</span>
-        <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="python, decorators, JOIN, closures…" autoComplete="off" />
-      </label>
-      <div className="path-filters" role="group" aria-label="Filter paths">
-        {FILTERS.map(f => <button key={f.id} type="button" className={`dojo-tab ${filter === f.id ? 'is-active' : ''}`} onClick={() => setFilter(f.id)}>{f.label}</button>)}
+      <div className="toolbar">
+        <label className="search">
+          <span className="visually-hidden">Search courses and lessons</span>
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search courses and lessons: loops, JOIN, closures…" autoComplete="off" />
+        </label>
+        <div className="chips" role="group" aria-label="Filter courses">
+          {FILTERS.map(f => <button key={f.id} type="button" className={`chip ${filter === f.id ? 'is-active' : ''}`} aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>{f.label}</button>)}
+        </div>
       </div>
 
       {lessonHits.length > 0 && (
-        <ul className="lesson-hits" aria-label="Matching lessons">
-          {lessonHits.map(h => <li key={h.href}><Link href={h.href}><span>{h.lang}</span>{h.title}</Link></li>)}
-        </ul>
+        <section className="lesson-hits" aria-label="Matching lessons">
+          <h2>Matching lessons</h2>
+          <ul>
+            {lessonHits.map(h => <li key={h.href}><Link href={h.href}><span>{h.lang}</span>{h.title}</Link></li>)}
+          </ul>
+        </section>
       )}
 
-      {visible.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No path matches. Try another word or clear the filter.</p>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
-          {visible.map(lang => {
-            const prog = getLangProgress(lang.slug, lang.lessons.length)
-            return <LanguageCard key={lang.slug} language={lang} completed={prog.completed} />
-          })}
-        </div>
-      )}
+      {visible.size === 0 && <p className="empty">No course matches. Try another word or clear the filter.</p>}
+
+      {COURSE_GROUPS.map(group => {
+        const slugs = group.slugs.filter(s => visible.has(s))
+        if (slugs.length === 0) return null
+        return (
+          <section key={group.id} className="course-group" aria-labelledby={`group-${group.id}`}>
+            <h2 id={`group-${group.id}`} className="course-group-title">{group.label} <span>{group.blurb}</span></h2>
+            <div className="course-grid">
+              {slugs.map(slug => {
+                const lang = getLanguage(slug)!
+                const prog = getLangProgress(lang.slug, lang.lessons.length)
+                return <LanguageCard key={slug} language={lang} completed={prog.completed} />
+              })}
+            </div>
+          </section>
+        )
+      })}
     </main>
   )
 }

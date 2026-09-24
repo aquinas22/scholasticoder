@@ -6,6 +6,7 @@ import { allQuaestiones } from '@/content'
 import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from '@/components/ProgressBar'
 import { useLastVisited } from '@/hooks/useLastVisited'
+import { LangIcon } from '@/components/LangIcon'
 
 export default function ProgressClient() {
   const { progress, exercisesDone, loaded } = useProgress()
@@ -14,7 +15,7 @@ export default function ProgressClient() {
   const challengesDone = challenges.filter(c => exercisesDone.includes(`challenge/${c.slug}`)).length
   const exercisesSolved = exercisesDone.filter(id => !id.startsWith('challenge/') && !id.startsWith('quiz:') && !id.startsWith('quaestio:')).length
   const quizzesAnswered = exercisesDone.filter(id => id.startsWith('quiz:')).length
-  const disputed = exercisesDone.filter(id => id.startsWith('quaestio:')).length
+  const reviewed = exercisesDone.filter(id => id.startsWith('quaestio:')).length
   const started = languages.filter(l => (progress[l.slug]?.completedLessons.length ?? 0) > 0 || exercisesDone.some(id => id.startsWith(l.slug + '/')))
   const untouched = languages.filter(l => !started.includes(l))
 
@@ -25,12 +26,11 @@ export default function ProgressClient() {
   }
 
   return (
-    <main className="section-wrap progress-shell">
-      <header className="progress-head">
+    <main className="wrap page">
+      <header className="page-head page-head-split">
         <div>
-          <p className="eyebrow"><span>H</span> Horarium</p>
-          <h1>Your progress.</h1>
-          <p>Kept in this browser only. Nothing leaves your machine, so nothing needs an account.</p>
+          <h1>Your progress</h1>
+          <p>Saved in this browser only. Nothing is sent anywhere, so there is no account to make. Using another device or browser starts fresh.</p>
         </div>
         {last && (
           <Link href={last.href} className="continue-card">
@@ -44,15 +44,15 @@ export default function ProgressClient() {
       <div className="stat-row" aria-label="Totals">
         <div className="stat-tile"><strong>{loaded ? lessonsDone : '–'}</strong><span>of {totalLessons} lessons completed</span></div>
         <div className="stat-tile"><strong>{loaded ? exercisesSolved : '–'}</strong><span>of {totalExercises} exercises solved</span></div>
-        <div className="stat-tile"><strong>{loaded ? challengesDone : '–'}</strong><span>of {challenges.length} challenges climbed</span></div>
-        <div className="stat-tile"><strong>{loaded ? disputed : '–'}</strong><span>of {allQuaestiones.length} questions disputed</span></div>
+        <div className="stat-tile"><strong>{loaded ? challengesDone : '–'}</strong><span>of {challenges.length} challenges solved</span></div>
+        <div className="stat-tile"><strong>{loaded ? reviewed : '–'}</strong><span>of {allQuaestiones.length} common questions reviewed</span></div>
         <div className="stat-tile"><strong>{loaded ? quizzesAnswered : '–'}</strong><span>quick checks answered</span></div>
-        <div className="stat-tile"><strong>{loaded ? started.length : '–'}</strong><span>of {languages.length} paths begun</span></div>
+        <div className="stat-tile"><strong>{loaded ? started.length : '–'}</strong><span>of {languages.length} courses started</span></div>
       </div>
 
       {started.length > 0 && (
         <section className="progress-section">
-          <h2>Paths in progress</h2>
+          <h2>Courses in progress</h2>
           <div className="progress-list">
             {started.map(l => {
               const done = progress[l.slug]?.completedLessons.length ?? 0
@@ -62,13 +62,13 @@ export default function ProgressClient() {
               const nextLesson = l.lessons.find(ls => !progress[l.slug]?.completedLessons.includes(ls.slug))
               return (
                 <div key={l.slug} className="progress-row">
-                  <span className="progress-icon" style={{ color: l.accentColor }}>{l.icon}</span>
+                  <LangIcon language={l} />
                   <div className="progress-row-body">
                     <div className="progress-row-head">
                       <Link href={`/languages/${l.slug}`}>{l.name}</Link>
                       <span>{done}/{l.lessons.length} lessons{ex > 0 ? ` · ${exDone}/${ex} exercises` : ''}</span>
                     </div>
-                    <ProgressBar value={pct} color={l.accentColor} height={4} />
+                    <ProgressBar value={pct} height={6} label={`${l.name} progress`} />
                     {nextLesson && <Link className="progress-next" href={`/languages/${l.slug}/lessons/${nextLesson.slug}`}>Next: {nextLesson.title} →</Link>}
                   </div>
                 </div>
@@ -79,7 +79,7 @@ export default function ProgressClient() {
       )}
 
       <section className="progress-section">
-        <h2>Challenge ladder</h2>
+        <h2>Python challenges</h2>
         <div className="ladder-strip" aria-label="Challenge completion">
           {challenges.map((c, i) => {
             const done = exercisesDone.includes(`challenge/${c.slug}`)
@@ -90,13 +90,13 @@ export default function ProgressClient() {
 
       {untouched.length > 0 && (
         <section className="progress-section">
-          <h2>Not yet begun</h2>
-          <div className="untouched-list">{untouched.map(l => <Link key={l.slug} href={`/languages/${l.slug}`} style={{ borderColor: `${l.accentColor}55` }}><span style={{ color: l.accentColor }}>{l.icon}</span>{l.name}</Link>)}</div>
+          <h2>Not started yet</h2>
+          <div className="untouched-list">{untouched.map(l => <Link key={l.slug} href={`/languages/${l.slug}`}><LangIcon language={l} size="sm" />{l.name}</Link>)}</div>
         </section>
       )}
 
       <footer className="progress-footer">
-        <button type="button" className="sc-btn sc-btn-ghost" onClick={resetAll}>Erase all progress on this device</button>
+        <button type="button" className="btn btn-quiet" onClick={resetAll}>Erase all progress in this browser</button>
       </footer>
     </main>
   )

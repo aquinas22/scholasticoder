@@ -1,10 +1,10 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from './Providers'
-import { palettes } from '@/lib/themes'
+import { AUTO_PALETTE, palettes } from '@/lib/themes'
 
 export function ThemeToggle() {
-  const { palette, setPalette } = useTheme()
+  const { choice, setPalette } = useTheme()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -17,7 +17,8 @@ export function ThemeToggle() {
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc) }
   }, [open])
 
-  const groups: Array<{ id: 'scriptorium' | 'editor'; label: string }> = [{ id: 'scriptorium', label: 'Scriptorium' }, { id: 'editor', label: 'Editor classics' }]
+  const pick = (id: string) => { setPalette(id); setOpen(false) }
+  const groups: Array<{ id: 'default' | 'editor'; label: string }> = [{ id: 'default', label: 'Site themes' }, { id: 'editor', label: 'Editor themes' }]
 
   return (
     <div className="theme-picker" ref={ref}>
@@ -27,6 +28,13 @@ export function ThemeToggle() {
       </button>
       {open && (
         <div className="theme-menu" role="listbox" aria-label="Colour themes">
+          <div className="theme-group">
+            <button type="button" role="option" aria-selected={choice === AUTO_PALETTE} className={`theme-option ${choice === AUTO_PALETTE ? 'is-active' : ''}`} onClick={() => pick(AUTO_PALETTE)}>
+              <span className="theme-dots theme-dots-auto" aria-hidden><i /><i /></span>
+              <span className="theme-option-text"><strong>Automatic</strong><small>Light or dark, following your device.</small></span>
+              {choice === AUTO_PALETTE && <span className="theme-check" aria-hidden>✓</span>}
+            </button>
+          </div>
           {groups.map(g => (
             <div key={g.id} className="theme-group">
               <div className="theme-group-label">{g.label}</div>
@@ -35,15 +43,15 @@ export function ThemeToggle() {
                   key={p.id}
                   type="button"
                   role="option"
-                  aria-selected={palette === p.id}
-                  className={`theme-option ${palette === p.id ? 'is-active' : ''}`}
-                  onClick={() => { setPalette(p.id); setOpen(false) }}
+                  aria-selected={choice === p.id}
+                  className={`theme-option ${choice === p.id ? 'is-active' : ''}`}
+                  onClick={() => pick(p.id)}
                 >
                   <span className="theme-dots" aria-hidden style={{ background: p.vars['--bg'], borderColor: p.vars['--border'] }}>
                     <i style={{ background: p.vars['--accent'] }} /><i style={{ background: p.vars['--syn-keyword'] }} /><i style={{ background: p.vars['--syn-string'] }} />
                   </span>
                   <span className="theme-option-text"><strong>{p.name}</strong><small>{p.note}</small></span>
-                  {palette === p.id && <span className="theme-check" aria-hidden>✓</span>}
+                  {choice === p.id && <span className="theme-check" aria-hidden>✓</span>}
                 </button>
               ))}
             </div>

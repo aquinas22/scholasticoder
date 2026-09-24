@@ -11,7 +11,7 @@ interface Example { title: string; runtime: Runtime | 'shell'; code: string }
 
 const EXAMPLES: Example[] = [
   {
-    title: 'Hello, dojo',
+    title: 'Hello',
     runtime: 'python',
     code: `# Everything here runs on real CPython, inside your browser.\nimport sys\nprint("Hello from Python", sys.version.split()[0])\n\nfor i in range(1, 6):\n    print("*" * i)\n`,
   },
@@ -28,7 +28,7 @@ const EXAMPLES: Example[] = [
   {
     title: 'Classes and dataclasses',
     runtime: 'python',
-    code: `from dataclasses import dataclass, field\n\n@dataclass(order=True)\nclass Monk:\n    name: str\n    pages_copied: int = 0\n    skills: list[str] = field(default_factory=list)\n\n    def copy(self, pages):\n        self.pages_copied += pages\n        return self\n\nscriptorium = [Monk("Bede").copy(12), Monk("Alcuin").copy(30), Monk("Hild").copy(21)]\nfor m in sorted(scriptorium, key=lambda m: -m.pages_copied):\n    print(f"{m.name:<8} {m.pages_copied:>3} pages")\n`,
+    code: `from dataclasses import dataclass, field\n\n@dataclass\nclass Reader:\n    name: str\n    pages_read: int = 0\n    books: list[str] = field(default_factory=list)\n\n    def read(self, pages):\n        self.pages_read += pages\n        return self\n\nclub = [Reader("Ada").read(120), Reader("Sam").read(300), Reader("Maya").read(210)]\nfor r in sorted(club, key=lambda r: -r.pages_read):\n    print(f"{r.name:<6} {r.pages_read:>4} pages")\n`,
   },
   {
     title: 'Generators and itertools',
@@ -48,7 +48,7 @@ const EXAMPLES: Example[] = [
   {
     title: 'TypeScript',
     runtime: 'typescript',
-    code: `// TypeScript is compiled in your browser, then run. Types are erased, not checked.\ninterface Monk {\n  name: string\n  pages: number\n  skills?: string[]\n}\n\nfunction busiest(monks: Monk[]): Monk | undefined {\n  return [...monks].sort((a, b) => b.pages - a.pages)[0]\n}\n\nconst abbey: Monk[] = [\n  { name: 'Bede', pages: 412, skills: ['history'] },\n  { name: 'Hild', pages: 88 },\n]\nconsole.log(busiest(abbey)?.name)\n`,
+    code: `// TypeScript is compiled in your browser, then run. Types are erased, not checked.\ninterface Reader {\n  name: string\n  pages: number\n  genres?: string[]\n}\n\nfunction keenest(readers: Reader[]): Reader | undefined {\n  return [...readers].sort((a, b) => b.pages - a.pages)[0]\n}\n\nconst club: Reader[] = [\n  { name: 'Ada', pages: 412, genres: ['history'] },\n  { name: 'Sam', pages: 88 },\n]\nconsole.log(keenest(club)?.name)\n`,
   },
   {
     title: 'Shell',
@@ -56,9 +56,9 @@ const EXAMPLES: Example[] = [
     code: '',
   },
   {
-    title: 'JavaScript, too',
+    title: 'JavaScript',
     runtime: 'javascript',
-    code: `// The dojo also runs JavaScript in an isolated worker.\nconst monks = [{ name: 'Bede', pages: 12 }, { name: 'Alcuin', pages: 30 }]\nconst total = monks.reduce((sum, m) => sum + m.pages, 0)\nconsole.log('Total pages:', total)\nconsole.log(monks.map(m => m.name.toUpperCase()))\n\nconst wait = ms => new Promise(r => setTimeout(r, ms))\nawait wait(200)\nconsole.log('Top-level await works here.')\n`,
+    code: `// JavaScript runs in an isolated background worker.\nconst orders = [{ item: 'coffee', price: 3.5 }, { item: 'bagel', price: 2.25 }]\nconst total = orders.reduce((sum, o) => sum + o.price, 0)\nconsole.log('Total:', total)\nconsole.log(orders.map(o => o.item.toUpperCase()))\n\nconst wait = ms => new Promise(r => setTimeout(r, ms))\nawait wait(200)\nconsole.log('Top-level await works here.')\n`,
   },
 ]
 
@@ -115,12 +115,11 @@ export default function DojoClient() {
   }
 
   return (
-    <main className="dojo-shell section-wrap">
-      <header className="dojo-head">
+    <main className="wrap page">
+      <header className="page-head page-head-split">
         <div>
-          <p className="eyebrow"><span>D</span> The dojo</p>
-          <h1>Python, in your browser.</h1>
-          <p>A complete CPython interpreter runs on your machine, in a background thread, with nothing to install. Type, run, break it, fix it. Files you write live in a private virtual disk that resets when you reload.</p>
+          <h1>Playground</h1>
+          <p>A place to try things out. Real Python runs on your own machine, inside the browser, with nothing to install. JavaScript, TypeScript and a practice shell are here too. Pick an example below or write your own. Files you create live on a private virtual disk that resets when you reload.</p>
         </div>
         <aside className="dojo-side">
           <div className={`dojo-runtime is-${py.status}`}>
@@ -128,32 +127,32 @@ export default function DojoClient() {
             <span>{py.status === 'loading' ? py.statusText || 'Downloading the runtime (about 10 MB, cached afterwards)' : py.status === 'ready' ? 'Runs in a Web Worker so the page never freezes. Stop kills runaway loops.' : py.status === 'error' ? py.statusText : 'Starts on your first Run.'}</span>
           </div>
           <Link href="/challenges" className="dojo-challenge-link">
-            <span className="sc-lab-kicker">Challenge ladder</span>
-            <strong>{solved}/{challenges.length} solved</strong>
-            <span>Graded problems from FizzBuzz to a recursive-descent calculator →</span>
+            <span className="sc-lab-kicker">Python challenges</span>
+            <strong>{solved} of {challenges.length} solved</strong>
+            <span>Checked problems, from FizzBuzz up to a small calculator →</span>
           </Link>
         </aside>
       </header>
 
-      <div className="dojo-examples" role="tablist" aria-label="Example programs">
-        {shared && <button role="tab" aria-selected className="dojo-tab is-active"><span className="dojo-tab-rt">{shared.runtime === 'python' ? 'Py' : shared.runtime === 'typescript' ? 'TS' : 'JS'}</span>Shared program</button>}
+      <div className="chips dojo-examples" role="tablist" aria-label="Example programs">
+        {shared && <button role="tab" aria-selected className="chip is-active"><span className="dojo-tab-rt">{shared.runtime === 'python' ? 'Py' : shared.runtime === 'typescript' ? 'TS' : 'JS'}</span>Shared program</button>}
         {EXAMPLES.map((ex, i) => (
-          <button key={ex.title} role="tab" aria-selected={!shared && i === active} className={`dojo-tab ${!shared && i === active ? 'is-active' : ''}`} onClick={() => { setShared(null); setActive(i); history.replaceState(null, '', location.pathname) }}>
+          <button key={ex.title} role="tab" aria-selected={!shared && i === active} className={`chip ${!shared && i === active ? 'is-active' : ''}`} onClick={() => { setShared(null); setActive(i); history.replaceState(null, '', location.pathname) }}>
             <span className="dojo-tab-rt">{ex.runtime === 'python' ? 'Py' : ex.runtime === 'typescript' ? 'TS' : ex.runtime === 'shell' ? '$' : 'JS'}</span>{ex.title}
           </button>
         ))}
-        {current.runtime !== 'shell' && <button type="button" className="dojo-tab dojo-share" onClick={share} title="Copy a link that opens this program">
-          {shareState === 'copied' ? '✓ Link copied' : shareState === 'failed' ? 'Could not copy' : '⛓ Share this program'}
+        {current.runtime !== 'shell' && <button type="button" className="chip dojo-share" onClick={share} title="Copy a link that opens this program">
+          {shareState === 'copied' ? '✓ Link copied' : shareState === 'failed' ? 'Could not copy' : 'Copy a share link'}
         </button>}
       </div>
 
       {current.runtime === 'shell' ? (
-        <ShellLab key="shell" height={420} intro={['A simulated bash shell with its own little file system. Try: ls, tree, cat data/monks.csv | cut -d , -f 1 | sort', 'Type help for the full command list.']} />
+        <ShellLab key="shell" height={420} intro={['A simulated bash shell with its own small file system. Try: ls, tree, cat data/team.csv | cut -d , -f 1 | sort', 'Type help for the full command list.']} />
       ) : (
         <CodeLab key={shared ? 'shared' : active} runtime={current.runtime} code={current.code} minLines={14} onCodeChange={c => { editorCode.current = c }} />
       )}
 
-      <section className="dojo-notes">
+      <section className="dojo-notes section-tight">
         <div>
           <h2>What works</h2>
           <ul>
@@ -172,7 +171,7 @@ export default function DojoClient() {
             <li>Desktop windows (tkinter), web servers (FastAPI, Flask) — those lessons say so and are marked to run locally.</li>
             <li>Very heavy computation: your laptop is doing the work, and a single tab gets one core.</li>
           </ul>
-          <p>Ready for the real thing? The <Link href="/languages/python">Python path</Link> shows how to install it in three commands.</p>
+          <p>Want Python on your own computer? The <Link className="text-link" href="/languages/python">Python course</Link> shows how to install it.</p>
         </div>
       </section>
     </main>

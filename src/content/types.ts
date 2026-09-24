@@ -46,9 +46,9 @@ export interface ShellExercise {
   checks: Array<{ name: string; check: (state: import('../lib/shell-sim').ShellState, lastOutput: string) => boolean | string }>
 }
 
-/** A disputed question in the form of the Summa: objections, sed contra, respondeo, replies. */
+/** A common mix-up about a lesson's question: something a learner might plausibly believe, and why it is wrong. */
 export interface Objection {
-  /** The objection as a plausible claim a learner might believe. */
+  /** The mistaken belief, written as a standalone sentence. */
   claim: string
   /** The reply that resolves it. */
   reply: string
@@ -57,13 +57,17 @@ export interface Objection {
   language?: string
 }
 
+/**
+ * A common question shown in a lesson: the question, the answer, a source note and the common mix-ups.
+ * (The field names come from an earlier version of the site and are kept so stored progress stays valid.)
+ */
 export interface Quaestio {
-  /** Posed in the scholastic form: "Whether …?" */
+  /** A plain question a beginner would ask, e.g. "Does a Python variable have a type?" */
   question: string
   objections: Objection[]
-  /** The authority or fact on the contrary — short and decisive. */
+  /** A short source note: a quote from the docs or a spec, or a plain fact. */
   sedContra: string
-  /** The body of the answer: the teaching itself, one or more paragraphs. */
+  /** The answer itself, one or more paragraphs. */
   respondeo: string[]
   code?: string
   language?: string

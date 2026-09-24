@@ -2,6 +2,10 @@
 import { useRef, KeyboardEvent, ChangeEvent } from 'react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 
+// Without this, react-syntax-highlighter puts the default theme's font and line height inline on <code>,
+// which overrides the stylesheet and makes the editor caret drift away from the highlighted text.
+const CODE_TAG_PROPS = { style: {} }
+
 const PRISM_LANG: Record<string, string> = { python: 'python', javascript: 'javascript', js: 'javascript', typescript: 'typescript', html: 'markup', css: 'css', json: 'json', sql: 'sql', bash: 'bash' }
 
 interface Props {
@@ -70,13 +74,13 @@ export function CodeEditor({ value, onChange, language = 'python', onRun, minLin
   }
 
   return (
-    <div className="sc-editor" style={{ minHeight: `calc(${lineCount} * 1.65 * 0.86rem + 2rem)` }}>
+    <div className="sc-editor" style={{ minHeight: `calc(${lineCount} * 1.65 * 0.9rem + 2rem)` }}>
       <div className="sc-editor-gutter" aria-hidden>
         {Array.from({ length: lineCount }, (_, i) => <div key={i}>{i + 1}</div>)}
       </div>
       <div className="sc-editor-scroll">
         <div className="sc-editor-layer">
-          <SyntaxHighlighter language={PRISM_LANG[language] ?? language} useInlineStyles={false} showLineNumbers={false} wrapLongLines={false} PreTag="pre" CodeTag="code">
+          <SyntaxHighlighter language={PRISM_LANG[language] ?? language} useInlineStyles={false} showLineNumbers={false} wrapLongLines={false} PreTag="pre" CodeTag="code" codeTagProps={CODE_TAG_PROPS}>
             {value.endsWith('\n') ? value + ' ' : value || ' '}
           </SyntaxHighlighter>
           <textarea

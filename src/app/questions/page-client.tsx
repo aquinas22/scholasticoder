@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { allQuaestiones } from '@/content'
 import { useProgress } from '@/hooks/useProgress'
-import { toRoman } from '@/lib/roman'
 
 export default function QuestionsClient() {
   const [query, setQuery] = useState('')
@@ -21,48 +20,44 @@ export default function QuestionsClient() {
     return [...map.values()]
   }, [visible])
 
-  const disputed = exercisesDone.filter(id => id.startsWith('quaestio:')).length
+  const reviewed = exercisesDone.filter(id => id.startsWith('quaestio:')).length
 
   return (
-    <main className="section-wrap questions-shell">
-      <header className="glossary-head">
+    <main className="wrap page">
+      <header className="page-head page-head-split">
         <div>
-          <p className="eyebrow"><span>Q</span> Tabula quaestionum</p>
-          <h1>The disputed questions.</h1>
-          <p>Every lesson poses one, in the form of the Summa: objections stated at their strongest, a sed contra, and the answer. {allQuaestiones.length} questions across the paths; you have disputed {disputed}.</p>
+          <h1>Common questions</h1>
+          <p>The questions beginners ask most, one per lesson, each with a plain answer and the usual mix-ups explained. {allQuaestiones.length} questions so far; you have reviewed {reviewed}.</p>
         </div>
-        <label className="glossary-search">
-          <span>Search the questions</span>
-          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="pointer, indentation, HTTPS…" autoComplete="off" />
+        <label className="search">
+          <span className="visually-hidden">Search the questions</span>
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search: pointer, indentation, HTTPS…" autoComplete="off" />
         </label>
       </header>
 
-      {visible.length === 0 && <p className="glossary-empty">No question matches “{query}”.</p>}
+      {visible.length === 0 && <p className="empty">No question matches “{query}”.</p>}
 
       {byPath.map(list => {
         const first = list[0]
         return (
-          <section key={first.languageSlug} className="quaestio-group" aria-label={`${first.languageName} questions`}>
-            <h2 style={{ color: first.accentColor }}>
+          <section key={first.languageSlug} className="q-group" aria-labelledby={`q-${first.languageSlug}`}>
+            <h2 id={`q-${first.languageSlug}`}>
               <Link href={`/languages/${first.languageSlug}`}>{first.languageName}</Link>
               <span>{list.length} question{list.length === 1 ? '' : 's'}</span>
             </h2>
-            <ol className="quaestio-list">
-              {list.map((x, i) => {
+            <ul className="q-list">
+              {list.map(x => {
                 const done = isExerciseDone(`quaestio:${x.languageSlug}/${x.lessonSlug}/${x.index}`)
                 return (
                   <li key={`${x.lessonSlug}-${x.index}`}>
-                    <Link href={`/languages/${x.languageSlug}/lessons/${x.lessonSlug}/#disputatio`} className={done ? 'is-done' : ''}>
-                      <span className="quaestio-num" style={done ? { borderColor: first.accentColor, background: first.accentColor, color: 'var(--on-accent)' } : undefined}>{done ? '✓' : toRoman(i + 1)}</span>
-                      <span className="quaestio-text">
-                        <strong>{x.question}</strong>
-                        <small>{x.lessonTitle} · {x.objections} objections</small>
-                      </span>
+                    <Link href={`/languages/${x.languageSlug}/lessons/${x.lessonSlug}/#common-question`} className={done ? 'is-done' : ''}>
+                      <strong>{x.question}</strong>
+                      <span>{done ? '✓ Reviewed · ' : ''}From the lesson “{x.lessonTitle}”</span>
                     </Link>
                   </li>
                 )
               })}
-            </ol>
+            </ul>
           </section>
         )
       })}

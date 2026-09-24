@@ -117,7 +117,7 @@ for (const [langSlug, byLesson] of Object.entries(shellPractice)) {
   }
 }
 
-// Disputed questions go after the reading and before the exercises.
+// Common questions go after the reading and before the exercises.
 for (const source of [quaestiones, quaestionesWeb, quaestionesTools, quaestionesSystems]) {
   for (const [langSlug, byLesson] of Object.entries(source)) {
     const lang = languages.find(l => l.slug === langSlug)
@@ -178,7 +178,7 @@ export function countExercises(language: Language) {
 }
 export interface QuaestioRef { languageSlug: string; languageName: string; accentColor: string; lessonSlug: string; lessonTitle: string; index: number; question: string; objections: number }
 
-/** Every disputed question on the site, in path then lesson order. */
+/** Every common question on the site, in course then lesson order. */
 export const allQuaestiones: QuaestioRef[] = languages.flatMap(l =>
   l.lessons.flatMap(lesson =>
     lesson.sections

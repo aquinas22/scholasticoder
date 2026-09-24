@@ -1,51 +1,41 @@
 import Link from 'next/link'
-
-const MOTTOS = [
-  ['Ora et labora.', 'Pray and work.'],
-  ['Fides quaerens intellectum.', 'Faith seeking understanding.'],
-  ['Initium sapientiae timor Domini.', 'The beginning of wisdom is reverence.'],
-  ['Age quod agis.', 'Do what you are doing.'],
-  ['Festina lente.', 'Make haste slowly.'],
-  ['Nulla dies sine linea.', 'No day without a line.'],
-]
+import { BrandMark } from './Navigation'
 
 export function SiteFooter() {
-  const [latin, english] = MOTTOS[new Date().getDate() % MOTTOS.length]
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
         <div className="site-footer-brand">
-          <span className="footer-seal" aria-hidden="true">☧</span>
+          <BrandMark size={24} />
           <div>
             <strong>ScholastiCoder</strong>
-            <p><em>{latin}</em> {english}</p>
+            <p>Free coding lessons you can run in your browser. No account needed; your progress stays on your device.</p>
           </div>
         </div>
         <nav className="site-footer-cols" aria-label="Footer">
           <div>
-            <h3>Study</h3>
-            <Link href="/languages">All paths</Link>
+            <h2>Learn</h2>
+            <Link href="/languages">All courses</Link>
             <Link href="/languages/python">Python</Link>
             <Link href="/languages/javascript">JavaScript</Link>
             <Link href="/languages/sql">SQL</Link>
           </div>
           <div>
-            <h3>Practice</h3>
-            <Link href="/dojo">The Dojo</Link>
-            <Link href="/challenges">Challenge ladder</Link>
+            <h2>Practice</h2>
+            <Link href="/dojo">Playground</Link>
+            <Link href="/challenges">Challenges</Link>
             <Link href="/progress">Your progress</Link>
           </div>
           <div>
-            <h3>Reference</h3>
-            <Link href="/method">The method</Link>
-            <Link href="/questions">Disputed questions</Link>
+            <h2>Reference</h2>
+            <Link href="/method">How lessons work</Link>
+            <Link href="/questions">Common questions</Link>
             <Link href="/glossary">Glossary</Link>
-            <Link href="/editors">Editors</Link>
+            <Link href="/editors">Choosing an editor</Link>
             <a href="https://github.com/aquinas22/scholasticoder" target="_blank" rel="noreferrer">Source on GitHub</a>
           </div>
         </nav>
       </div>
-      <div className="site-footer-rule" aria-hidden="true">✠</div>
     </footer>
   )
 }

@@ -7,8 +7,17 @@ import { getLesson } from '@/content'
 import { useProgress } from '@/hooks/useProgress'
 import { LessonSidebar } from '@/components/LessonSidebar'
 import { LessonSection } from '@/components/LessonSection'
-import { RUNNABLE_LANGS } from '@/lib/runnable'
+import { ProgressBar } from '@/components/ProgressBar'
 import { TermScope, RichText } from '@/components/Term'
+import type { SectionType } from '@/content/types'
+
+// Sections are grouped so every lesson reads in the same order: learn, common question, practise, check.
+const PART_DEFS: Array<{ id: string; title: string | null; types: SectionType[] }> = [
+  { id: 'learn', title: null, types: ['text', 'code', 'note', 'warning', 'tip'] },
+  { id: 'common-question', title: null, types: ['quaestio'] },
+  { id: 'practice', title: 'Practice', types: ['exercise', 'shell'] },
+  { id: 'check', title: 'Check yourself', types: ['quiz'] },
+]
 
 export default function LessonPage() {
   const params = useParams()
@@ -46,108 +55,94 @@ export default function LessonPage() {
   const done = isComplete(language.slug, lesson.slug)
   const lessonIndex = language.lessons.findIndex(l => l.slug === lesson.slug)
   const exerciseCount = lesson.sections.filter(s => s.type === 'exercise' || s.type === 'shell').length
-  const runnableCount = lesson.sections.filter(s => s.type === 'code' && s.runnable !== false && RUNNABLE_LANGS.has(s.language ?? language.slug)).length
   const solved = countExercises(`${language.slug}/${lesson.slug}/`)
+  const position = ((lessonIndex + 1) / language.lessons.length) * 100
 
-  // The scholastic order: reading, disputed question, practice, examination.
-  const PART_DEFS = [
-    { id: 'lectio', mark: 'L', title: 'Lectio', blurb: 'the reading', types: ['text', 'code', 'note', 'warning', 'tip'] },
-    { id: 'disputatio', mark: 'D', title: 'Disputatio', blurb: 'the disputed question', types: ['quaestio'] },
-    { id: 'exercitatio', mark: 'E', title: 'Exercitatio', blurb: 'practice with checks', types: ['exercise', 'shell'] },
-    { id: 'examen', mark: 'X', title: 'Examen', blurb: 'quick checks', types: ['quiz'] },
-  ]
-  const parts = PART_DEFS.map(def => ({ ...def, items: lesson.sections.map((section, idx) => ({ section, idx })).filter(x => def.types.includes(x.section.type)) })).filter(p => p.items.length > 0)
+  const parts = PART_DEFS
+    .map(def => ({ ...def, items: lesson.sections.map((section, idx) => ({ section, idx })).filter(x => def.types.includes(x.section.type)) }))
+    .filter(p => p.items.length > 0)
+
+  const nextHref = next ? `/languages/${language.slug}/lessons/${next.slug}` : `/languages/${language.slug}`
+  const completeAndContinue = () => {
+    if (!done) markComplete(language.slug, lesson.slug)
+    router.push(nextHref)
+  }
 
   return (
     <TermScope scopeKey={`${language.slug}/${lesson.slug}`}>
-    <div className="lesson-shell">
-      <LessonSidebar language={language} currentLessonSlug={lesson.slug} />
+      <div className="lesson-shell">
+        <LessonSidebar language={language} currentLessonSlug={lesson.slug} />
 
-      <main className="lesson-main">
-        <nav style={{ marginBottom: '1.5rem', fontSize: '0.78rem', color: 'var(--text-muted)' }} aria-label="Breadcrumb">
-          <Link href="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Home</Link>
-          {' / '}
-          <Link href={`/languages/${language.slug}`} style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>{language.name}</Link>
-          {' / '}
-          <span style={{ color: 'var(--text)' }}>{lesson.title}</span>
-        </nav>
+        <main className="lesson-main">
+          <nav className="breadcrumb" aria-label="Breadcrumb">
+            <Link href="/languages">Courses</Link>
+            <span aria-hidden>/</span>
+            <Link href={`/languages/${language.slug}`}>{language.name}</Link>
+            <span aria-hidden>/</span>
+            <span aria-current="page">Lesson {lessonIndex + 1}</span>
+          </nav>
 
-        <header style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: 'monospace', fontWeight: 900, color: language.accentColor, fontSize: '0.9rem' }}>{language.icon}</span>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              {language.name} · Lesson {lessonIndex + 1} of {language.lessons.length}
-            </span>
-            {(runnableCount > 0 || exerciseCount > 0) && (
-              <span className="interactive-pill">▶ {runnableCount > 0 ? `${runnableCount} runnable` : ''}{runnableCount > 0 && exerciseCount > 0 ? ' · ' : ''}{exerciseCount > 0 ? `${solved}/${exerciseCount} exercises` : ''}</span>
-            )}
-          </div>
+          <header className="lesson-head">
+            <p className="lesson-count">
+              Lesson {lessonIndex + 1} of {language.lessons.length}
+              {exerciseCount > 0 && <span> · {solved} of {exerciseCount} exercises solved</span>}
+              {done && <span className="done-badge">✓ Completed</span>}
+            </p>
+            <ProgressBar value={position} height={3} label="Position in course" className="lesson-position" />
+            <h1>{lesson.title}</h1>
+            <p className="lesson-intro"><RichText text={lesson.intro} blockId="intro" /></p>
+          </header>
 
-          <h1 style={{ fontFamily: 'var(--font-syne, sans-serif)', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
-            {lesson.title}
-          </h1>
-
-          <p style={{ background: `${language.accentColor}0e`, borderLeft: `3px solid ${language.accentColor}`, borderRadius: '0 8px 8px 0', padding: '0.85rem 1.1rem', fontSize: '0.97rem', color: 'var(--text)', fontStyle: 'italic', lineHeight: 1.7, margin: 0, opacity: 0.9 }}>
-            <RichText text={lesson.intro} blockId="intro" />
-          </p>
-        </header>
-
-        {parts.length > 1 && (
-          <ul className="ordo" aria-label="Order of the lesson">
-            {parts.map(p => <li key={p.id}><a href={`#${p.id}`}><b>{p.mark}</b>{p.title}</a></li>)}
-          </ul>
-        )}
-
-        {parts.map((part, pi) => (
-          <div key={part.id} id={part.id} className={pi === 0 ? 'lesson-prose has-dropcap' : 'lesson-prose'} style={{ marginBottom: pi === parts.length - 1 ? '3rem' : 0 }}>
-            {parts.length > 1 && (
-              <div className="lesson-part">
-                <span className="lesson-part-mark" aria-hidden>{part.mark}</span>
-                <h2>{part.title} <small>{part.blurb}</small></h2>
+          <div className="lesson-body">
+            {parts.map(part => (
+              <div key={part.id} id={part.id} className="lesson-part">
+                {part.title && <h2 className="lesson-part-title">{part.title}</h2>}
+                {part.items.map(({ section, idx }) => (
+                  <LessonSection key={idx} section={section} index={idx} languageSlug={language.slug} lessonSlug={lesson.slug} />
+                ))}
               </div>
-            )}
-            {part.items.map(({ section, idx }) => (
-              <LessonSection key={idx} section={section} index={idx} languageSlug={language.slug} lessonSlug={lesson.slug} />
             ))}
           </div>
-        ))}
 
-        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem', marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => (done ? markIncomplete(language.slug, lesson.slug) : markComplete(language.slug, lesson.slug))}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem', borderRadius: 8, border: `1px solid ${done ? language.accentColor : 'var(--border)'}`, background: done ? `${language.accentColor}18` : 'var(--card)', color: done ? language.accentColor : 'var(--text-muted)', fontSize: '0.88rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s' }}
-          >
-            {done ? '✠ Completed — Deo gratias' : '○ Mark as complete'}
-          </button>
-          {exerciseCount > 0 && (
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {solved === exerciseCount ? 'Every exercise in this lesson is solved.' : `${exerciseCount - solved} exercise${exerciseCount - solved === 1 ? '' : 's'} still open in this lesson.`}
-            </span>
-          )}
-        </div>
+          <section className="lesson-finish" aria-label="Finish this lesson">
+            <div>
+              <strong>{done ? 'You have completed this lesson.' : 'Finished reading?'}</strong>
+              <span>
+                {exerciseCount > 0
+                  ? solved === exerciseCount ? 'Every exercise here is solved.' : `${exerciseCount - solved} exercise${exerciseCount - solved === 1 ? '' : 's'} still open. You can come back to ${exerciseCount - solved === 1 ? 'it' : 'them'} later.`
+                  : 'Mark it done to track your progress.'}
+              </span>
+            </div>
+            <div className="actions">
+              <button type="button" className="btn btn-primary" onClick={completeAndContinue}>
+                {next ? (done ? 'Next lesson' : 'Mark complete and continue') : (done ? 'Back to the course' : 'Mark complete and finish')} <span aria-hidden>→</span>
+              </button>
+              {done && <button type="button" className="btn btn-quiet" onClick={() => markIncomplete(language.slug, lesson.slug)}>Mark as not done</button>}
+            </div>
+          </section>
 
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.6rem' }}><kbd className="key-hint">←</kbd> <kbd className="key-hint">→</kbd> move between lessons</p>
-        <nav style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }} aria-label="Lesson navigation">
-          {prev ? (
-            <Link href={`/languages/${language.slug}/lessons/${prev.slug}`} className="lesson-nav-card">
-              <span>← Previous</span>
-              <strong>{prev.title}</strong>
-            </Link>
-          ) : <div style={{ flex: 1 }} />}
-          {next ? (
-            <Link href={`/languages/${language.slug}/lessons/${next.slug}`} className="lesson-nav-card is-next">
-              <span>Next →</span>
-              <strong>{next.title}</strong>
-            </Link>
-          ) : (
-            <Link href={`/languages/${language.slug}`} className="lesson-nav-card is-next" style={{ background: `${language.accentColor}12`, borderColor: `${language.accentColor}40` }}>
-              <span style={{ color: language.accentColor }}>All lessons done</span>
-              <strong style={{ color: language.accentColor }}>Back to {language.name} →</strong>
-            </Link>
-          )}
-        </nav>
-      </main>
-    </div>
+          <nav className="pager" aria-label="Lesson navigation">
+            {prev ? (
+              <Link href={`/languages/${language.slug}/lessons/${prev.slug}`} className="pager-link">
+                <span>← Previous</span>
+                <strong>{prev.title}</strong>
+              </Link>
+            ) : <span />}
+            {next ? (
+              <Link href={`/languages/${language.slug}/lessons/${next.slug}`} className="pager-link is-next">
+                <span>Next →</span>
+                <strong>{next.title}</strong>
+              </Link>
+            ) : (
+              <Link href={`/languages/${language.slug}`} className="pager-link is-next">
+                <span>End of course</span>
+                <strong>Back to {language.name}</strong>
+              </Link>
+            )}
+          </nav>
+          <p className="key-tip">Tip: use the <kbd>←</kbd> and <kbd>→</kbd> keys to move between lessons.</p>
+        </main>
+      </div>
     </TermScope>
   )
 }

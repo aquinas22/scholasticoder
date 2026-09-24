@@ -2,7 +2,7 @@
 export interface Palette {
   id: string
   name: string
-  group: 'scriptorium' | 'editor'
+  group: 'default' | 'editor'
   dark: boolean
   /** Short flavour text shown in the picker. */
   note: string
@@ -16,39 +16,21 @@ const syntax = (o: { comment: string; keyword: string; string: string; number: s
 
 export const palettes: Palette[] = [
   {
-    id: 'scriptorium', name: 'Scriptorium', group: 'scriptorium', dark: true, note: 'Candlelit ink on dark vellum. The default.',
+    id: 'light', name: 'Light', group: 'default', dark: false, note: 'Clean and calm. Easy on the eyes in daylight.',
     vars: {
-      '--bg': '#171611', '--surface': '#201f19', '--card': '#2a2820', '--border': '#3d392d', '--text': '#eee6d5', '--text-muted': '#aaa18f',
-      '--accent': '#86df3d', '--accent-secondary': '#9cab83', '--on-accent': '#14170e', '--rubric': '#d9563b', '--gold': '#d5a94a',
-      '--code-bg': '#12110d', '--code-head': '#1b1a14', '--code-border': '#33302a', '--code-gutter': '#4a463b', '--code-text': '#ece4d2',
-      ...syntax({ comment: '#7d7663', keyword: '#e0a65c', string: '#b9cf6d', number: '#e5c07b', fn: '#8fc6e8', cls: '#e6b96a', op: '#d7cfbb', punct: '#a39c8a', builtin: '#c9a4e0', attr: '#b9cf6d' }),
+      '--bg': '#fafaf8', '--surface': '#ffffff', '--card': '#f2f2ef', '--border': '#e2e1dc', '--text': '#1d1c1a', '--text-muted': '#5d5a54',
+      '--accent': '#1d6b50', '--accent-secondary': '#3a7ca5', '--on-accent': '#ffffff', '--rubric': '#b0452a', '--gold': '#95650c',
+      '--code-bg': '#f6f6f3', '--code-head': '#eeeeea', '--code-border': '#e2e1dc', '--code-gutter': '#9d9a93', '--code-text': '#1d1c1a',
+      ...syntax({ comment: '#6f7278', keyword: '#a3336b', string: '#1f6b3a', number: '#9a5a00', fn: '#2458a6', cls: '#8a4b08', op: '#3d3b37', punct: '#5d5a54', builtin: '#6b3fa0', attr: '#1f6b3a' }),
     },
   },
   {
-    id: 'vellum', name: 'Vellum', group: 'scriptorium', dark: false, note: 'Parchment, iron-gall ink and a red rubric.',
+    id: 'dark', name: 'Dark', group: 'default', dark: true, note: 'Soft contrast for evenings and long sessions.',
     vars: {
-      '--bg': '#f3eddf', '--surface': '#fffaf0', '--card': '#e9dfcc', '--border': '#d2c3aa', '--text': '#211f1a', '--text-muted': '#756d60',
-      '--accent': '#a44325', '--accent-secondary': '#68765a', '--on-accent': '#fff8ee', '--rubric': '#a44325', '--gold': '#a8842b',
-      '--code-bg': '#fbf6ea', '--code-head': '#efe6d3', '--code-border': '#d8cbb1', '--code-gutter': '#b9ab90', '--code-text': '#2a2620',
-      ...syntax({ comment: '#8d8371', keyword: '#8a3a1c', string: '#4d6b2a', number: '#8c5a12', fn: '#1f5f8b', cls: '#7a4b12', op: '#4e463a', punct: '#7b7262', builtin: '#6b3f8f', attr: '#4d6b2a' }),
-    },
-  },
-  {
-    id: 'illuminated', name: 'Illuminated', group: 'scriptorium', dark: false, note: 'Gold leaf and lapis on cream, like a Book of Hours.',
-    vars: {
-      '--bg': '#f6efe0', '--surface': '#fdf8ec', '--card': '#efe4cc', '--border': '#d9c69e', '--text': '#1f1b26', '--text-muted': '#6d6273',
-      '--accent': '#1f4e9e', '--accent-secondary': '#a8842b', '--on-accent': '#fff8ee', '--rubric': '#b0321f', '--gold': '#b9922e',
-      '--code-bg': '#fbf5e6', '--code-head': '#f1e7cf', '--code-border': '#dccaa3', '--code-gutter': '#b7a67e', '--code-text': '#26212e',
-      ...syntax({ comment: '#8f8577', keyword: '#1f4e9e', string: '#5c6f1f', number: '#a0641a', fn: '#7b2f8e', cls: '#9b6a12', op: '#4a4350', punct: '#7d7486', builtin: '#b0321f', attr: '#5c6f1f' }),
-    },
-  },
-  {
-    id: 'vespers', name: 'Vespers', group: 'scriptorium', dark: true, note: 'Violet dusk, liturgical purple and gold.',
-    vars: {
-      '--bg': '#14111c', '--surface': '#1c1826', '--card': '#272032', '--border': '#3c324c', '--text': '#eee7f4', '--text-muted': '#a99fb8',
-      '--accent': '#d8b25a', '--accent-secondary': '#9d7fd1', '--on-accent': '#1a1408', '--rubric': '#e0645a', '--gold': '#d8b25a',
-      '--code-bg': '#100d17', '--code-head': '#18131f', '--code-border': '#302740', '--code-gutter': '#4b4060', '--code-text': '#ece6f2',
-      ...syntax({ comment: '#7a6f8c', keyword: '#c497f0', string: '#d8b25a', number: '#f0a56c', fn: '#7fc8e6', cls: '#f2c98a', op: '#d2cbe0', punct: '#9a90ad', builtin: '#e58cb0', attr: '#d8b25a' }),
+      '--bg': '#131312', '--surface': '#1a1a19', '--card': '#222220', '--border': '#32312e', '--text': '#ecebe6', '--text-muted': '#a8a59d',
+      '--accent': '#5cc49a', '--accent-secondary': '#7fb3d9', '--on-accent': '#0b1f17', '--rubric': '#e8845f', '--gold': '#e0b457',
+      '--code-bg': '#0f0f0e', '--code-head': '#181817', '--code-border': '#2a2927', '--code-gutter': '#5f5d58', '--code-text': '#e6e4de',
+      ...syntax({ comment: '#8a877f', keyword: '#e39bc4', string: '#9fd08a', number: '#f0b877', fn: '#86b9ec', cls: '#e8c47c', op: '#d6d3cb', punct: '#a8a59d', builtin: '#c3a3ea', attr: '#9fd08a' }),
     },
   },
   {
@@ -170,7 +152,22 @@ export const palettes: Palette[] = [
   },
 ]
 
-export const DEFAULT_PALETTE = 'scriptorium'
+export const DEFAULT_PALETTE = 'dark'
+/** Stored value meaning "follow the operating system's light/dark setting". Also used when nothing is stored. */
+export const AUTO_PALETTE = 'auto'
+/** Palette ids from earlier versions of the site, mapped to their closest current palette. */
+const LEGACY: Record<string, string> = { scriptorium: 'dark', vespers: 'dark', vellum: 'light', illuminated: 'light' }
+
+export function systemPalette(): string {
+  try { return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark' } catch { return DEFAULT_PALETTE }
+}
+
+/** Turns a stored choice (a palette id, 'auto', a legacy id or nothing) into a palette id. */
+export function resolvePalette(stored: string | null | undefined): string {
+  if (!stored || stored === AUTO_PALETTE) return systemPalette()
+  const id = LEGACY[stored] ?? stored
+  return palettes.some(p => p.id === id) ? id : systemPalette()
+}
 export const PALETTE_KEY = 'scholasticoder_palette'
 
 export function getPalette(id: string | null | undefined): Palette {
@@ -183,4 +180,4 @@ export function paletteCss(): string {
 }
 
 /** Runs before hydration so the chosen palette paints first. */
-export const paletteBootScript = `(function(){try{var p=localStorage.getItem('${PALETTE_KEY}');var d=${JSON.stringify(Object.fromEntries(palettes.map(p => [p.id, p.dark])))};if(!p||!(p in d))p='${DEFAULT_PALETTE}';var h=document.documentElement;h.setAttribute('data-palette',p);h.classList.toggle('dark',d[p]);h.classList.toggle('light',!d[p]);h.style.colorScheme=d[p]?'dark':'light';}catch(e){}})();`
+export const paletteBootScript = `(function(){try{var d=${JSON.stringify(Object.fromEntries(palettes.map(p => [p.id, p.dark])))};var l=${JSON.stringify(LEGACY)};var p=null;try{p=localStorage.getItem('${PALETTE_KEY}')}catch(e){}if(p&&l[p])p=l[p];if(!p||!(p in d))p=window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';var h=document.documentElement;h.setAttribute('data-palette',p);h.classList.toggle('dark',d[p]);h.classList.toggle('light',!d[p]);h.style.colorScheme=d[p]?'dark':'light';}catch(e){}})();`

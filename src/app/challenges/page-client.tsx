@@ -6,10 +6,10 @@ import { ProgressBar } from '@/components/ProgressBar'
 
 const TIERS: ChallengeTier[] = ['novice', 'apprentice', 'journeyman', 'master']
 const TIER_BLURB: Record<ChallengeTier, string> = {
-  novice: 'Loops, strings and conditionals. Finish the first four Python lessons and you have everything you need.',
+  novice: 'Loops, strings and conditions. The first four Python lessons cover everything you need.',
   apprentice: 'Dictionaries, sorting, recursion and classic algorithms. Expect to think for a few minutes before typing.',
   journeyman: 'Data structures, parsers and decorators. Each one is a small piece of real software.',
-  master: 'Simulations, graphs, tries and parsers. Bring a notebook; these reward thinking before typing.',
+  master: 'Simulations, graphs, tries and parsers. Sketch a plan on paper before you start.',
 }
 
 export default function ChallengesClient() {
@@ -18,17 +18,16 @@ export default function ChallengesClient() {
   const pct = Math.round((solved / challenges.length) * 100)
 
   return (
-    <main className="section-wrap challenges-shell">
-      <header className="challenges-head">
+    <main className="wrap page">
+      <header className="page-head page-head-split">
         <div>
-          <p className="eyebrow"><span>L</span> The ladder</p>
-          <h1>Python challenges.</h1>
-          <p>Every problem is checked automatically in your browser. Hints are there when you are stuck; the reference solution is there when you are done. Progress is saved on this device.</p>
+          <h1>Python challenges</h1>
+          <p>Small problems to practise on, from easy to hard. Your code is checked automatically in the browser. Hints are there when you are stuck, and a reference solution when you are done. New to Python? Do the first few <Link className="text-link" href="/languages/python">Python lessons</Link> first.</p>
         </div>
         <div className="challenges-progress">
-          <strong>{solved}<span>/{challenges.length}</span></strong>
-          <ProgressBar value={pct} color="var(--accent)" height={4} />
-          <span>{pct}% of the ladder climbed</span>
+          <strong>{solved}<span> of {challenges.length} solved</span></strong>
+          <ProgressBar value={pct} height={6} label="Challenges solved" />
+          <span>{pct}% complete</span>
         </div>
       </header>
 
@@ -38,16 +37,16 @@ export default function ChallengesClient() {
         return (
           <section key={tier} className="tier-section" aria-labelledby={`tier-${tier}`}>
             <div className="tier-head">
-              <h2 id={`tier-${tier}`} style={{ color: TIER_COLOR[tier] }}>{TIER_LABEL[tier]}</h2>
+              <h2 id={`tier-${tier}`}><span className="tier-dot" style={{ background: TIER_COLOR[tier] }} aria-hidden />{TIER_LABEL[tier]}</h2>
               <p>{TIER_BLURB[tier]}</p>
-              <span className="tier-count">{done}/{list.length}</span>
+              <span className="tier-count">{done} of {list.length} solved</span>
             </div>
             <div className="challenge-grid">
               {list.map((c, i) => {
                 const solvedOne = isExerciseDone(`challenge/${c.slug}`)
                 return (
                   <Link key={c.slug} href={`/challenges/${c.slug}`} className={`challenge-card ${solvedOne ? 'is-solved' : ''}`}>
-                    <span className="challenge-num" style={{ borderColor: solvedOne ? TIER_COLOR[tier] : undefined, background: solvedOne ? TIER_COLOR[tier] : undefined, color: solvedOne ? '#fff' : undefined }}>{solvedOne ? '✓' : i + 1}</span>
+                    <span className="challenge-num" aria-hidden>{solvedOne ? '✓' : i + 1}</span>
                     <div>
                       <h3>{c.title}</h3>
                       <p>{c.prompt}</p>

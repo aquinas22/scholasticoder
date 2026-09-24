@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Language } from '@/content/types'
 import { useProgress } from '@/hooks/useProgress'
 import { ProgressBar } from './ProgressBar'
-import { toRoman } from '@/lib/roman'
+import { LangIcon } from './LangIcon'
 
 interface Props {
   language: Language
@@ -17,50 +17,42 @@ export function LessonSidebar({ language, currentLessonSlug }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
-    <aside className={`lesson-sidebar ${open ? 'is-open' : ''}`}>
-      <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.75rem' }}>
-          <Link href={`/languages/${language.slug}`} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
-            <span style={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.1rem', color: language.accentColor }}>{language.icon}</span>
-            <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.95rem' }}>{language.name}</span>
-          </Link>
-          <button type="button" className="sc-btn sc-btn-ghost lesson-drawer-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="lesson-list">
-            {open ? 'Hide lessons' : 'All lessons ▾'}
-          </button>
+    <aside className={`lesson-sidebar ${open ? 'is-open' : ''}`} aria-label={`${language.name} lessons`}>
+      <div className="lesson-sidebar-head">
+        <Link href={`/languages/${language.slug}`} className="lesson-sidebar-course">
+          <LangIcon language={language} size="sm" />
+          <span>{language.name}</span>
+        </Link>
+        <button type="button" className="btn btn-small btn-quiet lesson-drawer-toggle" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="lesson-list">
+          {open ? 'Hide lessons' : 'All lessons'}
+        </button>
+        <div className="lesson-sidebar-progress">
+          <span>{prog.completed} of {prog.total} lessons done</span>
+          <ProgressBar value={prog.percentage} height={4} label={`${language.name} progress`} />
         </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{prog.completed}/{prog.total} lessons</span>
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: prog.percentage > 0 ? language.accentColor : 'var(--text-muted)' }}>{prog.percentage}%</span>
-        </div>
-        <ProgressBar value={prog.percentage} color={language.accentColor} height={3} />
       </div>
 
-      <nav id="lesson-list" aria-label="Lessons" style={{ flex: 1, padding: '0.5rem 0' }}>
-        {language.lessons.map((lesson, idx) => {
-          const done = isComplete(language.slug, lesson.slug)
-          const current = lesson.slug === currentLessonSlug
-          return (
-            <Link
-              key={lesson.slug}
-              href={`/languages/${language.slug}/lessons/${lesson.slug}`}
-              aria-current={current ? 'page' : undefined}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', textDecoration: 'none', background: current ? `${language.accentColor}12` : 'transparent', borderRight: current ? `2px solid ${language.accentColor}` : '2px solid transparent', transition: 'background 0.15s' }}
-              onMouseEnter={e => { if (!current) e.currentTarget.style.background = 'var(--card)' }}
-              onMouseLeave={e => { if (!current) e.currentTarget.style.background = 'transparent' }}
-            >
-              <span className="lesson-numeral" style={{ minWidth: 26, height: 22, padding: '0 5px', borderRadius: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 700, flexShrink: 0, fontFamily: 'var(--font-cormorant), Georgia, serif', letterSpacing: '0.02em', background: done ? language.accentColor : current ? `${language.accentColor}30` : 'var(--card)', border: `1px solid ${done ? language.accentColor : current ? `${language.accentColor}60` : 'var(--border)'}`, color: done ? language.textOnAccent : current ? language.accentColor : 'var(--text-muted)' }}>
-                {done ? '✓' : toRoman(idx + 1)}
-              </span>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text)', fontWeight: current ? 600 : 450, lineHeight: 1.35, opacity: done && !current ? 0.6 : 1 }}>{lesson.title}</span>
-            </Link>
-          )
-        })}
+      <nav id="lesson-list" aria-label="Lessons">
+        <ol>
+          {language.lessons.map((lesson, idx) => {
+            const done = isComplete(language.slug, lesson.slug)
+            const current = lesson.slug === currentLessonSlug
+            return (
+              <li key={lesson.slug}>
+                <Link
+                  href={`/languages/${language.slug}/lessons/${lesson.slug}`}
+                  aria-current={current ? 'page' : undefined}
+                  className={`sidebar-lesson ${current ? 'is-current' : ''} ${done ? 'is-done' : ''}`}
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="sidebar-num" aria-hidden>{done ? '✓' : idx + 1}</span>
+                  <span>{lesson.title}</span>
+                </Link>
+              </li>
+            )
+          })}
+        </ol>
       </nav>
-
-      <div style={{ padding: '1rem 1.25rem', borderTop: '1px solid var(--border)' }}>
-        <Link href="/languages" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>← All Languages</Link>
-      </div>
     </aside>
   )
 }

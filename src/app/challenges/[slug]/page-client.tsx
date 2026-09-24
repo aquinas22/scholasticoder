@@ -20,26 +20,24 @@ export default function ChallengeClient() {
 
   return (
     <TermScope scopeKey={`challenge/${challenge.slug}`}>
-    <main className="section-wrap challenge-shell">
-      <nav style={{ marginBottom: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }} aria-label="Breadcrumb">
-        <Link href="/dojo" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Dojo</Link>
-        {' / '}
-        <Link href="/challenges" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Challenges</Link>
-        {' / '}
-        <span style={{ color: 'var(--text)' }}>{challenge.title}</span>
+    <main className="wrap page page-narrow">
+      <nav className="breadcrumb" aria-label="Breadcrumb">
+        <Link href="/challenges">Challenges</Link>
+        <span aria-hidden>/</span>
+        <span aria-current="page">{challenge.title}</span>
       </nav>
 
       <header className="challenge-head">
         <div className="challenge-meta">
-          <span className="challenge-tier" style={{ color: TIER_COLOR[challenge.tier], borderColor: TIER_COLOR[challenge.tier] }}>{TIER_LABEL[challenge.tier]}</span>
+          <span className="challenge-tier"><span className="tier-dot" style={{ background: TIER_COLOR[challenge.tier] }} aria-hidden />{TIER_LABEL[challenge.tier]}</span>
           <span>Challenge {index + 1} of {challenges.length}</span>
-          {solved && <span className="interactive-pill">✓ solved</span>}
+          {solved && <span className="done-badge">✓ Solved</span>}
         </div>
         <h1>{challenge.title}</h1>
         <p className="challenge-prompt"><RichText text={challenge.prompt} blockId="prompt" /></p>
         {challenge.examples && (
           <div className="challenge-examples">
-            <span className="sc-lab-kicker">Examples</span>
+            <span className="challenge-examples-label">Examples</span>
             <pre>{challenge.examples.join('\n')}</pre>
           </div>
         )}
@@ -56,9 +54,9 @@ export default function ChallengeClient() {
         minLines={12}
       />
 
-      <nav style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }} aria-label="Challenge navigation">
-        {prev ? <Link href={`/challenges/${prev.slug}`} className="lesson-nav-card"><span>← Previous</span><strong>{prev.title}</strong></Link> : <div style={{ flex: 1 }} />}
-        {next ? <Link href={`/challenges/${next.slug}`} className="lesson-nav-card is-next"><span>Next →</span><strong>{next.title}</strong></Link> : <Link href="/challenges" className="lesson-nav-card is-next"><span>Top of the ladder</span><strong>Back to all challenges →</strong></Link>}
+      <nav className="pager" aria-label="Challenge navigation">
+        {prev ? <Link href={`/challenges/${prev.slug}`} className="pager-link"><span>← Previous</span><strong>{prev.title}</strong></Link> : <span />}
+        {next ? <Link href={`/challenges/${next.slug}`} className="pager-link is-next"><span>Next →</span><strong>{next.title}</strong></Link> : <Link href="/challenges" className="pager-link is-next"><span>That was the last one</span><strong>Back to all challenges</strong></Link>}
       </nav>
     </main>
     </TermScope>

@@ -165,7 +165,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
       {(title || tests) && (
         <header className="sc-lab-head">
           <div>
-            <span className="sc-lab-kicker">{tests ? 'Exercise' : 'Playground'}</span>
+            <span className="sc-lab-kicker">{tests ? 'Exercise' : 'Code'}</span>
             {title && <h3>{title}</h3>}
           </div>
           {tests && <span className={`sc-lab-badge ${done ? 'is-done' : ''}`}>{done ? '✓ Solved' : `${tests.length} check${tests.length === 1 ? '' : 's'}`}</span>}
@@ -183,13 +183,13 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
           )}
           {tests && !running && <button type="button" className="sc-btn sc-btn-check" onClick={check}>✓ Check answer</button>}
           <button type="button" className="sc-btn sc-btn-ghost" onClick={reset} title="Restore the original code">↺ Reset</button>
-          <button type="button" className="sc-btn sc-btn-ghost" onClick={copy} title="Copy the code">{copied ? '✓ Copied' : '⧉ Copy'}</button>
-          {isSql && <button type="button" className="sc-btn sc-btn-ghost" onClick={resetDb} title="Recreate the sample tables">⌂ Reset database</button>}
-          {isPython && <button type="button" className={`sc-btn sc-btn-ghost ${showStdin ? 'is-on' : ''}`} onClick={() => setShowStdin(s => !s)} title="Lines fed to input(), one per call">⌨ Program input</button>}
-          {hints.length > 0 && hintsShown < hints.length && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setHintsShown(h => h + 1)}>💡 Hint {hintsShown + 1}/{hints.length}</button>}
+          <button type="button" className="sc-btn sc-btn-ghost" onClick={copy} title="Copy the code">{copied ? '✓ Copied' : 'Copy'}</button>
+          {isSql && <button type="button" className="sc-btn sc-btn-ghost" onClick={resetDb} title="Recreate the sample tables">Reset database</button>}
+          {isPython && <button type="button" className={`sc-btn sc-btn-ghost ${showStdin ? 'is-on' : ''}`} onClick={() => setShowStdin(s => !s)} title="Lines fed to input(), one per call">Program input</button>}
+          {hints.length > 0 && hintsShown < hints.length && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setHintsShown(h => h + 1)}>Hint {hintsShown + 1} of {hints.length}</button>}
           {solution && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setShowSolution(s => !s)}>{showSolution ? 'Hide solution' : 'Show solution'}</button>}
         </div>
-        <span className={`sc-lab-status is-${isPython ? py.status : 'ready'}`}>{statusChip}<kbd>Ctrl</kbd>+<kbd>↵</kbd></span>
+        <span className={`sc-lab-status is-${isPython ? py.status : 'ready'}`}>{statusChip}<span className="sc-lab-keys"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> runs</span></span>
       </div>
 
       {showStdin && isPython && (
@@ -211,7 +211,7 @@ export function CodeLab({ runtime, code: initial, id, title, stdin: initialStdin
 
       {results && (
         <div className={`sc-results ${passed === results.length ? 'all-pass' : ''}`}>
-          <div className="sc-results-head">{passed === results.length ? '✓ All checks passed — well done.' : `${passed} of ${results.length} checks passed`}</div>
+          <div className="sc-results-head">{passed === results.length ? '✓ All checks passed. Nice work.' : `${passed} of ${results.length} checks passed`}</div>
           <ul>
             {results.map((r, i) => (
               <li key={i} className={r.passed ? 'pass' : 'fail'}>

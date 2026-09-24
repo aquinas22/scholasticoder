@@ -1,63 +1,47 @@
 import type { Metadata } from 'next'
-import { Rajdhani, Barlow_Semi_Condensed, Fira_Code, Cormorant_Garamond } from 'next/font/google'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { Navigation } from '@/components/Navigation'
 import { SiteFooter } from '@/components/SiteFooter'
 import { paletteBootScript, paletteCss } from '@/lib/themes'
 
-const rajdhani = Rajdhani({
+const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-syne',
+  variable: '--font-sans-var',
   display: 'swap',
 })
 
-const barlowSemiCondensed = Barlow_Semi_Condensed({
+const mono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-})
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
-
-const firaCode = Fira_Code({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-jetbrains-mono',
+  variable: '--font-mono-var',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'ScholastiCoder — Learn to code. Actually learn it.',
-  description: 'Free, interactive coding lessons: run Python in your browser, solve graded exercises, and climb a challenge ladder. 32 paths across Python, JavaScript, TypeScript, SQL, Git, Rust, Go, and how computers really work. No paywalls, no accounts.',
+  title: 'ScholastiCoder: learn to code, step by step',
+  description: 'Free, hands-on coding lessons that run in your browser. Start with Python, JavaScript, SQL or the web, try every example, and check your answers as you go. No account, no installs, no paywall.',
   metadataBase: new URL('https://aquinas22.github.io/scholasticoder/'),
   openGraph: {
-    title: 'ScholastiCoder — the open-source coding scriptorium',
-    description: 'Run Python in your browser, solve graded exercises, and study 32 learning paths for free.',
+    title: 'ScholastiCoder: learn to code, step by step',
+    description: 'Free, hands-on coding lessons that run in your browser. No account, no installs, no paywall.',
     type: 'website',
-    images: ['/art/benedictine-coding-monk-hero.png'],
   },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-palette="scriptorium" className="dark">
+    <html lang="en" suppressHydrationWarning data-palette="dark" className="dark">
       <head>
         <style id="palettes" dangerouslySetInnerHTML={{ __html: paletteCss() }} />
         <script dangerouslySetInnerHTML={{ __html: paletteBootScript }} />
       </head>
-      <body className={`${rajdhani.variable} ${barlowSemiCondensed.variable} ${firaCode.variable} ${cormorant.variable}`}>
+      <body className={`${inter.variable} ${mono.variable}`}>
         <Providers>
+          <a href="#main" className="skip-link">Skip to content</a>
           <Navigation />
-          {children}
+          <div id="main" className="site-main">{children}</div>
           <SiteFooter />
         </Providers>
       </body>

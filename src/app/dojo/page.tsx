@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import DojoClient from './page-client'
 
 export const metadata: Metadata = {
-  title: 'Python Dojo — ScholastiCoder',
-  description: 'A full Python 3 playground that runs in your browser. No installs, no accounts. Write, run, and break things safely.',
+  title: 'Playground | ScholastiCoder',
+  description: 'Write and run Python, JavaScript, TypeScript and shell commands in your browser. No installs, no account.',
 }
 
 export default function Page() {

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import QuestionsClient from './page-client'
 
 export const metadata: Metadata = {
-  title: 'Tabula Quaestionum — ScholastiCoder',
-  description: 'Every disputed question on the site, in the form of the Summa: the objections, the sed contra, and the answer. Searchable across all paths.',
+  title: 'Common questions | ScholastiCoder',
+  description: 'The questions beginners ask most, one per lesson, each with a plain answer and the usual mix-ups explained. Searchable across every course.',
 }
 
 export default function Page() {

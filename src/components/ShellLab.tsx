@@ -123,7 +123,7 @@ export function ShellLab({ id, title, task, checks, hints = [], solution, intro,
           {checks && <button type="button" className="sc-btn sc-btn-check" onClick={check}>✓ Check</button>}
           <button type="button" className="sc-btn sc-btn-ghost" onClick={reset}>↺ Reset files</button>
           <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setLines([])}>Clear screen</button>
-          {hints.length > 0 && hintsShown < hints.length && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setHintsShown(h => h + 1)}>💡 Hint {hintsShown + 1}/{hints.length}</button>}
+          {hints.length > 0 && hintsShown < hints.length && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setHintsShown(h => h + 1)}>Hint {hintsShown + 1} of {hints.length}</button>}
           {solution && <button type="button" className="sc-btn sc-btn-ghost" onClick={() => setShowSolution(s => !s)}>{showSolution ? 'Hide solution' : 'Show solution'}</button>}
         </div>
         <span className="sc-lab-status is-ready">simulated bash<kbd>Tab</kbd> completes <kbd>↑</kbd> history</span>
@@ -131,7 +131,7 @@ export function ShellLab({ id, title, task, checks, hints = [], solution, intro,
       {hintsShown > 0 && <ol className="sc-hints">{hints.slice(0, hintsShown).map((h, i) => <li key={i}><span>Hint {i + 1}</span>{h}</li>)}</ol>}
       {results && (
         <div className={`sc-results ${passed === results.length ? 'all-pass' : ''}`}>
-          <div className="sc-results-head">{passed === results.length ? '✓ All checks passed — well done.' : `${passed} of ${results.length} checks passed`}</div>
+          <div className="sc-results-head">{passed === results.length ? '✓ All checks passed. Nice work.' : `${passed} of ${results.length} checks passed`}</div>
           <ul>{results.map((r, i) => <li key={i} className={r.passed ? 'pass' : 'fail'}><span aria-hidden>{r.passed ? '✓' : '✗'}</span><div><strong>{r.name}</strong>{!r.passed && r.message && <p>{r.message}</p>}</div></li>)}</ul>
         </div>
       )}

@@ -12,20 +12,19 @@ export default function GlossaryClient() {
   const letters = Array.from(new Set(entries.map(e => e.term[0].toUpperCase())))
 
   return (
-    <main className="section-wrap glossary-shell">
-      <header className="glossary-head">
+    <main className="wrap page">
+      <header className="page-head page-head-split">
         <div>
-          <p className="eyebrow"><span>G</span> Glossarium</p>
-          <h1>The words, explained.</h1>
-          <p>{glossary.length} terms in plain language, most with a worked example, each pointing to the path where it is taught properly. The same words are clickable inside lessons.</p>
+          <h1>Glossary</h1>
+          <p>{glossary.length} programming words explained in plain language, most with a short example and a link to the course that teaches them. The same words are underlined inside lessons; click one for a quick definition.</p>
         </div>
-        <label className="glossary-search">
-          <span>Search</span>
-          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="closure, regex, JOIN…" autoComplete="off" />
+        <label className="search">
+          <span className="visually-hidden">Search the glossary</span>
+          <input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search: closure, regex, JOIN…" autoComplete="off" />
         </label>
       </header>
 
-      {entries.length === 0 && <p className="glossary-empty">Nothing matches “{query}”. Try a broader word.</p>}
+      {entries.length === 0 && <p className="empty">Nothing matches “{query}”. Try a broader word.</p>}
 
       {letters.map(letter => (
         <section key={letter} className="glossary-letter" aria-label={`Terms starting with ${letter}`}>
@@ -39,7 +38,7 @@ export default function GlossaryClient() {
                   {e.example && <span className="glossary-example"><CodeBlock code={e.example.code} language={e.example.language} /></span>}
                   {e.paths && e.paths.length > 0 && (
                     <span className="glossary-paths">
-                      {e.paths.map(p => { const lang = getLanguage(p); return lang ? <Link key={p} href={`/languages/${p}`} style={{ color: lang.accentColor }}>{lang.name}</Link> : null })}
+                      {e.paths.map(p => { const lang = getLanguage(p); return lang ? <Link key={p} href={`/languages/${p}`}>{lang.name}</Link> : null })}
                     </span>
                   )}
                 </dd>

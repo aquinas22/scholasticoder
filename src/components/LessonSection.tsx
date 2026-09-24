@@ -6,20 +6,16 @@ import { LiveHtml } from './LiveHtml'
 import { Quiz } from './Quiz'
 import { ShellLab } from './ShellLab'
 import { RichText } from './Term'
-import { Disputatio } from './Disputatio'
+import { CommonQuestion } from './CommonQuestion'
 import { runtimeFor } from '@/lib/runnable'
 
 interface Props { section: Section; index: number; languageSlug: string; lessonSlug: string }
 
-const CALLOUT = {
-  note: { label: '◆ Note', color: 'var(--accent)', bg: 'var(--card)', border: 'var(--border)' },
-  warning: { label: '⚠ Warning', color: '#ff6b00', bg: 'rgba(255,107,0,0.06)', border: 'rgba(255,107,0,0.2)' },
-  tip: { label: '✦ Tip', color: '#00b372', bg: 'rgba(0,179,114,0.06)', border: 'rgba(0,179,114,0.2)' },
-} as const
+const CALLOUT_LABEL = { note: 'Note', warning: 'Watch out', tip: 'Tip' } as const
 
 export function LessonSection({ section, index, languageSlug, lessonSlug }: Props) {
   if (section.type === 'text') {
-    return <p style={{ marginBottom: '1.4rem', lineHeight: 1.8, fontSize: '1rem', color: 'var(--text)' }}><RichText text={section.content} blockId={`s${index}`} /></p>
+    return <p className="prose-p"><RichText text={section.content} blockId={`s${index}`} /></p>
   }
 
   if (section.type === 'code') {
@@ -32,7 +28,7 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
       return <LiveHtml code={section.content} language={runtime} />
     }
     return (
-      <div style={{ marginBottom: '1.75rem' }}>
+      <div className="block">
         <CodeBlock code={section.content} language={lang} showLineNumbers />
       </div>
     )
@@ -41,8 +37,8 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
   if (section.type === 'exercise' && section.exercise) {
     const ex = section.exercise
     return (
-      <div style={{ marginBottom: '1.9rem' }}>
-        <p style={{ marginBottom: '0.75rem', lineHeight: 1.75, fontSize: '0.98rem', color: 'var(--text)' }}><RichText text={section.content} blockId={`s${index}`} /></p>
+      <div className="block">
+        <p className="exercise-prompt"><RichText text={section.content} blockId={`s${index}`} /></p>
         <CodeLab
           runtime={(() => { const r = runtimeFor(section.language ?? languageSlug); return r === 'javascript' || r === 'sql' || r === 'typescript' ? r : 'python' })()}
           id={`${languageSlug}/${lessonSlug}/${index}`}
@@ -59,13 +55,13 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
   }
 
   if (section.type === 'quaestio' && section.quaestio) {
-    return <Disputatio quaestio={section.quaestio} id={`quaestio:${languageSlug}/${lessonSlug}/${index}`} blockId={`s${index}`} />
+    return <CommonQuestion quaestio={section.quaestio} id={`quaestio:${languageSlug}/${lessonSlug}/${index}`} blockId={`s${index}`} />
   }
 
   if (section.type === 'shell' && section.shell) {
     const sh = section.shell
     return (
-      <div style={{ marginBottom: '1.9rem' }}>
+      <div className="block">
         <ShellLab id={`${languageSlug}/${lessonSlug}/${index}`} title={sh.title} task={section.content} intro={sh.intro} checks={sh.checks} hints={sh.hints} solution={sh.solution} />
       </div>
     )
@@ -76,13 +72,11 @@ export function LessonSection({ section, index, languageSlug, lessonSlug }: Prop
   }
 
   if (section.type === 'note' || section.type === 'warning' || section.type === 'tip') {
-    const c = CALLOUT[section.type]
     return (
-      <div style={{ background: c.bg, border: `1px solid ${c.border}`, borderLeft: `3px solid ${c.color}`, borderRadius: '0 8px 8px 0', padding: '0.9rem 1.1rem', marginBottom: '1.75rem', fontSize: '0.92rem', lineHeight: 1.7, color: 'var(--text)' }}>
-        <span style={{ display: 'inline-block', color: c.color, fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{c.label}</span>
-        <br />
-        <RichText text={section.content} blockId={`s${index}`} />
-      </div>
+      <aside className={`callout callout-${section.type}`}>
+        <strong className="callout-label">{CALLOUT_LABEL[section.type]}</strong>
+        <div><RichText text={section.content} blockId={`s${index}`} /></div>
+      </aside>
     )
   }
 

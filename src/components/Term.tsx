@@ -54,15 +54,15 @@ export function Term({ text, entry }: { text: string; entry: GlossaryEntry }) {
       {open && (
         <span className={`term-pop is-${side}`} id={id} role="dialog" aria-label={entry.term}>
           <span className="term-pop-head">
-            <span className="sc-lab-kicker">Glossarium</span>
+            <span className="term-kicker">Glossary</span>
             <strong>{entry.term}</strong>
             <button type="button" className="term-close" onClick={() => setOpen(false)} aria-label="Close">×</button>
           </span>
           <span className="term-def">{entry.definition}</span>
           {entry.example && <span className="term-example"><CodeBlock code={entry.example.code} language={entry.example.language} /></span>}
           <span className="term-links">
-            {path && <Link href={`/languages/${path.slug}`} style={{ color: path.accentColor }}>Taught in {path.name} →</Link>}
-            <Link href={`/glossary/#${glossaryAnchor(entry.term)}`}>Glossary</Link>
+            {path && <Link href={`/languages/${path.slug}`}>Learn it in {path.name} →</Link>}
+            <Link href={`/glossary/#${glossaryAnchor(entry.term)}`}>Open in glossary</Link>
           </span>
         </span>
       )}

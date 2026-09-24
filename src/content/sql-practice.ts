@@ -232,15 +232,15 @@ export const sqlPractice: Record<string, Section[]> = {
     {
       type: 'exercise',
       language: 'sql',
-      content: 'Move 100 from the Almonry account (id 1) to the Infirmary account (id 2) inside a single transaction, so both updates succeed or fail together.',
+      content: 'Move 100 from the Savings account (id 1) to the Checking account (id 2) inside a single transaction, so both updates succeed or fail together.',
       exercise: {
         title: 'An atomic transfer',
         starter: `-- BEGIN, two UPDATEs, COMMIT\n\nSELECT * FROM accounts;\n`,
         solution: `BEGIN TRANSACTION;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;\n\nSELECT * FROM accounts;\n`,
         hints: ['BEGIN TRANSACTION; ... COMMIT;', 'balance = balance - 100 subtracts from the current value.'],
         tests: [
-          { name: 'Almonry has 400', check: `SELECT (SELECT balance FROM accounts WHERE id = 1) = 400` },
-          { name: 'Infirmary has 350', check: `SELECT (SELECT balance FROM accounts WHERE id = 2) = 350` },
+          { name: 'Savings has 400', check: `SELECT (SELECT balance FROM accounts WHERE id = 1) = 400` },
+          { name: 'Checking has 350', check: `SELECT (SELECT balance FROM accounts WHERE id = 2) = 350` },
           { name: 'Money was conserved', check: `SELECT (SELECT SUM(balance) FROM accounts) = 1950` },
         ],
       },
@@ -259,7 +259,7 @@ export const sqlPractice: Record<string, Section[]> = {
         hints: ['The inner query lists customer_ids with big orders.', 'WHERE id IN (...) keeps customers whose id appears in that list.'],
         tests: [
           { name: 'Four customers', check: `SELECT (SELECT COUNT(*) FROM _result) = 4` },
-          { name: 'Includes Hildegard and Teresa, not Bede', check: `SELECT EXISTS (SELECT 1 FROM _result WHERE name = 'Hildegard') AND EXISTS (SELECT 1 FROM _result WHERE name = 'Teresa') AND NOT EXISTS (SELECT 1 FROM _result WHERE name = 'Bede')` },
+          { name: 'Includes Hanna and Lucia, not Oliver', check: `SELECT EXISTS (SELECT 1 FROM _result WHERE name = 'Hanna') AND EXISTS (SELECT 1 FROM _result WHERE name = 'Lucia') AND NOT EXISTS (SELECT 1 FROM _result WHERE name = 'Oliver')` },
         ],
       },
     },
@@ -274,8 +274,8 @@ export const sqlPractice: Record<string, Section[]> = {
         hints: ['Join the CTE to customers to get names.', 'Filter with WHERE total_spent > 300 and sort DESC.'],
         tests: [
           { name: 'Four big spenders', check: `SELECT (SELECT COUNT(*) FROM _result) = 4` },
-          { name: 'Hildegard first with 1405', check: `SELECT (SELECT name FROM _result ORDER BY rowid LIMIT 1) = 'Hildegard' AND ABS((SELECT total_spent FROM _result ORDER BY rowid LIMIT 1) - 1405) < 0.01` },
-          { name: 'Catherine last with 599', check: `SELECT (SELECT name FROM _result ORDER BY rowid DESC LIMIT 1) = 'Catherine'` },
+          { name: 'Hanna first with 1405', check: `SELECT (SELECT name FROM _result ORDER BY rowid LIMIT 1) = 'Hanna' AND ABS((SELECT total_spent FROM _result ORDER BY rowid LIMIT 1) - 1405) < 0.01` },
+          { name: 'Giulia last with 599', check: `SELECT (SELECT name FROM _result ORDER BY rowid DESC LIMIT 1) = 'Giulia'` },
         ],
       },
     },
@@ -293,8 +293,8 @@ export const sqlPractice: Record<string, Section[]> = {
         hints: ['RANK() OVER (PARTITION BY department ORDER BY salary DESC)', 'Every original row stays in the output; that is what makes it a window, not a GROUP BY.'],
         tests: [
           { name: 'All 11 employees', check: `SELECT (SELECT COUNT(*) FROM _result) = 11` },
-          { name: 'Sister Hild is first in engineering', check: `SELECT (SELECT dept_rank FROM _result WHERE name = 'Sister Hild') = 1` },
-          { name: 'Brother Bede is third in engineering', check: `SELECT (SELECT dept_rank FROM _result WHERE name = 'Brother Bede') = 3` },
+          { name: 'Maya Chen is first in engineering', check: `SELECT (SELECT dept_rank FROM _result WHERE name = 'Maya Chen') = 1` },
+          { name: 'Sam Carter is third in engineering', check: `SELECT (SELECT dept_rank FROM _result WHERE name = 'Sam Carter') = 3` },
         ],
       },
     },

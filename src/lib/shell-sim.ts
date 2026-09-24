@@ -20,7 +20,7 @@ export interface ShellState {
 
 export interface ShellLine { kind: 'command' | 'stdout' | 'stderr'; text: string }
 
-const HOME = '/home/apprentice'
+const HOME = '/home/learner'
 
 export function dir(children: Record<string, ShellNode> = {}): ShellDir { return { type: 'dir', children } }
 export function file(content: string, exec = false): ShellFile { return { type: 'file', content, exec } }
@@ -29,9 +29,9 @@ export function createInitialState(): ShellState {
   return {
     fs: dir({
       home: dir({
-        apprentice: dir({
-          'README.md': file('# Welcome, apprentice\n\nThis is a practice shell. Nothing here is real, so break things freely.\nTry: ls, cat README.md, cd lessons, mkdir notes\n'),
-          'koan.txt': file('A bug is only a lesson wearing a disguise.\n'),
+        learner: dir({
+          'README.md': file('# Welcome\n\nThis is a practice shell. Nothing here is real, so break things freely.\nTry: ls, cat README.md, cd lessons, mkdir notes\n'),
+          'notes.txt': file('Small steps every day add up.\n'),
           lessons: dir({
             'day1.txt': file('ls pwd cd cat\n'),
             'day2.txt': file('mkdir touch rm mv cp\n'),
@@ -41,22 +41,22 @@ export function createInitialState(): ShellState {
             'hello.sh': file('#!/bin/bash\necho "Hello from a script"\n', true),
           }),
           data: dir({
-            'psalms.txt': file('Psalm 23 The Lord is my shepherd\nPsalm 51 Have mercy on me\nPsalm 100 Make a joyful noise\nPsalm 150 Praise him with the trumpet\nPsalm 23 The Lord is my shepherd\n'),
-            'monks.csv': file('name,role,pages\nBede,scribe,412\nHild,abbess,88\nAlcuin,teacher,300\nCaedmon,poet,12\n'),
+            'songs.txt': file('Track 3 Morning Coffee\nTrack 7 Rainy Day\nTrack 12 Night Drive\nTrack 20 Summer Road\nTrack 3 Morning Coffee\n'),
+            'team.csv': file('name,role,tasks\nMaya,designer,41\nSam,support,88\nAda,engineer,30\nLeo,engineer,12\n'),
           }),
         }),
       }),
-      etc: dir({ hostname: file('abbey\n'), motd: file('Ora et labora.\n') }),
+      etc: dir({ hostname: file('sandbox\n'), motd: file('Welcome to the sandbox. Have fun.\n') }),
       tmp: dir(),
       usr: dir({ bin: dir() }),
       bin: dir(),
     }),
     cwd: HOME,
-    env: { HOME, USER: 'apprentice', PATH: '/usr/local/bin:/usr/bin:/bin', SHELL: '/bin/bash', PWD: HOME, LANG: 'en_US.UTF-8' },
+    env: { HOME, USER: 'learner', PATH: '/usr/local/bin:/usr/bin:/bin', SHELL: '/bin/bash', PWD: HOME, LANG: 'en_US.UTF-8' },
     history: [],
     lastStatus: 0,
-    user: 'apprentice',
-    host: 'abbey',
+    user: 'learner',
+    host: 'sandbox',
   }
 }
 
@@ -205,7 +205,7 @@ function lsEntry(name: string, node: ShellNode, long: boolean) {
   if (!long) return node.type === 'dir' ? name + '/' : name
   const perms = node.type === 'dir' ? 'drwxr-xr-x' : node.exec ? '-rwxr-xr-x' : '-rw-r--r--'
   const size = node.type === 'dir' ? 4096 : node.content.length
-  return `${perms}  1 apprentice apprentice ${String(size).padStart(6)} Sep  6 09:00 ${name}${node.type === 'dir' ? '/' : ''}`
+  return `${perms}  1 learner learner ${String(size).padStart(6)} Sep  6 09:00 ${name}${node.type === 'dir' ? '/' : ''}`
 }
 
 function flags(argv: string[]) {

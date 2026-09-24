@@ -196,13 +196,13 @@ export const jsPractice: Record<string, Section[]> = {
       content: 'Update the user object: add an email property, remove age, and set keys to the list of remaining property names. Finish by building tagline with the user\'s name and city.',
       exercise: {
         title: 'Working with objects',
-        starter: `const user = { name: 'Hild', age: 34, city: 'Whitby' }\n\n// add email, remove age\n\nconst keys = []\nconst tagline = ''\nconsole.log(keys, tagline)\n`,
-        solution: `const user = { name: 'Hild', age: 34, city: 'Whitby' }\n\nuser.email = 'hild@whitby.abbey'\ndelete user.age\n\nconst keys = Object.keys(user)\nconst tagline = \`\${user.name} of \${user.city}\`\nconsole.log(keys, tagline)\n`,
+        starter: `const user = { name: 'Maya', age: 34, city: 'Lisbon' }\n\n// add email, remove age\n\nconst keys = []\nconst tagline = ''\nconsole.log(keys, tagline)\n`,
+        solution: `const user = { name: 'Maya', age: 34, city: 'Lisbon' }\n\nuser.email = 'maya@example.com'\ndelete user.age\n\nconst keys = Object.keys(user)\nconst tagline = \`\${user.name} of \${user.city}\`\nconsole.log(keys, tagline)\n`,
         hints: ['Adding a property is just assignment: user.email = ...', 'delete user.age removes it; Object.keys lists what is left.'],
         tests: [
           { name: 'email added, age removed', check: `assert(typeof user.email === 'string' && user.email.length > 0, 'add an email')\nassert(!('age' in user), 'remove age')` },
           { name: 'keys lists the remaining properties', check: `assert.deepEqual([...keys].sort(), ['city', 'email', 'name'])` },
-          { name: 'tagline', check: `assert.equal(tagline, 'Hild of Whitby')` },
+          { name: 'tagline', check: `assert.equal(tagline, 'Maya of Lisbon')` },
         ],
       },
     },
@@ -349,11 +349,11 @@ export const jsPractice: Record<string, Section[]> = {
       content: 'Destructure config in a single statement: pull out host and port (defaulting port to 8080), and collect everything else into rest.',
       exercise: {
         title: 'Object destructuring with defaults',
-        starter: `const config = { host: 'abbey.local', debug: true, retries: 3 }\n\n// const { ... } = config\n\nconsole.log(host, port, rest)\n`,
-        solution: `const config = { host: 'abbey.local', debug: true, retries: 3 }\n\nconst { host, port = 8080, ...rest } = config\n\nconsole.log(host, port, rest)\n`,
+        starter: `const config = { host: 'app.local', debug: true, retries: 3 }\n\n// const { ... } = config\n\nconsole.log(host, port, rest)\n`,
+        solution: `const config = { host: 'app.local', debug: true, retries: 3 }\n\nconst { host, port = 8080, ...rest } = config\n\nconsole.log(host, port, rest)\n`,
         hints: ['Defaults: { port = 8080 }', 'Rest in objects: { ...rest } collects the remaining properties.'],
         tests: [
-          { name: 'host and default port', check: `assert.equal(host, 'abbey.local'); assert.equal(port, 8080)` },
+          { name: 'host and default port', check: `assert.equal(host, 'app.local'); assert.equal(port, 8080)` },
           { name: 'rest holds the other properties', check: `assert.deepEqual(rest, { debug: true, retries: 3 })` },
           { name: 'Single destructuring statement', check: `assert(/const\\s*\\{[^}]*host[^}]*\\}\\s*=\\s*config/.test(_src), 'destructure config with const { ... } = config')` },
         ],
@@ -458,8 +458,8 @@ export const jsPractice: Record<string, Section[]> = {
       content: 'Make Playlist iterable by implementing [Symbol.iterator] as a generator method, so for...of and spread yield the track titles in order.',
       exercise: {
         title: 'A custom iterable',
-        starter: `class Playlist {\n  constructor() {\n    this.tracks = []\n  }\n  add(title) {\n    this.tracks.push(title)\n    return this\n  }\n  // *[Symbol.iterator]() { ... }\n}\n\nconst p = new Playlist().add('Kyrie').add('Gloria').add('Credo')\nconsole.log([...p])\n`,
-        solution: `class Playlist {\n  constructor() {\n    this.tracks = []\n  }\n  add(title) {\n    this.tracks.push(title)\n    return this\n  }\n  *[Symbol.iterator]() {\n    yield* this.tracks\n  }\n}\n\nconst p = new Playlist().add('Kyrie').add('Gloria').add('Credo')\nconsole.log([...p])\n`,
+        starter: `class Playlist {\n  constructor() {\n    this.tracks = []\n  }\n  add(title) {\n    this.tracks.push(title)\n    return this\n  }\n  // *[Symbol.iterator]() { ... }\n}\n\nconst p = new Playlist().add('Intro').add('Chorus').add('Outro')\nconsole.log([...p])\n`,
+        solution: `class Playlist {\n  constructor() {\n    this.tracks = []\n  }\n  add(title) {\n    this.tracks.push(title)\n    return this\n  }\n  *[Symbol.iterator]() {\n    yield* this.tracks\n  }\n}\n\nconst p = new Playlist().add('Intro').add('Chorus').add('Outro')\nconsole.log([...p])\n`,
         hints: ['A generator method: *[Symbol.iterator]() { ... }', 'yield* delegates to another iterable such as this.tracks.'],
         tests: [
           { name: 'Spread yields the titles', check: `assert.deepEqual([...new Playlist().add('a').add('b')], ['a', 'b'])` },
@@ -517,11 +517,11 @@ export const jsPractice: Record<string, Section[]> = {
       content: 'Write isValidEmail(s) with a simple pattern (something@something.tld, no spaces) and extractHashtags(text) that returns every #word in the text without the hash.',
       exercise: {
         title: 'Test and extract',
-        starter: `function isValidEmail(s) {\n  return false\n}\n\nfunction extractHashtags(text) {\n  return []\n}\n\nconsole.log(isValidEmail('bede@jarrow.uk'), isValidEmail('not an email'))\nconsole.log(extractHashtags('Learning #python and #sql today #100DaysOfCode'))\n`,
-        solution: `function isValidEmail(s) {\n  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(s)\n}\n\nfunction extractHashtags(text) {\n  return [...text.matchAll(/#(\\w+)/g)].map(m => m[1])\n}\n\nconsole.log(isValidEmail('bede@jarrow.uk'), isValidEmail('not an email'))\nconsole.log(extractHashtags('Learning #python and #sql today #100DaysOfCode'))\n`,
+        starter: `function isValidEmail(s) {\n  return false\n}\n\nfunction extractHashtags(text) {\n  return []\n}\n\nconsole.log(isValidEmail('sam@mail.co.uk'), isValidEmail('not an email'))\nconsole.log(extractHashtags('Learning #python and #sql today #100DaysOfCode'))\n`,
+        solution: `function isValidEmail(s) {\n  return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(s)\n}\n\nfunction extractHashtags(text) {\n  return [...text.matchAll(/#(\\w+)/g)].map(m => m[1])\n}\n\nconsole.log(isValidEmail('sam@mail.co.uk'), isValidEmail('not an email'))\nconsole.log(extractHashtags('Learning #python and #sql today #100DaysOfCode'))\n`,
         hints: ['regex.test(string) returns true or false.', 'matchAll with the g flag gives every match; m[1] is the first capture group.'],
         tests: [
-          { name: 'Accepts a normal email', check: `assert.equal(isValidEmail('bede@jarrow.uk'), true)` },
+          { name: 'Accepts a normal email', check: `assert.equal(isValidEmail('sam@mail.co.uk'), true)` },
           { name: 'Rejects junk', check: `assert.equal(isValidEmail('not an email'), false); assert.equal(isValidEmail('a@b'), false); assert.equal(isValidEmail('a @b.com'), false)` },
           { name: 'Extracts hashtags', check: `assert.deepEqual(extractHashtags('Learning #python and #sql today #100DaysOfCode'), ['python', 'sql', '100DaysOfCode'])` },
           { name: 'No hashtags gives []', check: `assert.deepEqual(extractHashtags('plain text'), [])` },
@@ -539,7 +539,7 @@ export const jsPractice: Record<string, Section[]> = {
         hints: ['[^a-z0-9]+ matches one or more characters that are not letters or digits.', 'A second replace with ^-+|-+$ trims leading and trailing hyphens.'],
         tests: [
           { name: 'Basic', check: `assert.equal(slugify('Hello, World! 2026'), 'hello-world-2026')` },
-          { name: 'Collapses runs and trims ends', check: `assert.equal(slugify('  --Ora et   Labora!!  '), 'ora-et-labora')` },
+          { name: 'Collapses runs and trims ends', check: `assert.equal(slugify('  --Good   Morning!!  '), 'good-morning')` },
           { name: 'Uses a regular expression', check: `assert(/replace\\(\\s*\\//.test(_src), 'use replace with a regex')` },
         ],
       },

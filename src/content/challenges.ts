@@ -17,12 +17,12 @@ export interface Challenge {
   hints: string[]
 }
 
-export const TIER_LABEL: Record<ChallengeTier, string> = { novice: 'Novice', apprentice: 'Apprentice', journeyman: 'Journeyman', master: 'Master' }
+export const TIER_LABEL: Record<ChallengeTier, string> = { novice: 'Basics', apprentice: 'Core', journeyman: 'Intermediate', master: 'Advanced' }
 export const TIER_COLOR: Record<ChallengeTier, string> = { novice: '#22c55e', apprentice: '#f59e0b', journeyman: '#ef4444', master: '#a855f7' }
 
 /** The Python challenge ladder. Every check runs in the browser against the learner's namespace. */
 export const challenges: Challenge[] = [
-  // ─────────────────────────────── Novice ───────────────────────────────
+  // ─────────────────────────────── Basics ───────────────────────────────
   {
     slug: 'sum-of-digits',
     title: 'Sum of digits',
@@ -151,7 +151,7 @@ export const challenges: Challenge[] = [
     ],
   },
 
-  // ───────────────────────────── Apprentice ─────────────────────────────
+  // ──────────────────────────────── Core ────────────────────────────────
   {
     slug: 'caesar-cipher',
     title: 'Caesar cipher',
@@ -338,7 +338,7 @@ export const challenges: Challenge[] = [
     ],
   },
 
-  // ───────────────────────────── Journeyman ─────────────────────────────
+  // ──────────────────────────── Intermediate ────────────────────────────
   {
     slug: 'group-anagrams',
     title: 'Group anagrams',
@@ -455,7 +455,7 @@ export const challenges: Challenge[] = [
       { name: 'Empty inventory', check: `assert report([]) == "TOTAL                0.00"` },
     ],
   },
-  // ─────────────────────────────── Master ───────────────────────────────
+  // ────────────────────────────── Advanced ──────────────────────────────
   {
     slug: 'game-of-life',
     title: "Conway's Game of Life",
@@ -496,12 +496,12 @@ export const challenges: Challenge[] = [
     tier: 'master',
     tags: ['classes', 'data structures'],
     prompt: 'Implement Trie with insert(word), contains(word) and starts_with(prefix), which returns every inserted word beginning with the prefix in alphabetical order. Store the words in a tree of dictionaries, one level per character.',
-    starter: `class Trie:\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        ...\n\n    def contains(self, word):\n        ...\n\n    def starts_with(self, prefix):\n        ...\n\n\nt = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nprint(t.contains("mass"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
-    solution: `class Trie:\n    END = "$"\n\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        node = self.root\n        for ch in word:\n            node = node.setdefault(ch, {})\n        node[self.END] = True\n\n    def _find(self, prefix):\n        node = self.root\n        for ch in prefix:\n            if ch not in node:\n                return None\n            node = node[ch]\n        return node\n\n    def contains(self, word):\n        node = self._find(word)\n        return node is not None and self.END in node\n\n    def starts_with(self, prefix):\n        node = self._find(prefix)\n        if node is None:\n            return []\n        words = []\n\n        def walk(n, path):\n            if self.END in n:\n                words.append(path)\n            for ch in sorted(k for k in n if k != self.END):\n                walk(n[ch], path + ch)\n\n        walk(node, prefix)\n        return words\n\n\nt = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nprint(t.contains("mass"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
-    hints: ['Mark the end of a word with a special key such as "$" so "mat" is not confused with "matins".', 'starts_with: walk to the prefix node, then collect words depth-first in sorted key order.'],
+    starter: `class Trie:\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        ...\n\n    def contains(self, word):\n        ...\n\n    def starts_with(self, prefix):\n        ...\n\n\nt = Trie()\nfor w in ["maple", "mango", "matter", "melon", "peach"]:\n    t.insert(w)\nprint(t.contains("mango"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
+    solution: `class Trie:\n    END = "$"\n\n    def __init__(self):\n        self.root = {}\n\n    def insert(self, word):\n        node = self.root\n        for ch in word:\n            node = node.setdefault(ch, {})\n        node[self.END] = True\n\n    def _find(self, prefix):\n        node = self.root\n        for ch in prefix:\n            if ch not in node:\n                return None\n            node = node[ch]\n        return node\n\n    def contains(self, word):\n        node = self._find(word)\n        return node is not None and self.END in node\n\n    def starts_with(self, prefix):\n        node = self._find(prefix)\n        if node is None:\n            return []\n        words = []\n\n        def walk(n, path):\n            if self.END in n:\n                words.append(path)\n            for ch in sorted(k for k in n if k != self.END):\n                walk(n[ch], path + ch)\n\n        walk(node, prefix)\n        return words\n\n\nt = Trie()\nfor w in ["maple", "mango", "matter", "melon", "peach"]:\n    t.insert(w)\nprint(t.contains("mango"), t.contains("mat"))\nprint(t.starts_with("ma"))\n`,
+    hints: ['Mark the end of a word with a special key such as "$" so "mat" is not confused with "matter".', 'starts_with: walk to the prefix node, then collect words depth-first in sorted key order.'],
     tests: [
-      { name: 'contains distinguishes words from prefixes', check: `t = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nassert t.contains("mass") and t.contains("matins")\nassert not t.contains("mat") and not t.contains("vespers")` },
-      { name: 'starts_with returns sorted matches', check: `t = Trie()\nfor w in ["matins", "mass", "matter", "monk", "prime"]:\n    t.insert(w)\nassert t.starts_with("ma") == ["mass", "matins", "matter"]\nassert t.starts_with("m") == ["mass", "matins", "matter", "monk"]` },
+      { name: 'contains distinguishes words from prefixes', check: `t = Trie()\nfor w in ["maple", "mango", "matter", "melon", "peach"]:\n    t.insert(w)\nassert t.contains("mango") and t.contains("matter")\nassert not t.contains("mat") and not t.contains("grape")` },
+      { name: 'starts_with returns sorted matches', check: `t = Trie()\nfor w in ["maple", "mango", "matter", "melon", "peach"]:\n    t.insert(w)\nassert t.starts_with("ma") == ["mango", "maple", "matter"]\nassert t.starts_with("m") == ["mango", "maple", "matter", "melon"]` },
       { name: 'No matches and empty prefix', check: `t = Trie()\nt.insert("a"); t.insert("b")\nassert t.starts_with("z") == []\nassert t.starts_with("") == ["a", "b"]` },
       { name: 'Uses nested dicts', check: `t = Trie()\nt.insert("ab")\nassert isinstance(t.root, dict) and "a" in t.root and "b" in t.root["a"]` },
     ],
@@ -512,12 +512,12 @@ export const challenges: Challenge[] = [
     tier: 'master',
     tags: ['strings', 'greedy'],
     prompt: 'Write wrap(text, width) that breaks text into lines no longer than width characters, breaking only at spaces, greedily fitting as many words per line as possible. Words longer than width go on their own line unbroken. Return the list of lines.',
-    examples: ['wrap("ora et labora ora et lege", 10) → ["ora et", "labora ora", "et lege"]'],
-    starter: `def wrap(text, width):\n    ...\n\n\nfor line in wrap("ora et labora ora et lege", 10):\n    print(f"|{line:<10}|")\n`,
-    solution: `def wrap(text, width):\n    lines, current = [], []\n    length = 0\n    for word in text.split():\n        extra = len(word) if not current else len(word) + 1\n        if current and length + extra > width:\n            lines.append(" ".join(current))\n            current, length = [word], len(word)\n        else:\n            current.append(word)\n            length += extra\n    if current:\n        lines.append(" ".join(current))\n    return lines\n\n\nfor line in wrap("ora et labora ora et lege", 10):\n    print(f"|{line:<10}|")\n`,
+    examples: ['wrap("keep calm and write more code", 10) → ["keep calm", "and write", "more code"]'],
+    starter: `def wrap(text, width):\n    ...\n\n\nfor line in wrap("keep calm and write more code", 10):\n    print(f"|{line:<10}|")\n`,
+    solution: `def wrap(text, width):\n    lines, current = [], []\n    length = 0\n    for word in text.split():\n        extra = len(word) if not current else len(word) + 1\n        if current and length + extra > width:\n            lines.append(" ".join(current))\n            current, length = [word], len(word)\n        else:\n            current.append(word)\n            length += extra\n    if current:\n        lines.append(" ".join(current))\n    return lines\n\n\nfor line in wrap("keep calm and write more code", 10):\n    print(f"|{line:<10}|")\n`,
     hints: ['Keep the words of the current line and its length; adding a word costs its length plus one space.', 'When a word does not fit, flush the current line and start a new one with that word.'],
     tests: [
-      { name: 'Greedy fit', check: `assert wrap("ora et labora ora et lege", 10) == ["ora et", "labora ora", "et lege"]` },
+      { name: 'Greedy fit', check: `assert wrap("keep calm and write more code", 10) == ["keep calm", "and write", "more code"]` },
       { name: 'Never exceeds width', check: `text = "the quick brown fox jumps over the lazy dog " * 5\nfor w in (8, 12, 20):\n    assert all(len(l) <= w for l in wrap(text, w))\n    assert " ".join(wrap(text, w)).split() == text.split()` },
       { name: 'Long words stand alone', check: `assert wrap("a supercalifragilistic b", 5) == ["a", "supercalifragilistic", "b"]` },
       { name: 'Empty text', check: `assert wrap("", 10) == []` },
@@ -581,13 +581,13 @@ export const challenges: Challenge[] = [
     tier: 'master',
     tags: ['parsing', 'strings'],
     prompt: 'Write to_html(md) that converts a tiny Markdown subset: lines starting with # or ## become <h1>/<h2>; lines starting with "- " form a <ul> of <li>; any other non-empty line is a <p>. Inline, **bold** becomes <strong> and *italic* becomes <em>. Blank lines separate blocks. Return the HTML lines joined with newlines.',
-    examples: ['to_html("# Rule\\n\\n- pray\\n- work") → "<h1>Rule</h1>\\n<ul>\\n<li>pray</li>\\n<li>work</li>\\n</ul>"'],
-    starter: `import re\n\n\ndef inline(text):\n    return text\n\n\ndef to_html(md):\n    ...\n\n\nprint(to_html("# The Rule\\n\\nOra **et** labora.\\n\\n- pray\\n- *work*"))\n`,
-    solution: `import re\n\n\ndef inline(text):\n    text = re.sub(r"\\*\\*(.+?)\\*\\*", r"<strong>\\1</strong>", text)\n    text = re.sub(r"\\*(.+?)\\*", r"<em>\\1</em>", text)\n    return text\n\n\ndef to_html(md):\n    out, in_list = [], False\n    for line in md.split("\\n"):\n        stripped = line.strip()\n        if stripped.startswith("- "):\n            if not in_list:\n                out.append("<ul>")\n                in_list = True\n            out.append(f"<li>{inline(stripped[2:])}</li>")\n            continue\n        if in_list:\n            out.append("</ul>")\n            in_list = False\n        if not stripped:\n            continue\n        if stripped.startswith("## "):\n            out.append(f"<h2>{inline(stripped[3:])}</h2>")\n        elif stripped.startswith("# "):\n            out.append(f"<h1>{inline(stripped[2:])}</h1>")\n        else:\n            out.append(f"<p>{inline(stripped)}</p>")\n    if in_list:\n        out.append("</ul>")\n    return "\\n".join(out)\n\n\nprint(to_html("# The Rule\\n\\nOra **et** labora.\\n\\n- pray\\n- *work*"))\n`,
+    examples: ['to_html("# Todo\\n\\n- shop\\n- cook") → "<h1>Todo</h1>\\n<ul>\\n<li>shop</li>\\n<li>cook</li>\\n</ul>"'],
+    starter: `import re\n\n\ndef inline(text):\n    return text\n\n\ndef to_html(md):\n    ...\n\n\nprint(to_html("# My notes\\n\\nKeep **it** simple.\\n\\n- plan\\n- *build*"))\n`,
+    solution: `import re\n\n\ndef inline(text):\n    text = re.sub(r"\\*\\*(.+?)\\*\\*", r"<strong>\\1</strong>", text)\n    text = re.sub(r"\\*(.+?)\\*", r"<em>\\1</em>", text)\n    return text\n\n\ndef to_html(md):\n    out, in_list = [], False\n    for line in md.split("\\n"):\n        stripped = line.strip()\n        if stripped.startswith("- "):\n            if not in_list:\n                out.append("<ul>")\n                in_list = True\n            out.append(f"<li>{inline(stripped[2:])}</li>")\n            continue\n        if in_list:\n            out.append("</ul>")\n            in_list = False\n        if not stripped:\n            continue\n        if stripped.startswith("## "):\n            out.append(f"<h2>{inline(stripped[3:])}</h2>")\n        elif stripped.startswith("# "):\n            out.append(f"<h1>{inline(stripped[2:])}</h1>")\n        else:\n            out.append(f"<p>{inline(stripped)}</p>")\n    if in_list:\n        out.append("</ul>")\n    return "\\n".join(out)\n\n\nprint(to_html("# My notes\\n\\nKeep **it** simple.\\n\\n- plan\\n- *build*"))\n`,
     hints: ['Handle bold before italic so ** is not eaten by the single-star rule; use non-greedy .+?', 'Track whether you are inside a list so you can open <ul> on the first item and close it when the list ends.'],
     tests: [
-      { name: 'Headings and paragraphs', check: `assert to_html("# Rule\\n\\n## Chapter\\n\\nOra et labora.") == "<h1>Rule</h1>\\n<h2>Chapter</h2>\\n<p>Ora et labora.</p>"` },
-      { name: 'Lists open and close', check: `assert to_html("- pray\\n- work\\n\\nAmen") == "<ul>\\n<li>pray</li>\\n<li>work</li>\\n</ul>\\n<p>Amen</p>"` },
+      { name: 'Headings and paragraphs', check: `assert to_html("# Title\\n\\n## Section\\n\\nHello there.") == "<h1>Title</h1>\\n<h2>Section</h2>\\n<p>Hello there.</p>"` },
+      { name: 'Lists open and close', check: `assert to_html("- shop\\n- cook\\n\\nDone") == "<ul>\\n<li>shop</li>\\n<li>cook</li>\\n</ul>\\n<p>Done</p>"` },
       { name: 'Inline bold and italic', check: `assert inline("**bold** and *italic*") == "<strong>bold</strong> and <em>italic</em>"\nassert to_html("a **b** c") == "<p>a <strong>b</strong> c</p>"` },
       { name: 'Trailing list is closed', check: `assert to_html("- one").endswith("</ul>")` },
       { name: 'Empty input', check: `assert to_html("") == ""` },

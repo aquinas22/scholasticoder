@@ -8,20 +8,20 @@ CREATE TABLE students (
   grade REAL DEFAULT 0
 );
 INSERT INTO students (id, name, email, age, grade) VALUES
-  (1, 'Ada',    'ada.lovelace@abbey.edu',   17, 95),
-  (2, 'Linus',  'linus.t@abbey.edu',        16, 88),
-  (3, 'Grace',  'grace.h@abbey.edu',        17, 92),
-  (4, 'Alan',   'alan.t@abbey.edu',         18, 79),
-  (5, 'Barbara','barbara.l@abbey.edu',      16, 84),
+  (1, 'Ada',    'ada.lovelace@school.edu',   17, 95),
+  (2, 'Linus',  'linus.t@school.edu',        16, 88),
+  (3, 'Grace',  'grace.h@school.edu',        17, 92),
+  (4, 'Alan',   'alan.t@school.edu',         18, 79),
+  (5, 'Barbara','barbara.l@school.edu',      16, 84),
   (6, 'Dennis', NULL,                       17, 71),
-  (7, 'Margaret','margaret.h@abbey.edu',    15, 90),
-  (8, 'Ken',    'ken.t@abbey.edu',          18, 66);
+  (7, 'Margaret','margaret.h@school.edu',    15, 90),
+  (8, 'Ken',    'ken.t@school.edu',          18, 66);
 
 CREATE TABLE courses (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
 );
-INSERT INTO courses (id, name) VALUES (1, 'Algorithms'), (2, 'Databases'), (3, 'Latin'), (4, 'Music Theory');
+INSERT INTO courses (id, name) VALUES (1, 'Algorithms'), (2, 'Databases'), (3, 'Spanish'), (4, 'Music Theory');
 
 CREATE TABLE enrollments (
   id INTEGER PRIMARY KEY,
@@ -42,13 +42,13 @@ CREATE TABLE customers (
   created_at TEXT NOT NULL
 );
 INSERT INTO customers (id, name, email, country, created_at) VALUES
-  (1, 'Hildegard', 'hildegard@bingen.de', 'DE', '2025-11-03'),
-  (2, 'Thomas',    'thomas@aquino.it',    'IT', '2025-12-14'),
-  (3, 'Teresa',    'teresa@avila.es',     'ES', '2026-01-09'),
-  (4, 'Anselm',    'anselm@bec.fr',       'FR', '2026-01-21'),
-  (5, 'Bede',      'bede@jarrow.uk',      'UK', '2026-02-02'),
-  (6, 'Catherine', 'catherine@siena.it',  'IT', '2026-02-18'),
-  (7, 'Benedict',  'benedict@nursia.it',  'IT', '2026-03-05');
+  (1, 'Hanna',     'hanna@mail.de',       'DE', '2025-11-03'),
+  (2, 'Marco',     'marco@mail.it',       'IT', '2025-12-14'),
+  (3, 'Lucia',     'lucia@mail.es',       'ES', '2026-01-09'),
+  (4, 'Julien',    'julien@mail.fr',      'FR', '2026-01-21'),
+  (5, 'Oliver',    'oliver@mail.uk',      'UK', '2026-02-02'),
+  (6, 'Giulia',    'giulia@mail.it',      'IT', '2026-02-18'),
+  (7, 'Luca',      'luca@mail.it',        'IT', '2026-03-05');
 
 CREATE TABLE products (
   id INTEGER PRIMARY KEY,
@@ -57,12 +57,12 @@ CREATE TABLE products (
   price REAL NOT NULL
 );
 INSERT INTO products (id, name, category, price) VALUES
-  (1, 'Vellum notebook', 'stationery', 24.00),
-  (2, 'Iron gall ink',   'stationery', 9.50),
-  (3, 'Goose quill set', 'stationery', 12.00),
-  (4, 'Beeswax candles', 'home',       18.00),
-  (5, 'Gregorian chant LP', 'music',   29.00),
-  (6, 'Abbey ale (6)',   'food',       15.00),
+  (1, 'Paper notebook',  'stationery', 24.00),
+  (2, 'Fountain pen ink', 'stationery', 9.50),
+  (3, 'Gel pen set',     'stationery', 12.00),
+  (4, 'Scented candles', 'home',       18.00),
+  (5, 'Jazz vinyl LP', 'music',   29.00),
+  (6, 'Ginger beer (6)', 'food',       15.00),
   (7, 'Herbal tea tin',  'food',       7.25);
 
 CREATE TABLE orders (
@@ -107,17 +107,17 @@ CREATE TABLE employees (
   manager_id INTEGER REFERENCES employees(id)
 );
 INSERT INTO employees (id, name, department, salary, manager_id) VALUES
-  (1, 'Abbot Cuthbert', 'leadership', 120000, NULL),
-  (2, 'Prior Aidan',    'leadership',  95000, 1),
-  (3, 'Sister Julian',  'engineering', 88000, 2),
-  (4, 'Brother Bede',   'engineering', 82000, 3),
-  (5, 'Brother Alcuin', 'engineering', 76000, 3),
-  (6, 'Sister Hild',    'engineering', 91000, 3),
-  (7, 'Brother Caedmon','scriptorium', 64000, 2),
-  (8, 'Sister Ebba',    'scriptorium', 69000, 7),
-  (9, 'Brother Oswald', 'scriptorium', 58000, 7),
-  (10, 'Sister Werburgh','kitchen',    52000, 2),
-  (11, 'Brother Wilfrid','kitchen',    49000, 10);
+  (1, 'Olivia Grant',   'leadership', 120000, NULL),
+  (2, 'Marcus Hale',    'leadership',  95000, 1),
+  (3, 'Priya Shah',     'engineering', 88000, 2),
+  (4, 'Sam Carter',     'engineering', 82000, 3),
+  (5, 'Leo Park',       'engineering', 76000, 3),
+  (6, 'Maya Chen',      'engineering', 91000, 3),
+  (7, 'Nina Brooks',    'design',      64000, 2),
+  (8, 'Omar Reyes',     'design',      69000, 7),
+  (9, 'Ruth Allen',     'design',      58000, 7),
+  (10, 'Tom Baker',     'support',    52000, 2),
+  (11, 'Zoe Evans',     'support',    49000, 10);
 
 CREATE TABLE daily_sales (
   day TEXT PRIMARY KEY,
@@ -134,7 +134,7 @@ CREATE TABLE accounts (
   owner TEXT NOT NULL,
   balance REAL NOT NULL CHECK (balance >= 0)
 );
-INSERT INTO accounts (id, owner, balance) VALUES (1, 'Almonry', 500.00), (2, 'Infirmary', 250.00), (3, 'Library', 1200.00);
+INSERT INTO accounts (id, owner, balance) VALUES (1, 'Savings', 500.00), (2, 'Checking', 250.00), (3, 'Holiday fund', 1200.00);
 
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
@@ -143,5 +143,5 @@ CREATE TABLE users (
   role TEXT NOT NULL DEFAULT 'reader'
 );
 INSERT INTO users (id, name, email, role) VALUES
-  (1, 'ada', 'ada@example.com', 'admin'), (2, 'bede', 'bede@example.com', 'reader'), (3, 'hild', 'hild@example.com', 'editor');
+  (1, 'ada', 'ada@example.com', 'admin'), (2, 'sam', 'sam@example.com', 'reader'), (3, 'maya', 'maya@example.com', 'editor');
 `

@@ -9,15 +9,15 @@ export const tsPractice: Record<string, Section[]> = {
     {
       type: 'exercise',
       language: 'typescript',
-      content: 'Annotate every declaration with an explicit type: a string, a number, a boolean, an array of strings, and a tuple of [string, number]. Then build summary so it reads Bede has 3 books.',
+      content: 'Annotate every declaration with an explicit type: a string, a number, a boolean, an array of strings, and a tuple of [string, number]. Then build summary so it reads Maya has 3 books.',
       exercise: {
         title: 'Annotate the basics',
-        starter: `const name = "Bede"\nconst books = 3\nconst isMonk = true\nconst titles = ["Historia", "De temporum ratione"]\nconst pair = ["Jarrow", 673]\n\nconst summary = ""\nconsole.log(summary)\n`,
-        solution: `const name: string = "Bede"\nconst books: number = 3\nconst isMonk: boolean = true\nconst titles: string[] = ["Historia", "De temporum ratione"]\nconst pair: [string, number] = ["Jarrow", 673]\n\nconst summary: string = \`\${name} has \${books} books\`\nconsole.log(summary)\n`,
+        starter: `const name = "Maya"\nconst books = 3\nconst isMember = true\nconst titles = ["Dune", "Emma"]\nconst pair = ["Paris", 1889]\n\nconst summary = ""\nconsole.log(summary)\n`,
+        solution: `const name: string = "Maya"\nconst books: number = 3\nconst isMember: boolean = true\nconst titles: string[] = ["Dune", "Emma"]\nconst pair: [string, number] = ["Paris", 1889]\n\nconst summary: string = \`\${name} has \${books} books\`\nconsole.log(summary)\n`,
         hints: ['Annotations go after the name: const name: string = ...', 'A tuple type lists each position: [string, number].'],
         tests: [
-          { name: 'summary reads correctly', check: `assert.equal(summary, 'Bede has 3 books')` },
-          { name: 'Primitive annotations present', check: `assert(/name\\s*:\\s*string/.test(_src) && /books\\s*:\\s*number/.test(_src) && /isMonk\\s*:\\s*boolean/.test(_src), 'annotate name, books and isMonk')` },
+          { name: 'summary reads correctly', check: `assert.equal(summary, 'Maya has 3 books')` },
+          { name: 'Primitive annotations present', check: `assert(/name\\s*:\\s*string/.test(_src) && /books\\s*:\\s*number/.test(_src) && /isMember\\s*:\\s*boolean/.test(_src), 'annotate name, books and isMember')` },
           { name: 'Array and tuple annotations', check: `assert(/titles\\s*:\\s*(string\\[\\]|Array<string>)/.test(_src), 'titles: string[]'); assert(/pair\\s*:\\s*\\[\\s*string\\s*,\\s*number\\s*\\]/.test(_src), 'pair: [string, number]')` },
         ],
       },
@@ -39,17 +39,17 @@ export const tsPractice: Record<string, Section[]> = {
     {
       type: 'exercise',
       language: 'typescript',
-      content: 'Define an interface Monk with name (string), age (number), optional skills (string array) and a readonly id (number). Then write describe(m: Monk) returning "Bede (62): scribe, historian" — or "Bede (62): no skills listed" when skills are missing.',
+      content: 'Define an interface Person with name (string), age (number), optional skills (string array) and a readonly id (number). Then write describe(p: Person) returning "Maya (34): design, cooking" — or "Maya (34): no skills listed" when skills are missing.',
       exercise: {
         title: 'An interface with optional and readonly fields',
-        starter: `// interface Monk { ... }\n\nfunction describe(m) {\n  return ""\n}\n\nconsole.log(describe({ id: 1, name: "Bede", age: 62, skills: ["scribe", "historian"] }))\nconsole.log(describe({ id: 2, name: "Hild", age: 66 }))\n`,
-        solution: `interface Monk {\n  readonly id: number\n  name: string\n  age: number\n  skills?: string[]\n}\n\nfunction describe(m: Monk): string {\n  const skills = m.skills && m.skills.length ? m.skills.join(", ") : "no skills listed"\n  return \`\${m.name} (\${m.age}): \${skills}\`\n}\n\nconsole.log(describe({ id: 1, name: "Bede", age: 62, skills: ["scribe", "historian"] }))\nconsole.log(describe({ id: 2, name: "Hild", age: 66 }))\n`,
+        starter: `// interface Person { ... }\n\nfunction describe(p) {\n  return ""\n}\n\nconsole.log(describe({ id: 1, name: "Maya", age: 34, skills: ["design", "cooking"] }))\nconsole.log(describe({ id: 2, name: "Sam", age: 29 }))\n`,
+        solution: `interface Person {\n  readonly id: number\n  name: string\n  age: number\n  skills?: string[]\n}\n\nfunction describe(p: Person): string {\n  const skills = p.skills && p.skills.length ? p.skills.join(", ") : "no skills listed"\n  return \`\${p.name} (\${p.age}): \${skills}\`\n}\n\nconsole.log(describe({ id: 1, name: "Maya", age: 34, skills: ["design", "cooking"] }))\nconsole.log(describe({ id: 2, name: "Sam", age: 29 }))\n`,
         hints: ['Optional properties use a question mark: skills?: string[]', 'readonly id: number prevents reassignment after construction.'],
         tests: [
-          { name: 'Describes a monk with skills', check: `assert.equal(describe({ id: 1, name: 'Bede', age: 62, skills: ['scribe', 'historian'] }), 'Bede (62): scribe, historian')` },
-          { name: 'Handles missing skills', check: `assert.equal(describe({ id: 2, name: 'Hild', age: 66 }), 'Hild (66): no skills listed')` },
-          { name: 'Interface declares the fields', check: `assert(/interface\\s+Monk/.test(_src), 'declare interface Monk'); assert(/readonly\\s+id\\s*:\\s*number/.test(_src), 'readonly id'); assert(/skills\\?\\s*:/.test(_src), 'skills is optional')` },
-          { name: 'describe is annotated', check: `assert(/describe\\s*\\(\\s*m\\s*:\\s*Monk\\s*\\)/.test(_src), 'annotate the parameter as Monk')` },
+          { name: 'Describes a person with skills', check: `assert.equal(describe({ id: 1, name: 'Maya', age: 34, skills: ['design', 'cooking'] }), 'Maya (34): design, cooking')` },
+          { name: 'Handles missing skills', check: `assert.equal(describe({ id: 2, name: 'Sam', age: 29 }), 'Sam (29): no skills listed')` },
+          { name: 'Interface declares the fields', check: `assert(/interface\\s+Person/.test(_src), 'declare interface Person'); assert(/readonly\\s+id\\s*:\\s*number/.test(_src), 'readonly id'); assert(/skills\\?\\s*:/.test(_src), 'skills is optional')` },
+          { name: 'describe is annotated', check: `assert(/describe\\s*\\(\\s*\\w+\\s*:\\s*Person\\s*\\)/.test(_src), 'annotate the parameter as Person')` },
         ],
       },
     },
@@ -110,8 +110,8 @@ export const tsPractice: Record<string, Section[]> = {
       content: 'Write a Library class using parameter properties: the constructor takes a public readonly name and a private books array (default empty). Add add(title: string): this, count getter, and has(title: string): boolean.',
       exercise: {
         title: 'Parameter properties and access modifiers',
-        starter: `class Library {\n  constructor(name) {\n    this.name = name\n    this.books = []\n  }\n}\n\nconst lib = new Library("Jarrow")\nlib.add("Historia").add("De natura rerum")\nconsole.log(lib.name, lib.count, lib.has("Historia"))\n`,
-        solution: `class Library {\n  constructor(public readonly name: string, private books: string[] = []) {}\n\n  add(title: string): this {\n    this.books.push(title)\n    return this\n  }\n\n  get count(): number {\n    return this.books.length\n  }\n\n  has(title: string): boolean {\n    return this.books.includes(title)\n  }\n}\n\nconst lib = new Library("Jarrow")\nlib.add("Historia").add("De natura rerum")\nconsole.log(lib.name, lib.count, lib.has("Historia"))\n`,
+        starter: `class Library {\n  constructor(name) {\n    this.name = name\n    this.books = []\n  }\n}\n\nconst lib = new Library("Central")\nlib.add("Dune").add("Emma")\nconsole.log(lib.name, lib.count, lib.has("Dune"))\n`,
+        solution: `class Library {\n  constructor(public readonly name: string, private books: string[] = []) {}\n\n  add(title: string): this {\n    this.books.push(title)\n    return this\n  }\n\n  get count(): number {\n    return this.books.length\n  }\n\n  has(title: string): boolean {\n    return this.books.includes(title)\n  }\n}\n\nconst lib = new Library("Central")\nlib.add("Dune").add("Emma")\nconsole.log(lib.name, lib.count, lib.has("Dune"))\n`,
         hints: ['constructor(public readonly name: string, private books: string[] = []) {} declares and assigns both fields.', 'Returning this from add() lets calls chain.'],
         tests: [
           { name: 'Chaining and counting', check: `const l = new Library('Test'); l.add('a').add('b'); assert.equal(l.count, 2); assert.equal(l.name, 'Test')` },
@@ -149,8 +149,8 @@ export const tsPractice: Record<string, Section[]> = {
       content: 'Given interface User { id: number; name: string; email: string; role: "admin" | "reader" }, declare UserPreview = Pick<User, "id" | "name">, UserPatch = Partial<Omit<User, "id">>, and write updateUser(user: User, patch: UserPatch): User that returns a new object with the patch applied.',
       exercise: {
         title: 'Pick, Omit and Partial',
-        starter: `interface User {\n  id: number\n  name: string\n  email: string\n  role: "admin" | "reader"\n}\n\n// type UserPreview = ...\n// type UserPatch = ...\n\nfunction updateUser(user, patch) {\n  return user\n}\n\nconst ada = { id: 1, name: "Ada", email: "ada@abbey.edu", role: "reader" }\nconsole.log(updateUser(ada, { role: "admin" }))\n`,
-        solution: `interface User {\n  id: number\n  name: string\n  email: string\n  role: "admin" | "reader"\n}\n\ntype UserPreview = Pick<User, "id" | "name">\ntype UserPatch = Partial<Omit<User, "id">>\n\nfunction updateUser(user: User, patch: UserPatch): User {\n  return { ...user, ...patch }\n}\n\nconst ada: User = { id: 1, name: "Ada", email: "ada@abbey.edu", role: "reader" }\nconsole.log(updateUser(ada, { role: "admin" }))\n`,
+        starter: `interface User {\n  id: number\n  name: string\n  email: string\n  role: "admin" | "reader"\n}\n\n// type UserPreview = ...\n// type UserPatch = ...\n\nfunction updateUser(user, patch) {\n  return user\n}\n\nconst ada = { id: 1, name: "Ada", email: "ada@example.com", role: "reader" }\nconsole.log(updateUser(ada, { role: "admin" }))\n`,
+        solution: `interface User {\n  id: number\n  name: string\n  email: string\n  role: "admin" | "reader"\n}\n\ntype UserPreview = Pick<User, "id" | "name">\ntype UserPatch = Partial<Omit<User, "id">>\n\nfunction updateUser(user: User, patch: UserPatch): User {\n  return { ...user, ...patch }\n}\n\nconst ada: User = { id: 1, name: "Ada", email: "ada@example.com", role: "reader" }\nconsole.log(updateUser(ada, { role: "admin" }))\n`,
         hints: ['Pick keeps listed keys; Omit removes them; Partial makes every key optional.', 'Spread the user then the patch so patched fields win: { ...user, ...patch }'],
         tests: [
           { name: 'Applies the patch without mutating', check: `const u = { id: 1, name: 'Ada', email: 'a@b', role: 'reader' }; const r = updateUser(u, { role: 'admin' }); assert.equal(r.role, 'admin'); assert.equal(u.role, 'reader'); assert.equal(r.id, 1)` },
@@ -168,11 +168,11 @@ export const tsPractice: Record<string, Section[]> = {
       content: 'Write a type guard isString(value: unknown): value is string, then formatValue(value: unknown): string that returns strings upper-cased, numbers with two decimals, arrays as their length in brackets, and "?" for anything else — narrowing at each step.',
       exercise: {
         title: 'Narrowing unknown',
-        starter: `function isString(value) {\n  return false\n}\n\nfunction formatValue(value) {\n  return "?"\n}\n\nconsole.log(formatValue("bede"), formatValue(3.14159), formatValue([1, 2, 3]), formatValue(null))\n`,
-        solution: `function isString(value: unknown): value is string {\n  return typeof value === "string"\n}\n\nfunction formatValue(value: unknown): string {\n  if (isString(value)) return value.toUpperCase()\n  if (typeof value === "number") return value.toFixed(2)\n  if (Array.isArray(value)) return \`[\${value.length}]\`\n  return "?"\n}\n\nconsole.log(formatValue("bede"), formatValue(3.14159), formatValue([1, 2, 3]), formatValue(null))\n`,
+        starter: `function isString(value) {\n  return false\n}\n\nfunction formatValue(value) {\n  return "?"\n}\n\nconsole.log(formatValue("hello"), formatValue(3.14159), formatValue([1, 2, 3]), formatValue(null))\n`,
+        solution: `function isString(value: unknown): value is string {\n  return typeof value === "string"\n}\n\nfunction formatValue(value: unknown): string {\n  if (isString(value)) return value.toUpperCase()\n  if (typeof value === "number") return value.toFixed(2)\n  if (Array.isArray(value)) return \`[\${value.length}]\`\n  return "?"\n}\n\nconsole.log(formatValue("hello"), formatValue(3.14159), formatValue([1, 2, 3]), formatValue(null))\n`,
         hints: ['A type predicate return type — value is string — tells the compiler what a true result means.', 'typeof and Array.isArray narrow unknown inside if blocks.'],
         tests: [
-          { name: 'Each branch', check: `assert.equal(formatValue('bede'), 'BEDE'); assert.equal(formatValue(3.14159), '3.14'); assert.equal(formatValue([1, 2, 3]), '[3]'); assert.equal(formatValue(null), '?'); assert.equal(formatValue({}), '?')` },
+          { name: 'Each branch', check: `assert.equal(formatValue('hello'), 'HELLO'); assert.equal(formatValue(3.14159), '3.14'); assert.equal(formatValue([1, 2, 3]), '[3]'); assert.equal(formatValue(null), '?'); assert.equal(formatValue({}), '?')` },
           { name: 'isString works', check: `assert.equal(isString('x'), true); assert.equal(isString(1), false)` },
           { name: 'Uses a type predicate and unknown', check: `assert(/value\\s*is\\s+string/.test(_src), 'return type "value is string"'); assert(/formatValue\\s*\\(\\s*value\\s*:\\s*unknown\\s*\\)/.test(_src), 'accept unknown')` },
         ],

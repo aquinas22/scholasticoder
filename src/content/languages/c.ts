@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const c: Language = {
   slug: 'c',
   name: 'C',
-  tagline: 'You have the power of the gods. Use it wisely. We believe in you. Mostly.',
-  description: 'C is the foundation of modern computing. Your operating system is written in it. Your browser\'s JavaScript engine is written in it. Python itself is written in it. Learning C means learning how computers actually work.',
+  tagline: 'A small, fast systems language that shows you how computers really work.',
+  description: 'C is a compact, compiled language used to write operating systems, embedded software, and the runtimes of many other languages, including Python. Learning it teaches you how memory, pointers and compilation work underneath higher-level languages.',
   accentColor: '#659BD3',
   textOnAccent: '#fff',
   icon: 'C',
@@ -12,7 +12,7 @@ export const c: Language = {
   usedFor: ['Operating Systems', 'Embedded Systems', 'Game Engines', 'Compilers', 'Systems Programming'],
   notableUsers: ['Linux', 'Windows NT', 'macOS XNU kernel', 'PostgreSQL', 'Python (CPython)'],
   setup: {
-    description: 'C needs a compiler. GCC and Clang are the two most common. On Linux/macOS they\'re easy to get. On Windows, you have a few good options.',
+    description: 'C needs a compiler. GCC and Clang are the two most common. They are easy to install on Linux and macOS, and on Windows there are a few good options, shown below.',
     windows: `# Option 1: MSYS2 + GCC (recommended for Windows dev)
 # Download MSYS2 from msys2.org
 # In the MSYS2 terminal:
@@ -52,7 +52,7 @@ gcc --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'The original Hello World was written in C in 1974 by Brian Kernighan. We\'re still writing it today. This is either a testament to C\'s longevity or our lack of creativity.',
+      intro: 'Write, compile and run your first C program, and see the basic shape every C program shares.',
       sections: [
         {
           type: 'text',
@@ -101,7 +101,7 @@ int main() {
     {
       slug: 'variables-types',
       title: 'Variables & Data Types',
-      intro: 'C gives you direct control over data types and sizes. With great power comes the ability to cause extremely confusing bugs.',
+      intro: 'Learn C\'s basic data types, how big they are, and why you should always initialize variables before using them.',
       sections: [
         {
           type: 'code',
@@ -189,7 +189,7 @@ int main() {
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'C\'s control flow is the template every other language copied. If you\'ve used any other language, this will feel familiar.',
+      intro: 'Learn if/else, switch and C\'s loops. Most other languages borrowed this syntax, so it carries over well.',
       sections: [
         {
           type: 'code',
@@ -283,7 +283,7 @@ int main() {
     {
       slug: 'functions',
       title: 'Functions & Pointers',
-      intro: 'C functions are straightforward. Pointers less so. But pointers are what make C C, so buckle up.',
+      intro: 'Learn how to write functions and get a first look at pointers, which C uses to let functions change data they are given.',
       sections: [
         {
           type: 'code',
@@ -380,7 +380,7 @@ int main() {
     {
       slug: 'arrays-strings',
       title: 'Arrays & Strings',
-      intro: 'In C, a string is just an array of characters ending with a null byte (\\0). This is either elegant or terrifying. Reader\'s choice.',
+      intro: 'Learn how C stores arrays and strings. A C string is just an array of characters ending in a null byte (\\0), and knowing that helps you avoid common bugs.',
       sections: [
         {
           type: 'code',
@@ -442,7 +442,7 @@ int main() {
     {
       slug: 'structs',
       title: 'Structs',
-      intro: 'Structs let you group related data together. They\'re C\'s version of objects — without the methods, inheritance, or any of the fun parts.',
+      intro: 'Learn to group related data into structs, which C uses where other languages would use objects.',
       sections: [
         {
           type: 'code',
@@ -510,7 +510,7 @@ int main() {
     {
       slug: 'mini-project',
       title: 'Mini Project: Number Guessing Game',
-      intro: 'Let\'s build something interactive: a number guessing game that uses everything we\'ve learned.',
+      intro: 'Put the earlier lessons together to build a small interactive number guessing game.',
       sections: [
         {
           type: 'code',
@@ -593,7 +593,7 @@ int main() {
     {
       slug: 'pointers',
       title: 'Pointers',
-      intro: 'A pointer is just a variable that holds a memory address. Every "hard" part of C — arrays, strings, structs passed to functions, dynamic memory — is really the same pointer rules applied again.',
+      intro: 'Learn what a pointer is: a variable that holds a memory address. Arrays, strings, structs passed to functions and dynamic memory all rely on the same pointer rules.',
       sections: [
         {
           type: 'code',
@@ -720,7 +720,7 @@ int main(void) {
     {
       slug: 'dynamic-memory',
       title: 'Dynamic Memory',
-      intro: 'Stack variables disappear when the function returns and their size must be known in advance. malloc gives you memory that outlives the scope and can be sized at runtime — and makes you responsible for giving it back.',
+      intro: 'Learn to allocate memory at runtime with malloc, so data can outlive a function and be sized on the fly, and how to free it again when you are done.',
       sections: [
         {
           type: 'code',
@@ -854,7 +854,7 @@ int main(void) {
     {
       slug: 'file-io',
       title: 'File I/O',
-      intro: 'C\'s file interface is small: open a FILE stream, read or write it, close it. The traps are all in error checking and in remembering that fgets keeps the newline.',
+      intro: 'Learn to open, read, write and close files with C\'s FILE streams, and how to check for errors along the way.',
       sections: [
         {
           type: 'code',
@@ -989,7 +989,7 @@ int main(int argc, char *argv[]) {
     {
       slug: 'preprocessor-multifile',
       title: 'The Preprocessor & Multi-File Programs',
-      intro: 'Before the compiler sees your code, the preprocessor pastes headers in, expands macros, and deletes the branches that do not apply. Understanding it is what lets you split a program across files without duplicate-symbol errors.',
+      intro: 'Learn what the preprocessor does before compilation, and how to split a program across several files using headers.',
       sections: [
         {
           type: 'code',

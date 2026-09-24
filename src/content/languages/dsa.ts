@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const dsa: Language = {
   slug: 'dsa',
   name: 'Data Structures & Algorithms',
-  tagline: 'The patterns behind every fast program.',
-  description: "Data structures are ways to organize data; algorithms are recipes for working with it. Together they explain why one program handles a million records instantly while another chokes on ten thousand. This track covers the core toolkit — Big-O, arrays, hash maps, stacks, queues, recursion, trees, graphs, sorting — with runnable Python examples. It's the language-agnostic layer under every language you'll ever learn, and the backbone of technical interviews.",
+  tagline: 'Common ways to organise data and solve problems efficiently.',
+  description: "Data structures are ways to organize data, and algorithms are step-by-step methods for working with it. This track covers Big-O, arrays, hash maps, stacks, queues, recursion, trees, graphs and sorting, with Python examples that apply to any language.",
   accentColor: '#E91E63',
   textOnAccent: '#fff',
   icon: 'DS',
@@ -12,7 +12,7 @@ export const dsa: Language = {
   usedFor: ['Problem Solving', 'Technical Interviews', 'Performance', 'System Design', 'CS Fundamentals'],
   notableUsers: ['Every tech interview', 'Database engines', 'Game engines', 'Compilers', 'Search engines'],
   setup: {
-    description: "Examples use Python because it reads like pseudocode — but every concept transfers to any language. If you finished the Python track's setup you're ready. Otherwise install Python and run examples in a file or the REPL.",
+    description: "The examples use Python because it is easy to read, but the ideas work the same in any language. If you already set up Python you are ready; otherwise install it and run the examples from a file or the REPL.",
     windows: `winget install Python.Python.3.12
 
 # verify:
@@ -34,7 +34,7 @@ python3 dsa_practice.py`,
     {
       slug: 'big-o',
       title: 'Big-O: Measuring Speed',
-      intro: "Before learning any data structure, you need the vocabulary for comparing them. Big-O notation describes how an algorithm's work grows as its input grows — the single most useful idea in this track.",
+      intro: "Big-O notation describes how an algorithm's work grows as its input grows. You'll use it throughout this track to compare data structures and algorithms.",
       sections: [
         {
           type: 'text',
@@ -88,11 +88,11 @@ O(log n)    ~10 ops         instant
 O(n)        1,000 ops       1 ms
 O(n log n)  ~10,000 ops     10 ms
 O(n^2)      1,000,000 ops   1 second
-O(2^n)      way too many    heat death of universe
+O(2^n)      way too many    longer than you can wait
 
 Same table at n = 1,000,000:
 O(n)        1 second
-O(n^2)      11.5 DAYS       <- why nested loops kill big data
+O(n^2)      11.5 DAYS       <- why nested loops struggle with big data
 `,
         },
         {
@@ -104,11 +104,11 @@ O(n^2)      11.5 DAYS       <- why nested loops kill big data
     {
       slug: 'arrays-and-strings',
       title: 'Arrays & Strings',
-      intro: "The array is the simplest data structure: items in a row, side by side in memory. Almost everything else is built on top of it — and its strengths and weaknesses explain half of Big-O in practice.",
+      intro: "An array stores items in a row, side by side in memory. You'll learn which operations are fast or slow on arrays and strings, and two common patterns for working with them.",
       sections: [
         {
           type: 'text',
-          content: "An array stores elements in one contiguous block of memory. That layout gives its superpower: to find item 500, the computer multiplies 500 by the item size and jumps straight there — O(1) access by index, no searching. The weakness is the flip side of the same layout: inserting at the front means shifting every other element right one slot, O(n). Python's list, JavaScript's array, and Java's ArrayList are all dynamic arrays — arrays that grow by allocating a bigger block and copying when full.",
+          content: "An array stores elements in one contiguous block of memory. That layout is its main strength: to find item 500, the computer multiplies 500 by the item size and jumps straight there — O(1) access by index, no searching. The weakness is the flip side of the same layout: inserting at the front means shifting every other element right one slot, O(n). Python's list, JavaScript's array, and Java's ArrayList are all dynamic arrays — arrays that grow by allocating a bigger block and copying when full.",
         },
         {
           type: 'code',
@@ -176,7 +176,7 @@ longest_unique('abcabcbb')   # 3 ('abc')
     {
       slug: 'hash-maps',
       title: 'Hash Maps & Sets',
-      intro: "The hash map is the most useful data structure in programming: look anything up by key in O(1). Python's dict, JavaScript's object and Map, Java's HashMap — same idea everywhere, and the #1 tool for making slow code fast.",
+      intro: "A hash map lets you look up a value by its key in O(1) time. You'll learn how it works and how it often turns slow nested-loop code into a single pass.",
       sections: [
         {
           type: 'text',
@@ -195,14 +195,14 @@ del ages['linus']        # O(1) delete
 
 # Compare with a list of pairs — every operation is O(n) scanning.
 
-# Killer use case 1: counting
+# Common use 1: counting
 def count_words(text):
     counts = {}
     for word in text.split():
         counts[word] = counts.get(word, 0) + 1
     return counts
 
-# Killer use case 2: replacing nested loops.
+# Common use 2: replacing nested loops.
 # "Find two numbers that sum to target" — the classic.
 
 def two_sum_slow(nums, target):      # O(n^2)
@@ -251,7 +251,7 @@ admins - online     # {'ada'}            difference
     {
       slug: 'stacks-queues-linked-lists',
       title: 'Stacks, Queues & Linked Lists',
-      intro: "Three structures about controlling the ORDER things come out: stacks (last in, first out), queues (first in, first out), and the linked list that often implements them.",
+      intro: "Stacks (last in, first out) and queues (first in, first out) control the order items come back out. You'll also see the linked list, which is often used to build them.",
       sections: [
         {
           type: 'text',
@@ -301,7 +301,7 @@ queue.popleft()           # 'job1' — first in, first out, O(1)
         },
         {
           type: 'text',
-          content: "How does deque get O(1) at both ends? Linked lists. A linked list stores each element in its own node with a pointer to the next node — no contiguous block. Insert or remove anywhere you hold a pointer: O(1), just rewire two links, no shifting. The price is the array's superpower reversed: no jumping to index 500 — you must walk there, O(n). Arrays trade cheap access for expensive insertion; linked lists trade the opposite.",
+          content: "How does deque get O(1) at both ends? Linked lists. A linked list stores each element in its own node with a pointer to the next node — no contiguous block. Insert or remove anywhere you hold a pointer: O(1), just rewire two links, no shifting. The cost is the opposite of the array's strength: no jumping to index 500 — you must walk there, O(n). Arrays trade cheap access for expensive insertion; linked lists trade the opposite.",
         },
         {
           type: 'code',
@@ -338,7 +338,7 @@ while node:
     {
       slug: 'recursion',
       title: 'Recursion',
-      intro: "A recursive function calls itself on a smaller piece of the problem until the piece is trivially small. It's the natural language for trees, divide-and-conquer sorting, and any nested structure — master it here before the next two lessons lean on it.",
+      intro: "A recursive function calls itself on a smaller piece of the problem until the piece is small enough to answer directly. The next two lessons, on trees and sorting, rely on it.",
       sections: [
         {
           type: 'text',
@@ -410,11 +410,11 @@ fib(50)    # instant — each fib(k) computed once, then cached
     {
       slug: 'trees',
       title: 'Trees & Binary Search',
-      intro: "A tree is nodes and pointers arranged as a hierarchy: one root, branching children, no cycles. File systems, the DOM, JSON, org charts, database indexes — hierarchies are everywhere, and trees are how programs hold them.",
+      intro: "A tree arranges nodes in a hierarchy with one root and no cycles. You'll learn how programs store things like folders, the DOM and database indexes, and how binary search works.",
       sections: [
         {
           type: 'text',
-          content: "Tree vocabulary in one breath: the root is the top node; children hang off parents; leaves have no children; height is the longest root-to-leaf path. A binary tree limits each node to two children, left and right. Since each subtree is itself a tree, tree code is naturally recursive — the base case is the empty tree (None).",
+          content: "Tree vocabulary: the root is the top node; children hang off parents; leaves have no children; height is the longest root-to-leaf path. A binary tree limits each node to two children, left and right. Since each subtree is itself a tree, tree code is naturally recursive — the base case is the empty tree (None).",
         },
         {
           type: 'code',
@@ -472,12 +472,12 @@ def insert(node, value):
         node.right = insert(node.right, value)
     return node
 
-# Bonus: in_order() on a BST prints values in sorted order. Free sort!
+# Note: in_order() on a BST prints values in sorted order.
 `,
         },
         {
           type: 'text',
-          content: "Same halving idea works on a plain sorted array — binary search, no tree needed. Check the middle; too small, discard the left half; too big, discard the right. O(log n) with three lines of state. It's the most implemented-slightly-wrong algorithm in history (off-by-one errors), so learn this canonical form.",
+          content: "Same halving idea works on a plain sorted array — binary search, no tree needed. Check the middle; too small, discard the left half; too big, discard the right. O(log n) with three lines of state. It is easy to get slightly wrong with off-by-one errors, so learn this standard form.",
         },
         {
           type: 'code',
@@ -507,7 +507,7 @@ binary_search([2, 5, 8, 12, 16, 23, 38, 56, 72, 91], 23)   # 5
     {
       slug: 'graphs',
       title: 'Graphs: BFS & DFS',
-      intro: "A graph is nodes plus edges connecting them — no hierarchy required, cycles allowed. Social networks, road maps, the internet, package dependencies, game maps: when things connect to things, it's a graph.",
+      intro: "A graph is a set of nodes connected by edges, with no required hierarchy. You'll learn to represent one and explore it with breadth-first and depth-first search.",
       sections: [
         {
           type: 'text',
@@ -593,7 +593,7 @@ def dfs_iterative(graph, start):
     {
       slug: 'sorting-and-searching',
       title: 'Sorting: How & When',
-      intro: "Sorting is the most-studied problem in computer science, and the ideas inside the classic algorithms — divide and conquer, trading memory for speed — show up everywhere. You'll almost always call your language's built-in sort, but knowing what's under it makes you use it well.",
+      intro: "You'll see how the classic sorting algorithms work and why the fast ones are O(n log n). In practice you'll call your language's built-in sort, and this lesson shows how to use it well.",
       sections: [
         {
           type: 'text',
@@ -666,7 +666,7 @@ nums = sorted([5, 3, 8, 3, 1])       # [1, 3, 3, 5, 8]
         },
         {
           type: 'note',
-          content: "That's the core toolkit: Big-O to measure, arrays and hash maps for storage, stacks and queues for order, recursion for self-similar problems, trees and graphs for connected data, sorting to impose order. From here, practice beats theory — pick easy problems on any practice site, and reach for the structure whose trade-offs fit. You now know them all.",
+          content: "That covers the core toolkit: Big-O to measure, arrays and hash maps for storage, stacks and queues for order, recursion for self-similar problems, trees and graphs for connected data, sorting to impose order. From here, practice beats theory — pick easy problems on any practice site, and reach for the structure whose trade-offs fit.",
         },
       ],
     },

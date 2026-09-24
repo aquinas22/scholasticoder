@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const vue: Language = {
   slug: 'vue',
   name: 'Vue',
-  tagline: 'The Progressive JavaScript Framework.',
-  description: "Vue is a framework for building UIs that is intentionally approachable. You can start with a script tag and no build step, or use a full CLI-built SPA. Vue 3's Composition API is powerful and explicit, while its Options API keeps simple things simple. Often described as the best parts of Angular and React, without the downsides of either.",
+  tagline: 'An approachable JavaScript framework for building web interfaces.',
+  description: "Vue is a framework for building user interfaces, designed to be easy to pick up. You can add it to a page with a single script tag or use it to build a full single-page app.",
   accentColor: '#42b883',
   textOnAccent: '#fff',
   icon: 'Vu',
@@ -12,7 +12,7 @@ export const vue: Language = {
   usedFor: ['Web UIs', 'Single-Page Apps', 'Full-stack (Nuxt)', 'Progressive Enhancement'],
   notableUsers: ['GitLab', 'Alibaba', 'Xiaomi', 'Laravel', 'Chess.com'],
   setup: {
-    description: 'Create a Vue project with Vite — the official and fastest setup. Vue also works as a CDN drop-in for progressive enhancement.',
+    description: 'Install Node.js, then create a Vue project with Vite, which is the official setup. You can also add Vue to an existing page from a CDN.',
     windows: `# Create a Vite-powered Vue app:
 npm create vite@latest my-app -- --template vue
 cd my-app
@@ -36,7 +36,7 @@ npm run dev`,
     {
       slug: 'hello-world',
       title: 'Hello, Vue!',
-      intro: "Vue's building block is the Single File Component (.vue file) — HTML, JavaScript, and CSS in one file, cleanly separated into three sections. It's the part that makes developers who've never used Vue say 'wait, that's actually nice.'",
+      intro: "You will write your first Single File Component, a .vue file that keeps a component's template, script and styles together. Every Vue app is built from these.",
       sections: [
         {
           type: 'code',
@@ -103,7 +103,7 @@ h1 { color: #42b883; }
     {
       slug: 'reactivity',
       title: 'Reactivity: ref & reactive',
-      intro: "Vue's reactivity system tracks which data a template uses and only re-renders what changed. `ref` wraps a primitive. `reactive` wraps an object. Know the difference and you'll avoid 90% of Vue gotchas.",
+      intro: "You will learn how Vue tracks data with `ref` and `reactive` and updates the page when it changes. Knowing when to use each avoids the most common Vue mistakes.",
       sections: [
         {
           type: 'code',
@@ -191,7 +191,7 @@ function submit() {
     {
       slug: 'directives',
       title: 'Template Directives',
-      intro: "Vue's directives (`v-if`, `v-for`, `v-bind`, `v-on`, `v-model`) are the glue between your reactive data and the DOM. They're attributes that start with `v-` and get special treatment from Vue's compiler.",
+      intro: "You will learn the directives (`v-if`, `v-for`, `v-bind`, `v-on`, `v-model`) that connect your data to the page. They are special attributes that start with `v-`.",
       sections: [
         {
           type: 'code',
@@ -272,7 +272,7 @@ const items = [
     {
       slug: 'components',
       title: 'Components & Props',
-      intro: "Vue components communicate via props (parent → child) and emits (child → parent). This one-directional data flow makes applications predictable — you always know where data comes from.",
+      intro: "You will learn how components pass data down with props and send messages up with emits. This one-way flow makes it clear where data comes from.",
       sections: [
         {
           type: 'code',
@@ -386,7 +386,7 @@ function handleFollow(userId) {
     {
       slug: 'composables',
       title: 'Composables',
-      intro: "Composables are Vue 3's way of extracting and sharing reactive logic between components. They're just functions that use Vue's Composition API — a composable is to Vue what a custom hook is to React.",
+      intro: "You will learn how to write composables: plain functions that use the Composition API to share reactive logic between components. They are Vue's equivalent of React's custom hooks.",
       sections: [
         {
           type: 'code',
@@ -480,7 +480,7 @@ const settings = useLocalStorage('settings', { notifications: true, lang: 'en' }
     {
       slug: 'mini-project',
       title: 'Mini Project: Todo App with Pinia',
-      intro: "Build a fully featured todo app using Vue 3 + Pinia (Vue's official state management library). Pinia replaces Vuex — it's simpler, type-safe, and works great with the Composition API.",
+      intro: "You will build a todo app with Vue 3 and Pinia, Vue's official state management library. It brings together components, reactivity and shared state.",
       sections: [
         {
           type: 'code',

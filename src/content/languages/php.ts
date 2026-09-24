@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const php: Language = {
   slug: 'php',
   name: 'PHP',
-  tagline: 'The language that runs most of the web.',
-  description: "PHP powers roughly three-quarters of all websites with a known server language — WordPress alone is over 40% of the web. Modern PHP (8.x) is fast, typed, and pleasant, a world away from its messy reputation. If you want web development jobs, PHP is a quietly enormous market.",
+  tagline: 'A server-side language for building websites and web apps.',
+  description: "PHP runs on the server and is used by a large share of websites, including everything built on WordPress. Modern PHP (8.x) is fast and supports type declarations, and it remains a common skill in web development jobs.",
   accentColor: '#777BB4',
   textOnAccent: '#fff',
   icon: 'Ph',
@@ -12,7 +12,7 @@ export const php: Language = {
   usedFor: ['Web Backends', 'WordPress', 'APIs', 'E-commerce', 'Server-side Rendering'],
   notableUsers: ['WordPress', 'Wikipedia', 'Slack', 'Etsy', 'Laravel'],
   setup: {
-    description: "Install PHP and you get a built-in development web server — no Apache or nginx needed to learn.",
+    description: "PHP comes with a built-in development web server, so you do not need Apache or nginx while learning.",
     windows: `winget install PHP.PHP.8.3
 # Or grab a zip from https://windows.php.net
 
@@ -39,7 +39,7 @@ php -S localhost:8000`,
     {
       slug: 'hello-php',
       title: 'Hello, PHP',
-      intro: "PHP's superpower and its quirk in one: PHP files are HTML files with code embedded in <?php ?> tags. The server runs the code, the browser sees only the result.",
+      intro: "Write your first PHP script and a page that mixes HTML with PHP code in <?php ?> tags. The server runs the code, and the browser only sees the result.",
       sections: [
         {
           type: 'code',
@@ -56,7 +56,7 @@ echo 'No interpolation in single quotes: $name' . "\\n";
         },
         {
           type: 'text',
-          content: "Every variable starts with $ — love it or hate it, you always know what's a variable. Double-quoted strings interpolate variables; single-quoted strings are literal. Statements end with semicolons.",
+          content: "Every variable starts with $, so variables are easy to spot. Double-quoted strings interpolate variables; single-quoted strings are literal. Statements end with semicolons.",
         },
         {
           type: 'code',
@@ -78,14 +78,14 @@ echo 'No interpolation in single quotes: $name' . "\\n";
         },
         {
           type: 'note',
-          content: "This embed-in-HTML model is why PHP conquered the web in the 2000s: rename page.html to page.php, sprinkle in dynamic bits, done. Modern PHP apps keep logic in pure-PHP files and use templates for HTML, but the model remains request → PHP runs → HTML out.",
+          content: "This embed-in-HTML model is a big reason PHP became popular in the 2000s: you could rename page.html to page.php and add dynamic parts. Modern PHP apps keep logic in pure-PHP files and use templates for HTML, but the model remains request → PHP runs → HTML out.",
         },
       ],
     },
     {
       slug: 'types-and-control-flow',
       title: 'Types, Conditions & Loops',
-      intro: "PHP is dynamically typed but has grown a real type system. Learn the comparison gotcha (== vs ===) early — it's the classic PHP interview question for a reason.",
+      intro: "Learn PHP's basic types, conditions and loops. Pay attention to the difference between == and ===, which is a common source of bugs.",
       sections: [
         {
           type: 'code',
@@ -147,8 +147,8 @@ $name   = $input ?? "anonymous";   // default if null/unset`,
     },
     {
       slug: 'arrays',
-      title: 'Arrays — PHP\'s Swiss Army Knife',
-      intro: "PHP has one collection type doing the job of lists, dictionaries, sets, and tuples: the array. Master it and you've mastered half of PHP.",
+      title: 'Arrays',
+      intro: "PHP uses one collection type, the array, for both ordered lists and key-value maps. Learn to create, loop over and transform arrays.",
       sections: [
         {
           type: 'code',
@@ -205,7 +205,7 @@ explode(",", "a,b,c");              // string -> array`,
     {
       slug: 'functions',
       title: 'Functions & Type Declarations',
-      intro: "Modern PHP functions look almost like TypeScript: typed parameters, return types, default and named arguments. Use the types — they turn silent bugs into loud errors.",
+      intro: "Learn to write functions with typed parameters, return types, defaults and named arguments. Type declarations make PHP report mistakes as errors instead of silently converting values.",
       sections: [
         {
           type: 'code',
@@ -261,7 +261,7 @@ sum(...[4, 5, 6]);       // 15`,
     {
       slug: 'classes-oop',
       title: 'Classes & Modern OOP',
-      intro: "PHP's object system is genuinely good now. Constructor property promotion, readonly properties, enums, interfaces — this is where modern PHP shines brightest.",
+      intro: "Learn to write classes in modern PHP, with constructor property promotion, readonly properties, interfaces and enums.",
       sections: [
         {
           type: 'code',
@@ -342,7 +342,7 @@ echo $s->label();`,
     {
       slug: 'composer-ecosystem',
       title: 'Composer & the Ecosystem',
-      intro: "Composer is PHP's npm — dependency manager, autoloader, and the gateway to 400,000+ packages. No modern PHP project starts without it.",
+      intro: "Learn to use Composer, PHP's package manager and autoloader, and get an overview of the main frameworks. Almost every modern PHP project uses Composer.",
       sections: [
         {
           type: 'code',
@@ -372,7 +372,7 @@ echo $data['name'];`,
         },
         {
           type: 'text',
-          content: "The ecosystem's center of gravity is Laravel — a full-featured web framework with an ORM, routing, queues, auth, and famously good documentation. Symfony is the other giant, more modular and the foundation many tools build on. WordPress is its own universe: older-style PHP, but half the freelance web market.",
+          content: "The most popular framework is Laravel, a full-featured web framework with an ORM, routing, queues, auth and well-regarded documentation. Symfony is the other major framework; it is more modular and many tools build on it. WordPress is its own ecosystem: older-style PHP, but very common in freelance web work.",
         },
         {
           type: 'code',
@@ -392,7 +392,7 @@ composer require --dev phpstan/phpstan   # static analysis
     {
       slug: 'web-request-basics',
       title: 'Handling Web Requests',
-      intro: "PHP's home turf: a form posts to your script, you read the input, talk to a database, and print HTML. Here's the raw version every framework abstracts.",
+      intro: "Learn to handle a form submission: read the input, save it to a database and print HTML safely. Frameworks do this for you, but it helps to see the plain version first.",
       sections: [
         {
           type: 'code',

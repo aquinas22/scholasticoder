@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const css: Language = {
   slug: 'css',
   name: 'CSS',
-  tagline: 'It\'s not a programming language. (It\'s not a programming language.) We\'ll keep saying it.',
-  description: 'CSS (Cascading Style Sheets) controls how HTML looks. Colors, fonts, layout, animations, responsiveness — CSS does all of it. It\'s deceptively powerful: the basics are easy to learn, mastering it takes years.',
+  tagline: 'The style sheet language that controls how web pages look.',
+  description: 'CSS (Cascading Style Sheets) controls how HTML looks: colors, fonts, spacing, layout, animation and how pages adapt to different screen sizes. The basics are quick to pick up, and the layout tools let you build almost any design.',
   accentColor: '#2580C4',
   textOnAccent: '#fff',
   icon: 'CSS',
@@ -12,7 +12,7 @@ export const css: Language = {
   usedFor: ['Web Page Styling', 'Animations', 'Responsive Layouts', 'Print Stylesheets'],
   notableUsers: ['Every website ever'],
   setup: {
-    description: 'CSS needs only a text editor and a browser. Create a .css file and link it from your HTML. The browser does the rest.',
+    description: 'All you need is a text editor and a web browser. Create a .css file, link it from your HTML page, and open the page in your browser to see the styles applied.',
     windows: `# Same as HTML — just a text editor + browser
 # VS Code with these extensions helps enormously:
 # - CSS Peek
@@ -42,7 +42,7 @@ sudo snap install code --classic
     {
       slug: 'linking-css',
       title: 'Linking CSS & Setup',
-      intro: 'CSS is written separately from HTML (usually) and linked in. This is the separation of concerns principle: HTML handles structure, CSS handles appearance.',
+      intro: 'You\'ll learn the ways to add CSS to a page and why a separate linked stylesheet is usually best. Keeping structure (HTML) and appearance (CSS) apart makes both easier to change.',
       sections: [
         {
           type: 'text',
@@ -110,14 +110,14 @@ h1 {
         },
         {
           type: 'note',
-          content: 'Browser DevTools are your best friend for CSS. In Chrome or Firefox: right-click any element → Inspect. You can live-edit CSS properties in the Styles panel to see changes instantly, then copy them to your file.',
+          content: 'Browser DevTools are the most useful tool for working with CSS. In Chrome or Firefox: right-click any element → Inspect. You can live-edit CSS properties in the Styles panel to see changes instantly, then copy them to your file.',
         },
       ],
     },
     {
       slug: 'selectors',
       title: 'Selectors & Properties',
-      intro: 'Selectors target which HTML elements to style. The more specific the selector, the higher the specificity, and the more likely it is to win if there\'s a conflict.',
+      intro: 'You\'ll learn how selectors choose which elements to style, and how specificity decides which rule wins when two rules conflict.',
       sections: [
         {
           type: 'code',
@@ -197,7 +197,7 @@ h1, h2, h3 { font-family: serif; }`,
     {
       slug: 'box-model',
       title: 'The Box Model',
-      intro: 'Every HTML element is a box. This sounds obvious until you try to center something, and then it sounds like a conspiracy.',
+      intro: 'Every HTML element is drawn as a box made of content, padding, border and margin. Understanding this box model makes sizing and spacing much more predictable.',
       sections: [
         {
           type: 'text',
@@ -300,7 +300,7 @@ h1, h2, h3 { font-family: serif; }`,
     {
       slug: 'flexbox',
       title: 'Flexbox',
-      intro: 'Before Flexbox, centering things in CSS required three StackOverflow tabs and a blessing from the CSS gods. Now it\'s two lines.',
+      intro: 'Flexbox lays items out in a single row or column and makes alignment and spacing straightforward. You\'ll use it for navbars, rows of cards, and centering content.',
       sections: [
         {
           type: 'text',
@@ -413,7 +413,7 @@ h1, h2, h3 { font-family: serif; }`,
     {
       slug: 'grid',
       title: 'CSS Grid',
-      intro: 'CSS Grid is the layout system we\'ve wanted since 1996. It arrived in 2017. Better late than never, we suppose.',
+      intro: 'CSS Grid lets you lay out content in rows and columns at the same time. You\'ll use it for page layouts, galleries and anything that needs a two-dimensional structure.',
       sections: [
         {
           type: 'code',
@@ -511,7 +511,7 @@ h1, h2, h3 { font-family: serif; }`,
     {
       slug: 'responsive',
       title: 'Responsive Design',
-      intro: 'Your site will be viewed on phones, tablets, laptops, and 27" monitors. Responsive design makes it look good on all of them.',
+      intro: 'People will view your site on phones, tablets and large monitors. You\'ll learn how media queries and flexible units let one layout adapt to all of them.',
       sections: [
         {
           type: 'code',
@@ -625,7 +625,7 @@ img {
     {
       slug: 'animations',
       title: 'Animations & Transitions',
-      intro: 'CSS can animate almost any property. Done well, animations guide attention and provide feedback. Done poorly, they make users want to leave your site.',
+      intro: 'You\'ll learn how to animate changes with transitions and keyframe animations. Used with restraint, motion helps guide attention and gives users feedback.',
       sections: [
         {
           type: 'code',
@@ -718,14 +718,14 @@ img {
         },
         {
           type: 'warning',
-          content: 'Always include a prefers-reduced-motion media query. Some users have vestibular disorders that make motion literally nauseating. It\'s two lines of CSS and it\'s the right thing to do.',
+          content: 'Always include a prefers-reduced-motion media query. Some users have vestibular disorders that make on-screen motion cause dizziness or nausea. It only takes a few lines of CSS to respect their settings.',
         },
       ],
     },
     {
       slug: 'mini-project',
       title: 'Mini Project: Card Component',
-      intro: 'Build a polished, responsive card component — the bread and butter of modern web UI.',
+      intro: 'You\'ll build a responsive card component, one of the most common patterns in web interfaces, using what you\'ve learned about the box model, Flexbox and Grid.',
       sections: [
         {
           type: 'code',
@@ -750,7 +750,7 @@ img {
         </div>
         <div class="card-body">
           <h2 class="card-title">Python</h2>
-          <p class="card-desc">Life is short, use Python. Batteries included, opinions optional.</p>
+          <p class="card-desc">A readable language for scripts, data and the web.</p>
           <div class="card-meta">
             <span>8 lessons</span>
             <span>·</span>
@@ -773,7 +773,7 @@ img {
         </div>
         <div class="card-body">
           <h2 class="card-title">Rust</h2>
-          <p class="card-desc">Memory safe, blazingly fast. The borrow checker is your friend.</p>
+          <p class="card-desc">Fast and memory safe, with a compiler that catches many bugs early.</p>
           <div class="card-meta">
             <span>8 lessons</span>
             <span>·</span>

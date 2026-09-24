@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const operatingSystems: Language = {
   slug: 'operating-systems',
   name: 'Operating Systems',
-  tagline: 'The program that runs all your programs.',
-  description: "The OS is the layer between your code and the hardware: it decides which program runs when, hands out memory, turns 'open this file' into disk operations, and keeps processes from trampling each other. Every language and every app sits on these ideas — processes, threads, files, system calls. Learn them once, understand computing forever.",
+  tagline: 'The software that manages the hardware and runs your programs.',
+  description: "The operating system sits between your code and the hardware, deciding which program runs when, handing out memory and managing files. This track covers processes, threads, memory, files and system calls, which every language and app relies on.",
   accentColor: '#3FA65C',
   textOnAccent: '#fff',
   icon: 'OS',
@@ -12,7 +12,7 @@ export const operatingSystems: Language = {
   usedFor: ['Systems Programming', 'DevOps & Servers', 'Debugging', 'Performance', 'CS Fundamentals'],
   notableUsers: ['Linux', 'Windows', 'macOS', 'Android', 'iOS'],
   setup: {
-    description: "Concepts track — nothing to install. The best lab is a Linux shell: WSL on Windows, Terminal on macOS, or any Linux box. Commands below let you watch your OS work in real time.",
+    description: "This is a concepts track, so there is nothing to install. A Linux shell is the best place to try things (WSL on Windows, Terminal on macOS, or any Linux machine), and the commands below let you watch the OS at work.",
     windows: `# Install WSL (a real Linux kernel inside Windows):
 wsl --install
 
@@ -38,11 +38,11 @@ strace ls         # every system call 'ls' makes`,
     {
       slug: 'what-an-os-does',
       title: 'What an OS Actually Does',
-      intro: "Strip away the desktop and wallpaper: an operating system is a resource manager and a bodyguard. It multiplexes one CPU among hundreds of programs, and stops each one from wrecking the others.",
+      intro: "An operating system shares the hardware between many programs and keeps them from interfering with each other. This lesson covers its main jobs and the line between user programs and the kernel.",
       sections: [
         {
           type: 'text',
-          content: "Three jobs. Abstraction: turn ugly hardware (disk sectors, network chips, interrupts) into clean concepts (files, sockets, processes). Multiplexing: share limited CPU, RAM, and disk among many programs that each think they own the machine. Protection: isolate programs from each other and the kernel from everyone, so a crashing game can't take down your unsaved document.",
+          content: "Three jobs. Abstraction: turn ugly hardware (disk sectors, network chips, interrupts) into clean concepts (files, sockets, processes). Multiplexing: share limited CPU, RAM, and disk among many programs that each think they own the machine. Protection: isolate programs from each other and the kernel from everyone, so a crashing game can't take your unsaved document with it.",
         },
         {
           type: 'code',
@@ -66,14 +66,14 @@ Everything below it runs with total power.`,
         },
         {
           type: 'note',
-          content: "Kernel panics (Linux) and Blue Screens (Windows) are what happens when code below the line hits a bug — there's no safety net beneath the kernel, so the OS stops everything rather than corrupt your data. A user program crashing is Tuesday; a kernel crash is an event.",
+          content: "Kernel panics (Linux) and Blue Screens (Windows) are what happens when code below the line hits a bug — there's no safety net beneath the kernel, so the OS stops everything rather than corrupt your data. A user program crashing is routine; a kernel crash is much rarer and more serious.",
         },
       ],
     },
     {
       slug: 'processes',
       title: 'Processes',
-      intro: "A process is a running program plus everything it owns: its memory, its open files, its identity. It's also the OS's unit of protection — each process lives in its own bubble.",
+      intro: "A process is a running program plus everything it owns, such as its memory and open files. You'll learn how processes are created, inspected and stopped.",
       sections: [
         {
           type: 'text',
@@ -123,7 +123,7 @@ else:
     {
       slug: 'threads-scheduling',
       title: 'Threads & the Scheduler',
-      intro: "Your machine runs 400 processes on 8 cores. The illusion that they all run 'at once' is the scheduler switching between them thousands of times per second — the greatest magic trick in computing.",
+      intro: "A machine with 8 cores can run hundreds of processes because the scheduler switches between them thousands of times per second. You'll learn how threads and scheduling work, and how to avoid data races.",
       sections: [
         {
           type: 'text',
@@ -175,7 +175,7 @@ print(counter)                # 400000 — only correct WITH the lock`,
     {
       slug: 'memory-management',
       title: 'Memory: Virtual, Paged, Shared',
-      intro: "Every process believes it has the entire address space to itself. It's lying — or rather, the OS is lying to it, beautifully. Virtual memory is the OS's single best idea.",
+      intro: "Each process sees its own private address space, even though they all share the same physical RAM. You'll learn how virtual memory makes this work and what it enables.",
       sections: [
         {
           type: 'text',
@@ -224,7 +224,7 @@ dmesg | grep -i "out of memory"`,
     {
       slug: 'files-and-filesystems',
       title: 'Files, Descriptors & Filesystems',
-      intro: "Unix's boldest simplification: everything is a file. Documents, your terminal, network sockets, even random numbers — all read and written through the same tiny interface.",
+      intro: "On Unix, documents, terminals, network sockets and more are all read and written through the same small file interface. You'll learn how files, descriptors and permissions work.",
       sections: [
         {
           type: 'text',
@@ -261,18 +261,18 @@ os.close(fd)
 # Shell redirection is just descriptor surgery:
 #   ./prog > out.txt 2>&1
 # means: point fd 1 at out.txt, then point fd 2
-# wherever fd 1 points. That's the whole trick.`,
+# wherever fd 1 points.`,
         },
         {
           type: 'tip',
-          content: "Writes are buffered at multiple layers — your language's library, then the kernel's page cache. 'Saved' data may sit in RAM for seconds before reaching disk; that's what fsync() and safe-save patterns (write temp file, fsync, rename) are for. Databases obsess over this — now you know why.",
+          content: "Writes are buffered at multiple layers — your language's library, then the kernel's page cache. 'Saved' data may sit in RAM for seconds before reaching disk; that's what fsync() and safe-save patterns (write temp file, fsync, rename) are for. Databases take great care over this for that reason.",
         },
       ],
     },
     {
       slug: 'syscalls-and-ipc',
       title: 'System Calls & Talking Between Processes',
-      intro: "Every interesting thing a program does — print, read a file, open a connection — is a polite request to the kernel. Watch the requests and any program's behavior becomes transparent.",
+      intro: "Whenever a program prints, reads a file or opens a connection, it asks the kernel through a system call. You'll learn to watch those calls and see how processes talk to each other.",
       sections: [
         {
           type: 'text',
@@ -306,12 +306,11 @@ cat access.log | grep "500" | wc -l
 # The kernel moves the bytes; the processes never meet.
 
 # The pipe blocks when full — that's backpressure:
-# 'cat' automatically slows to the speed of 'wc'.
-# Unix got streaming right in 1973.`,
+# 'cat' automatically slows to the speed of 'wc'.`,
         },
         {
           type: 'note',
-          content: "Containers (Docker) are not virtual machines — they're OS features: namespaces give a process group its own view of PIDs, filesystems, and network; cgroups cap its CPU and memory. Same kernel, walled gardens. A VM boots a whole second OS; a container is just processes wearing blinders — which is why containers start in milliseconds.",
+          content: "Containers (Docker) are not virtual machines — they're OS features: namespaces give a process group its own view of PIDs, filesystems, and network; cgroups cap its CPU and memory. Same kernel, separate views. A VM boots a whole second OS; a container is just processes with a restricted view, which is why containers start in milliseconds.",
         },
       ],
     },

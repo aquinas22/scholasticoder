@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const asm: Language = {
   slug: 'asm',
   name: 'Assembly',
-  tagline: 'The last language between you and the hardware.',
-  description: "Assembly language is a thin layer above raw machine code. Every other programming language compiles down to this. Learning it means seeing exactly what the CPU does — registers, memory, jumps, the stack. It's tedious, unforgiving, and makes everything else feel like a luxury. We teach x86-64 NASM on Linux, the most common flavor for desktop/server work.",
+  tagline: 'The human-readable form of the instructions a CPU actually runs.',
+  description: "Assembly language is a thin layer above raw machine code. Every other programming language compiles down to this. Learning it means seeing exactly what the CPU does — registers, memory, jumps, the stack. It takes more code to do simple things, but it shows you what every other language is doing underneath. We teach x86-64 NASM on Linux, the most common flavor for desktop/server work.",
   accentColor: '#8E6EC0',
   textOnAccent: '#fff',
   icon: 'As',
@@ -12,7 +12,7 @@ export const asm: Language = {
   usedFor: ['Reverse Engineering', 'Exploit Development', 'OS Kernels', 'Embedded Firmware', 'Performance-Critical Code'],
   notableUsers: ['OS kernels', 'Game emulators', 'Cryptographic libraries', 'Antivirus engines', 'Bootloaders'],
   setup: {
-    description: 'We use NASM (Netwide Assembler) with the x86-64 Linux ABI. You need a Linux environment — WSL2 works fine on Windows.',
+    description: 'This track uses NASM (the Netwide Assembler) and the x86-64 Linux calling conventions, so you need a Linux environment. On Windows, WSL2 works well; on macOS, a Linux VM or container is the simplest option.',
     windows: `# Install WSL2 (run in PowerShell as Administrator):
 wsl --install
 # Restart, then in Ubuntu (WSL2):
@@ -45,11 +45,11 @@ ld --version`,
     {
       slug: 'how-cpus-work',
       title: 'How CPUs Actually Work',
-      intro: "Before writing a single line, you need a mental model of what the CPU is doing. Everything in assembly makes sense once you understand registers, memory, and the fetch-decode-execute cycle.",
+      intro: "Before writing any code, you'll build a simple picture of how a CPU runs a program: registers, memory, and the fetch-decode-execute cycle. The rest of the track builds on this.",
       sections: [
         {
           type: 'text',
-          content: "A CPU is a machine that reads instructions from memory one at a time, executes them, and moves to the next. An instruction might be \"add two numbers,\" \"copy a value from memory,\" or \"jump to a different instruction.\" That's it. Everything your computer does — 3D games, video calls, AI — reduces to sequences of these tiny operations.",
+          content: "A CPU is a machine that reads instructions from memory one at a time, executes them, and moves to the next. An instruction might be \"add two numbers,\" \"copy a value from memory,\" or \"jump to a different instruction.\" Everything your computer does is built from long sequences of these small operations.",
         },
         {
           type: 'text',
@@ -120,7 +120,7 @@ ld --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: "In Python, `print('Hello')` is one line that hides a function call, a string object, stdout buffering, and a syscall. In assembly, you see all of it.",
+      intro: "You'll write, assemble, link and run a program that prints Hello, World!. Along the way you'll see the system call that higher-level languages normally hide from you.",
       sections: [
         {
           type: 'text',
@@ -177,7 +177,7 @@ objdump -d hello`,
     {
       slug: 'registers-moves',
       title: 'Registers & Data Movement',
-      intro: "`mov` is the most common instruction. It moves data between registers, and between registers and memory. 'Move' is a misnomer — it copies. The source is unchanged.",
+      intro: "You'll learn `mov`, the most common instruction, which copies data between registers and memory (the source is left unchanged). Nearly every program you write will use it.",
       sections: [
         {
           type: 'code',
@@ -259,7 +259,7 @@ movsx rax, byte [some_signed]  ; e.g., -1 (0xFF) becomes 0xFFFFFFFFFFFFFFFF`,
     {
       slug: 'arithmetic-logic',
       title: 'Arithmetic & Logic',
-      intro: "The CPU can add, subtract, multiply, divide, and do bitwise operations. Every result updates the FLAGS register — a set of bits that record whether the result was zero, negative, overflowed, etc. Branches read those flags.",
+      intro: "You'll learn the instructions for arithmetic and bitwise operations, and how each result updates the FLAGS register. Those flags are what conditional jumps use to make decisions.",
       sections: [
         {
           type: 'code',
@@ -336,7 +336,7 @@ cmovl rax, rbx      ; if rax < rbx, rax = rbx`,
     {
       slug: 'control-flow',
       title: 'Control Flow & Loops',
-      intro: "Assembly has no if/else, no for loops. It has unconditional jumps (`jmp`) and conditional jumps that read the FLAGS register. Every higher-level control structure is built from these two primitives.",
+      intro: "Assembly has no if/else or for loops, only jumps. You'll learn how to build conditions and loops from `jmp`, `cmp` and the conditional jumps.",
       sections: [
         {
           type: 'code',
@@ -425,7 +425,7 @@ _start:
     {
       slug: 'the-stack',
       title: 'The Stack & Functions',
-      intro: "The stack is how functions store local variables and return addresses. `push` and `pop` move data on and off it. Understanding the stack is the key to understanding function calls, recursion, and most security vulnerabilities.",
+      intro: "You'll learn how the stack holds return addresses and local variables, and how `push`, `pop`, `call` and `ret` work together. This is how function calls and recursion work at the machine level.",
       sections: [
         {
           type: 'code',
@@ -531,7 +531,7 @@ factorial:
     {
       slug: 'syscalls',
       title: 'System Calls',
-      intro: "A syscall is the gate between user space and the kernel. Reading files, writing to the terminal, allocating memory, creating threads — all of it goes through syscalls. In x86-64 Linux, the interface is beautifully simple.",
+      intro: "A system call is how a program asks the kernel to do something for it, such as reading a file or writing to the terminal. You'll learn the x86-64 Linux convention for making syscalls and use several common ones.",
       sections: [
         {
           type: 'code',
@@ -637,14 +637,14 @@ _start:
         },
         {
           type: 'tip',
-          content: 'The syscall table is in `/usr/include/asm/unistd_64.h` or at `man 2 syscalls`. You can also trace syscalls of any running program with `strace ./program` — this is incredibly useful for understanding what your OS is doing and for debugging segfaults that happen inside libc.',
+          content: 'The syscall table is in `/usr/include/asm/unistd_64.h` or at `man 2 syscalls`. You can also trace syscalls of any running program with `strace ./program` — this is very useful for understanding what your OS is doing and for debugging segfaults that happen inside libc.',
         },
       ],
     },
     {
       slug: 'calling-c',
       title: 'Calling C Functions from ASM',
-      intro: "You don't have to do everything in raw assembly. Linking against libc gives you printf, malloc, file I/O, and the entire C standard library — while your hot paths stay in assembly.",
+      intro: "You'll learn how to call C library functions such as printf and malloc from assembly. This lets you reuse existing code and keep assembly for the parts that need it.",
       sections: [
         {
           type: 'code',
@@ -734,7 +734,7 @@ strace ./main   # trace syscalls at runtime`,
     {
       slug: 'mini-project',
       title: 'Mini Project: String Operations',
-      intro: "Let's write a small library of string utilities in pure assembly — strlen, strcpy, strcmp, and a number-to-string converter. No libc. Just registers, memory, and loops.",
+      intro: "You'll write a small set of string functions in plain assembly without libc: strlen, strcpy, strcmp and a number-to-string converter. It brings together registers, memory access, loops and functions.",
       sections: [
         {
           type: 'code',
@@ -913,7 +913,7 @@ ls -lh strings`,
         },
         {
           type: 'tip',
-          content: "Use `gdb` to step through assembly line by line: `gdb ./strings`, then `layout asm` for the disassembly view, `layout regs` for register display, `si` to step one instruction. Or use `gdb -tui`. Seeing registers change as each instruction executes makes assembly click faster than anything else.",
+          content: "Use `gdb` to step through assembly line by line: `gdb ./strings`, then `layout asm` for the disassembly view, `layout regs` for register display, `si` to step one instruction. Or use `gdb -tui`. Seeing registers change as each instruction executes is one of the best ways to understand what your code is doing.",
         },
       ],
     },

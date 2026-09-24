@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const internet: Language = {
   slug: 'internet',
   name: 'How the Internet Works',
-  tagline: 'From typing a URL to pixels on screen.',
-  description: "You type a URL and a page appears half a second later — after your request crossed continents, touched a dozen machines, and got reassembled from packets that each found their own route. Every web developer stands on this machinery. This track walks the whole journey: DNS, TCP/IP, HTTP, TLS, and what browsers actually do.",
+  tagline: 'What happens between typing a URL and seeing the page.',
+  description: "When you load a web page, your request is split into packets, passed between many machines and put back together at the other end. This track walks through each step: DNS, TCP/IP, HTTP, TLS and what the browser does with the response.",
   accentColor: '#2196F3',
   textOnAccent: '#fff',
   icon: 'IN',
@@ -12,7 +12,7 @@ export const internet: Language = {
   usedFor: ['Web Development', 'APIs', 'Debugging', 'DevOps', 'Interviews'],
   notableUsers: ['Every website', 'Every app', 'Every API', 'You, right now', 'Everything'],
   setup: {
-    description: "Concepts track — nothing to install. These built-in tools let you watch each layer work; every lesson uses one or two.",
+    description: "This is a concepts track, so there is nothing to install. These built-in tools let you see each layer at work, and each lesson uses one or two of them.",
     windows: `# All built in (PowerShell):
 nslookup example.com        # DNS lookups
 ping example.com            # reachability + latency
@@ -32,11 +32,11 @@ curl -v https://example.com`,
     {
       slug: 'the-big-picture',
       title: 'The Big Picture: Packets & Layers',
-      intro: "The internet's founding trick: chop every message into small packets, let each one find its own way, reassemble at the far end. No phone-style dedicated lines — just billions of self-addressed envelopes.",
+      intro: "The internet splits every message into small packets, sends each one separately and reassembles them at the other end. This lesson explains packets and the layers that carry them.",
       sections: [
         {
           type: 'text',
-          content: "There is no wire between you and a website. Your request is split into packets (~1,500 bytes each), each stamped with source and destination addresses. Routers — machines whose whole job is 'read the address, forward toward it' — pass each packet hop by hop. Packets may take different routes, arrive out of order, or vanish; the endpoints sort it out. This design survives failures beautifully: any router can die and packets route around it.",
+          content: "There is no wire between you and a website. Your request is split into packets (~1,500 bytes each), each stamped with source and destination addresses. Routers — machines whose whole job is 'read the address, forward toward it' — pass each packet hop by hop. Packets may take different routes, arrive out of order, or vanish; the endpoints sort it out. This design copes well with failures: if a router goes down, packets route around it.",
         },
         {
           type: 'code',
@@ -70,14 +70,14 @@ traceroute example.com
         },
         {
           type: 'note',
-          content: "Layering is why the internet evolves without coordination: WiFi replaced cables without changing IP; HTTP/3 replaced TCP with QUIC without changing web apps. Each layer only promises an interface to the one above — implementation swaps freely. It's the best API-design lesson in engineering history.",
+          content: "Layering is why the internet evolves without coordination: WiFi replaced cables without changing IP; HTTP/3 replaced TCP with QUIC without changing web apps. Each layer only promises an interface to the one above — implementation swaps freely. It is a good example of interface design.",
         },
       ],
     },
     {
       slug: 'ip-addresses-routing',
       title: 'IP Addresses & Routing',
-      intro: "Every machine on the internet has an address. How your laptop — with its private address behind a home router — talks to a server across the planet is a story of hierarchy and one great hack called NAT.",
+      intro: "Every machine on the internet has an address. You'll learn how IP addresses, NAT and routing let your laptop reach a server on the other side of the world.",
       sections: [
         {
           type: 'code',
@@ -114,7 +114,7 @@ ip addr | grep "inet "      # local IP (192.168.x.x — private)
     {
       slug: 'dns',
       title: 'DNS — The Internet\'s Phone Book',
-      intro: "Computers route by number; humans remember names. DNS translates example.com into 93.184.216.34 — a distributed database queried billions of times per second, and the first step of every page load.",
+      intro: "DNS translates names like example.com into IP addresses like 93.184.216.34. It's the first step of every page load, and you'll learn how a lookup works and how to inspect one.",
       sections: [
         {
           type: 'code',
@@ -156,14 +156,14 @@ dig example.com +trace`,
         },
         {
           type: 'tip',
-          content: "DNS is also a load balancer and a failover switch: return different IPs per query (round-robin), or per requester location (CDNs steering you to a nearby server). When a site is 'down for some people but not others', stale or split DNS is suspect number one. The dev-facing rule: it's always DNS.",
+          content: "DNS is also a load balancer and a failover switch: return different IPs per query (round-robin), or per requester location (CDNs steering you to a nearby server). When a site is 'down for some people but not others', stale or split DNS is the first thing to check.",
         },
       ],
     },
     {
       slug: 'tcp-udp',
       title: 'TCP & UDP — Reliable vs Fast',
-      intro: "IP delivers packets 'best effort' — they can vanish, duplicate, or arrive shuffled. TCP builds reliability on top of that chaos. UDP skips the ceremony for speed. Every connection chooses one.",
+      intro: "IP can lose, duplicate or reorder packets. TCP adds reliable, ordered delivery on top, while UDP skips those guarantees for speed, and you'll learn when each is used.",
       sections: [
         {
           type: 'code',
@@ -196,7 +196,7 @@ netstat -an | head -20      # (or: ss -t on Linux)
 # ESTABLISHED = active   LISTEN = server waiting
 
 # UDP: no handshake, no ACKs, no retransmit, no order.
-# Just 'fling the packet'. Perfect when late data is
+# Just send the packet. Good for when late data is
 # worthless — a lost frame of a video call shouldn't
 # be replayed 2 seconds later.
 #   DNS queries    UDP (tiny, just re-ask on loss)
@@ -213,7 +213,7 @@ netstat -an | head -20      # (or: ss -t on Linux)
     {
       slug: 'http-https',
       title: 'HTTP & HTTPS',
-      intro: "Above all the plumbing sits a plain-text conversation: 'GET /page' — '200 OK, here you go'. HTTP is simple enough to speak by hand, and TLS wraps the whole exchange in encryption.",
+      intro: "HTTP is a simple text conversation of requests and responses, and HTTPS wraps it in TLS encryption. You'll learn methods, status codes, headers and what the padlock actually means.",
       sections: [
         {
           type: 'code',
@@ -236,7 +236,7 @@ netstat -an | head -20      # (or: ss -t on Linux)
 #   DELETE  remove
 
 # Status codes:
-#   2xx yes | 3xx go elsewhere | 4xx your fault | 5xx my fault
+#   2xx success | 3xx redirect | 4xx client error | 5xx server error
 #   200 OK, 301 moved, 304 not modified, 401 unauthenticated,
 #   403 forbidden, 404 not found, 429 slow down, 500 crashed`,
         },
@@ -264,14 +264,14 @@ its identity. It does NOT mean the site is honest.`,
         },
         {
           type: 'tip',
-          content: "Certificates are free (Let's Encrypt) and automated now — there is no excuse for plain HTTP. For developers: 'mixed content' errors mean an HTTPS page loading an http:// asset, and CORS errors aren't network failures — they're the browser enforcing cross-origin rules the server must opt out of via headers.",
+          content: "Certificates are free (Let's Encrypt) and automated now, so there is little reason to serve plain HTTP. For developers: 'mixed content' errors mean an HTTPS page loading an http:// asset, and CORS errors aren't network failures — they're the browser enforcing cross-origin rules the server must opt out of via headers.",
         },
       ],
     },
     {
       slug: 'browser-page-load',
       title: 'The Full Journey: URL to Pixels',
-      intro: "Everything assembled: type example.com, press Enter, and watch every layer from this track fire in sequence — then the browser's own pipeline turns bytes into a rendered page.",
+      intro: "This lesson puts the track together, following a page load from DNS lookup to rendered page. It also covers how the browser turns HTML and CSS into pixels.",
       sections: [
         {
           type: 'code',
@@ -309,12 +309,12 @@ Total:      %{time_total}s
 
 # In the browser: DevTools (F12) -> Network tab
 # shows every request, its timing waterfall, cache
-# hits, and headers. The single most useful web
-# debugging tool ever built.`,
+# hits, and headers. It's one of the most useful
+# tools for debugging websites.`,
         },
         {
           type: 'note',
-          content: "Caching is the web's real performance engine, at every level: browser cache (cache-control headers skip the request entirely), CDN edge caches (your request never crosses the ocean), DNS caches, connection reuse (keep-alive skips handshakes). A 'fast site' is mostly a site that arranged to skip steps.",
+          content: "Caching is the main source of web performance, at every level: browser cache (cache-control headers skip the request entirely), CDN edge caches (your request never crosses the ocean), DNS caches, connection reuse (keep-alive skips handshakes). A 'fast site' is mostly a site that arranged to skip steps.",
         },
       ],
     },

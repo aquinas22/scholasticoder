@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const csharp: Language = {
   slug: 'csharp',
   name: 'C#',
-  tagline: 'Java, but Microsoft-flavored. Honestly, quite good.',
-  description: 'C# is a modern, statically typed language from Microsoft built on the .NET platform. It\'s the language of Unity game development, Windows desktop apps, and enterprise backends. It evolves rapidly and has some genuinely excellent features.',
+  tagline: 'A modern, typed language from Microsoft for apps, games and web services on .NET.',
+  description: 'C# is a statically typed language from Microsoft that runs on the cross-platform .NET runtime. It is used for Unity games, Windows desktop apps, web APIs and business software.',
   accentColor: '#7C5FE0',
   textOnAccent: '#fff',
   icon: 'C#',
@@ -46,7 +46,7 @@ dotnet --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'C# has evolved dramatically. Modern C# (12+) lets you write Hello World in one line. Old C# needed a class, a namespace, and a static void Main. We\'ll show both, but live in the modern world.',
+      intro: 'Write and run your first C# program, in both the modern one-line style and the traditional form with a class and a Main method.',
       sections: [
         {
           type: 'text',
@@ -103,7 +103,7 @@ dotnet run`,
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'C# has a rich type system with value types, reference types, and nullable types. It\'s verbose in the old style but quite clean with var and modern inference.',
+      intro: 'Learn C#\'s value types, reference types and nullable types, and how var lets the compiler work out types for you.',
       sections: [
         {
           type: 'code',
@@ -181,7 +181,7 @@ Console.WriteLine(n2);  // Alice`,
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'C# control flow is classic C-family. The highlight is pattern matching in switch statements, which is genuinely one of C#\'s best features.',
+      intro: 'Learn if/else, loops and switch in C#, including pattern matching in switch expressions.',
       sections: [
         {
           type: 'code',
@@ -264,7 +264,7 @@ foreach (int n2 in evenSquares) {
     {
       slug: 'methods',
       title: 'Methods & Properties',
-      intro: 'In C#, properties are special class members that look like fields but act like methods. They\'re how you do encapsulation without writing getBlah()/setBlah() everywhere.',
+      intro: 'Learn to write methods and properties. Properties look like fields but run code, so you can control access without writing getX() and setX() methods.',
       sections: [
         {
           type: 'code',
@@ -352,7 +352,7 @@ Console.WriteLine(t.Kelvin);     // 273.15`,
     {
       slug: 'collections',
       title: 'Collections',
-      intro: 'C# has a rich set of collection types in System.Collections.Generic. List<T> is your workhorse.',
+      intro: 'Learn the main collection types in System.Collections.Generic, starting with List<T>, the one you will use most.',
       sections: [
         {
           type: 'code',
@@ -410,7 +410,7 @@ Console.WriteLine(stack.Pop());  // 3 (LIFO)`,
     {
       slug: 'classes-oop',
       title: 'Classes & OOP',
-      intro: 'C# is a thoroughly object-oriented language. Classes, inheritance, interfaces, abstract classes — it\'s all here, and it\'s well-designed.',
+      intro: 'Learn classes, inheritance, interfaces and abstract classes in C#.',
       sections: [
         {
           type: 'code',
@@ -477,7 +477,7 @@ Console.WriteLine(p2);  // Point { X = 0, Y = 4 }`,
     {
       slug: 'async',
       title: 'LINQ & Async/Await',
-      intro: 'LINQ is what makes C# shine for data manipulation. async/await is what makes C# shine for I/O. Together they\'re unstoppable.',
+      intro: 'Learn the basics of LINQ for working with data and async/await for waiting on I/O without blocking.',
       sections: [
         {
           type: 'code',
@@ -559,7 +559,7 @@ await Main();`,
     {
       slug: 'mini-project',
       title: 'Mini Project: Simple Calculator',
-      intro: 'A console calculator that evaluates expressions and tracks history, using everything we\'ve covered.',
+      intro: 'Put the earlier lessons together to build a console calculator that evaluates expressions and keeps a history.',
       sections: [
         {
           type: 'code',
@@ -640,7 +640,7 @@ while (true) {
     {
       slug: 'linq',
       title: 'LINQ — Querying Anything',
-      intro: 'LINQ is one query language for lists, databases, XML, and anything else that can be enumerated. Learn it once and the same filter/project/group vocabulary works everywhere in .NET.',
+      intro: 'Learn LINQ in more depth. The same filter, project and group methods work on lists, databases, XML and anything else you can loop over.',
       sections: [
         {
           type: 'code',
@@ -766,7 +766,7 @@ public static class Extensions
     {
       slug: 'generics-interfaces',
       title: 'Generics, Interfaces & Delegates',
-      intro: 'Generics give you reusable code without boxing or casting, interfaces define contracts, and delegates make functions into values. These three make up the vocabulary of .NET library design.',
+      intro: 'Learn generics for reusable typed code, interfaces for defining contracts, and delegates for passing functions around as values.',
       sections: [
         {
           type: 'code',
@@ -892,7 +892,7 @@ d.Download();`,
     {
       slug: 'records-patterns',
       title: 'Records, Pattern Matching & Nullable Types',
-      intro: 'Modern C# reads very differently from C# of ten years ago. Records remove boilerplate, patterns replace chains of if-else casts, and nullable reference types turn NullReferenceException into a compiler warning.',
+      intro: 'Learn records, pattern matching and nullable reference types, three modern C# features that cut boilerplate and catch null bugs at compile time.',
       sections: [
         {
           type: 'code',
@@ -1015,7 +1015,7 @@ var cfg = new Config { ConnectionString = "..." };   // omitting it is a compile
     {
       slug: 'files-and-json',
       title: 'Files, JSON & HTTP',
-      intro: 'The three things nearly every C# program does: read and write files, serialize objects to JSON, and call an HTTP API. All three have a modern built-in answer in .NET.',
+      intro: 'Learn to read and write files, convert objects to and from JSON, and call an HTTP API using .NET\'s built-in tools.',
       sections: [
         {
           type: 'code',

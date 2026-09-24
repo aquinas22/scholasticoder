@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const react: Language = {
   slug: 'react',
   name: 'React',
-  tagline: 'A JavaScript library for building user interfaces.',
-  description: 'React is a declarative, component-based library for building UIs. Created by Facebook in 2013, it changed how developers think about web interfaces — from "mutate the DOM" to "describe what you want and let React figure it out." Now the most widely-used frontend library in the world.',
+  tagline: 'A JavaScript library for building user interfaces from components.',
+  description: 'React lets you build a user interface out of small components, each describing what the screen should show for the current data. It was released by Facebook in 2013 and is now the most widely used front-end library.',
   accentColor: '#61DAFB',
   textOnAccent: '#111',
   icon: 'Re',
@@ -12,7 +12,7 @@ export const react: Language = {
   usedFor: ['Web UIs', 'Single-Page Apps', 'Mobile (React Native)', 'Desktop (Electron)', 'Static Sites (Next.js)'],
   notableUsers: ['Meta', 'Netflix', 'Airbnb', 'Twitter', 'Discord'],
   setup: {
-    description: 'The fastest way to start is with Vite (recommended) or Create React App. You need Node.js installed first.',
+    description: 'Install Node.js first, then create a new React project with Vite. Vite sets up everything you need to start writing components.',
     windows: `# Using Vite (recommended):
 npm create vite@latest my-app -- --template react
 cd my-app
@@ -42,7 +42,7 @@ npm create vite@latest my-app -- --template react-ts`,
     {
       slug: 'hello-world',
       title: 'Hello, React!',
-      intro: "React turns your app into a tree of components. Each component is a function that returns JSX — which looks like HTML but is actually JavaScript.",
+      intro: "You will write your first React component: a function that returns JSX, which looks like HTML but is JavaScript. Every React app is built from components like this.",
       sections: [
         {
           type: 'text',
@@ -102,7 +102,7 @@ function Card({ title, count }) {
     {
       slug: 'props',
       title: 'Props & Composition',
-      intro: "Props are how data flows in React — from parent to child, as function arguments. They're read-only: a component never modifies its own props.",
+      intro: "You will learn how to pass data from a parent component to a child with props, and how to nest components using children. Props are how components share data.",
       sections: [
         {
           type: 'code',
@@ -186,7 +186,7 @@ function Status({ isLoading, error, data }) {
     {
       slug: 'state',
       title: 'State & useState',
-      intro: "State is a component's memory. Unlike props (which come from outside), state lives inside the component and triggers a re-render when it changes. `useState` is the hook you'll use constantly.",
+      intro: "You will learn how to give a component its own changing data with `useState`. When state changes, React updates the screen to match.",
       sections: [
         {
           type: 'code',
@@ -296,7 +296,7 @@ function TodoApp() {
     {
       slug: 'effects',
       title: 'useEffect & Side Effects',
-      intro: "`useEffect` is where you handle things that happen outside the React render cycle: API calls, timers, subscriptions, DOM manipulation. It runs after every render, unless you tell it otherwise.",
+      intro: "You will learn how to use `useEffect` for work outside rendering, such as fetching data, timers and subscriptions, and how to clean it up. Getting this right avoids leaks and duplicate requests.",
       sections: [
         {
           type: 'code',
@@ -392,7 +392,7 @@ function AutoFocusInput() {
     {
       slug: 'custom-hooks',
       title: 'Custom Hooks',
-      intro: "Custom hooks are functions that start with `use` and call other hooks. They let you extract stateful logic into reusable pieces — without the complexity of class components or render props.",
+      intro: "You will learn how to write custom hooks: functions that start with `use` and call other hooks. They let you reuse the same stateful logic in several components.",
       sections: [
         {
           type: 'code',
@@ -491,7 +491,7 @@ function SearchBox() {
     {
       slug: 'context',
       title: 'Context & State Management',
-      intro: "Context lets you share data across a component tree without passing props through every level. It's great for global state like the current user, theme, or locale — but it's not a replacement for a proper state manager in complex apps.",
+      intro: "You will learn how to share data such as the current user or theme across many components with Context, without passing props through every level. You will also see when a state library is a better fit.",
       sections: [
         {
           type: 'code',
@@ -598,7 +598,7 @@ function CartBadge() {
     {
       slug: 'mini-project',
       title: 'Mini Project: Weather Dashboard',
-      intro: "Let's build a weather dashboard that uses everything we've learned: components, props, state, effects, and a custom hook for data fetching.",
+      intro: "You will build a weather dashboard that uses components, props, state, effects and a custom hook for fetching data. It puts the earlier lessons together in one small app.",
       sections: [
         {
           type: 'code',
@@ -686,7 +686,7 @@ export default WeatherDashboard`,
     {
       slug: 'lists-and-conditionals',
       title: 'Lists, Keys & Conditional Rendering',
-      intro: 'Rendering an array is where React apps spend most of their JSX — and where the two most common bugs live: a missing key, and a condition that renders a stray 0 on the page.',
+      intro: 'You will learn how to render lists and show content conditionally, and how to avoid two common bugs: missing keys and a stray 0 appearing on the page.',
       sections: [
         {
           type: 'code',
@@ -812,7 +812,7 @@ function GroupedTodos({ todos }) {
     {
       slug: 'forms',
       title: 'Forms & User Input',
-      intro: 'Forms are where React\'s "state is the source of truth" model pays off most — and where beginners write the most boilerplate. One state object and one change handler cover almost every form you will build.',
+      intro: 'You will learn how to build forms whose inputs are driven by state, using one state object and one change handler. This pattern covers most forms you will write.',
       sections: [
         {
           type: 'code',
@@ -990,7 +990,7 @@ function SearchBox({ onSearch }) {
     {
       slug: 'usereducer-and-state-patterns',
       title: 'useReducer & State Patterns',
-      intro: 'When five useState calls have to change together, they will eventually get out of sync. useReducer puts every transition in one place, so an impossible state becomes impossible to write.',
+      intro: 'You will learn how to manage related pieces of state with useReducer, which keeps every update in one function. This stops separate useState calls from getting out of sync.',
       sections: [
         {
           type: 'code',
@@ -1167,7 +1167,7 @@ function AddToCartButton({ product }) {
     {
       slug: 'performance',
       title: 'Performance: memo, useMemo & useCallback',
-      intro: 'React is fast by default. Optimize only what you have measured — but when a list of a thousand rows re-renders on every keystroke, these three tools are the fix.',
+      intro: 'You will learn how to use memo, useMemo and useCallback to avoid unnecessary re-renders. React is fast by default, so use these only where you have measured a problem.',
       sections: [
         {
           type: 'code',

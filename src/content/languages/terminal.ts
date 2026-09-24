@@ -3,16 +3,16 @@ import { Language } from '../types'
 export const terminal: Language = {
   slug: 'terminal',
   name: 'How the Terminal Works',
-  tagline: 'The text interface behind every developer tool.',
-  description: "Terminals look ancient because they are — and they've outlived every 'replacement' because text commands compose, automate, and travel over SSH like nothing else. This track explains the machinery: what a shell actually is, how commands are found and run, where the text goes, and why your terminal understands colors. Pairs with the Bash track, which teaches the commands themselves.",
+  tagline: 'How the terminal and shell work, and what happens when you run a command.',
+  description: "This track explains how the terminal works: what a shell is, how commands are found and run, where their output goes, and how colors and SSH fit in. It pairs with the Bash track, which teaches the commands themselves.",
   accentColor: '#00C853',
   textOnAccent: '#1a1a1a',
   icon: '>_',
   difficulty: 'beginner',
-  usedFor: ['Development', 'Servers & SSH', 'Automation', 'Debugging', 'Every Dev Tool Ever'],
-  notableUsers: ['Every developer', 'Every server', 'macOS Terminal', 'Windows Terminal', 'VS Code'],
+  usedFor: ['Development', 'Servers & SSH', 'Automation', 'Debugging', 'Developer Tools'],
+  notableUsers: ['macOS Terminal', 'Windows Terminal', 'GNOME Terminal', 'VS Code'],
   setup: {
-    description: "You already have one. This track explains what it is — the Bash track covers commands in depth.",
+    description: "Your computer already has a terminal. The steps below show how to open it; the examples in this track use Bash or zsh.",
     windows: `# Windows Terminal (get it from the Microsoft Store)
 # runs three different shells:
 #   PowerShell  — Windows-native (see PowerShell track)
@@ -35,7 +35,7 @@ tty               # which terminal device you're on`,
     {
       slug: 'terminal-vs-shell',
       title: 'Terminal vs Shell — Two Different Programs',
-      intro: "People say 'the terminal' for the whole experience, but it's two programs: the terminal draws the window, and the shell interprets your commands. Untangling them explains most terminal mysteries.",
+      intro: "What people call 'the terminal' is really two programs: the terminal draws the window, and the shell runs your commands. Knowing which does what makes the rest of this track easier to follow.",
       sections: [
         {
           type: 'text',
@@ -71,7 +71,7 @@ pixels on your screen`,
     {
       slug: 'what-happens-when-you-run-a-command',
       title: 'What Happens When You Press Enter',
-      intro: "'ls -l' — Enter — output appears. Between those two moments: parsing, an environment-variable treasure hunt, a process being born, and three data streams being wired up. Here's the whole journey.",
+      intro: "Follow a command from the moment you press Enter: the shell splits and expands it, finds the program using PATH, starts a process and reads its exit code.",
       sections: [
         {
           type: 'code',
@@ -115,14 +115,14 @@ cmd || echo "failed"`,
         },
         {
           type: 'tip',
-          content: "'Command not found' now debuggable: the shell searched every PATH directory and none contained that name. Installed something and it's not found? Its directory isn't in PATH, or the shell cached an old lookup (hash -r / rehash clears it).",
+          content: "Debugging 'command not found': the shell searched every PATH directory and none contained that name. Installed something and it's not found? Its directory isn't in PATH, or the shell cached an old lookup (hash -r / rehash clears it).",
         },
       ],
     },
     {
       slug: 'stdin-stdout-pipes',
       title: 'stdin, stdout & Pipes',
-      intro: "Every program is born holding three data streams: input, output, errors. Redirection and pipes just re-plug those streams — into files, or into other programs. This is the terminal's superpower.",
+      intro: "Every program starts with three data streams: input, output and errors. Learn how redirection and pipes connect those streams to files or to other programs.",
       sections: [
         {
           type: 'code',
@@ -144,7 +144,7 @@ myprogram > results.txt     # errors still hit your screen`,
         },
         {
           type: 'text',
-          content: "The pipe | connects one program's stdout to the next one's stdin, no temp files involved. Both programs run simultaneously; the kernel shuttles bytes between them and pauses the fast one when the slow one falls behind. Small tools, each doing one job, snapped together like hose segments — the Unix philosophy in one character.",
+          content: "The pipe | connects one program's stdout to the next one's stdin, no temp files involved. Both programs run simultaneously; the kernel shuttles bytes between them and pauses the fast one when the slow one falls behind. Small tools, each doing one job, connected in a chain.",
         },
         {
           type: 'code',
@@ -171,7 +171,7 @@ long_build 2>&1 | tee build.log | grep -i error`,
     {
       slug: 'environment-and-config',
       title: 'Environment Variables & Shell Startup',
-      intro: "Why does PATH exist in every window? What is .bashrc actually for? Environment variables are the shell's inheritance system — settings that flow parent to child, window to program.",
+      intro: "Learn what environment variables are, how they pass from a shell to the programs it starts, and what startup files like .bashrc are for.",
       sections: [
         {
           type: 'code',
@@ -196,7 +196,7 @@ MY_FLAG=changed bash -c 'echo $MY_FLAG'  # one-off override
         },
         {
           type: 'text',
-          content: "Programs read the environment for configuration: EDITOR tells git which editor to open, HOME tells everything where your files live, NODE_ENV switches app behavior, API keys arrive in CI this way. It's the universal config channel — no files, no flags, inherited automatically.",
+          content: "Programs read the environment for configuration: EDITOR tells git which editor to open, HOME tells everything where your files live, NODE_ENV switches app behavior, API keys arrive in CI this way. It is a common way to configure programs without files or flags, and child processes inherit it automatically.",
         },
         {
           type: 'code',
@@ -226,7 +226,7 @@ source ~/.bashrc`,
     {
       slug: 'escape-codes-and-tty',
       title: 'Colors, Cursors & Full-Screen Apps',
-      intro: "Terminals only move bytes — so how does text turn green? How does vim own the whole screen? Answer: some bytes are secret commands. Escape codes are the terminal's hidden control language.",
+      intro: "Learn how escape codes let programs color text, move the cursor and draw full-screen apps like vim, even though the terminal only receives bytes.",
       sections: [
         {
           type: 'code',
@@ -245,7 +245,7 @@ ls --color=always | head -3 | cat -v
         },
         {
           type: 'text',
-          content: "Beyond colors, escape codes move the cursor to any row and column, clear regions, and switch screens. Progress bars are 'carriage return, redraw the line'. Spinners are 'print, back up, print'. Full-screen apps — vim, htop, top — are programs furiously emitting cursor-movement and redraw codes while reading your keys raw. The terminal is a canvas addressed by text.",
+          content: "Beyond colors, escape codes move the cursor to any row and column, clear regions, and switch screens. Progress bars are 'carriage return, redraw the line'. Spinners are 'print, back up, print'. Full-screen apps such as vim, htop and top constantly send cursor-movement and redraw codes while reading your keys directly.",
         },
         {
           type: 'code',
@@ -271,8 +271,8 @@ done; echo
     },
     {
       slug: 'ssh-and-remote',
-      title: 'SSH — Your Terminal, Any Machine',
-      intro: "The payoff for all this text-protocol archaeology: because a terminal session is just a byte stream, it travels over a network connection perfectly. SSH is how every server on Earth is administered.",
+      title: 'SSH and Remote Machines',
+      intro: "Because a terminal session is just a stream of bytes, it works over a network connection too. Learn to use SSH to log in to and manage remote machines.",
       sections: [
         {
           type: 'code',
@@ -280,7 +280,7 @@ done; echo
           content: `ssh user@server.example.com
 # Encrypted connection; the server starts a shell for you;
 # your keys flow there, its output flows back. Your
-# terminal now controls a machine anywhere on Earth.
+# terminal now controls the remote machine.
 
 # Set up key-based login (no passwords, more secure):
 ssh-keygen -t ed25519            # once: makes a keypair
@@ -296,7 +296,7 @@ rsync -av ./site/ user@server:/var/www/   # sync, resumable`,
         },
         {
           type: 'text',
-          content: "Everything from earlier lessons applies unchanged over SSH — pipes, redirection, environment variables, escape codes, vim. The shell doesn't know it's remote; the terminal doesn't know either. Two machines, one byte protocol. This is why the terminal remains the universal server interface while GUIs come and go: bytes over a wire beat pixels over a wire.",
+          content: "Everything from earlier lessons applies unchanged over SSH — pipes, redirection, environment variables, escape codes, vim. The shell doesn't know it's remote; the terminal doesn't know either. This is one reason the terminal is still the standard way to manage servers: sending text over a network is cheap and reliable.",
         },
         {
           type: 'code',
@@ -316,7 +316,7 @@ tmux attach              # session exactly as you left it
         },
         {
           type: 'tip',
-          content: "Next steps from here: the Bash track for real command-line fluency, and ~/.ssh/config for saving host aliases (ssh myserver instead of ssh -p 2222 admin@203.0.113.9). Once tmux + ssh feel natural, you can work from anything with a keyboard.",
+          content: "Next steps from here: the Bash track for real command-line fluency, and ~/.ssh/config for saving host aliases (ssh myserver instead of ssh -p 2222 admin@203.0.113.9). Once tmux and ssh feel comfortable, you can work on a remote machine from almost any computer.",
         },
       ],
     },

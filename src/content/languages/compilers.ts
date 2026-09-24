@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const compilers: Language = {
   slug: 'compilers',
   name: 'Compilers',
-  tagline: 'How text becomes a running program.',
-  description: "A compiler is a program that reads your code and writes an equivalent program in another language — usually machine code. Understanding the pipeline (lexing, parsing, type checking, optimization, code generation) demystifies error messages, explains what optimizers can and can't do, and covers the ideas behind every linter, formatter, and transpiler you use daily.",
+  tagline: 'How source code is turned into a program the computer can run.',
+  description: "A compiler reads your code and produces an equivalent program in another language, usually machine code. This track walks through each stage (lexing, parsing, type checking, optimization and code generation), which also helps you read error messages and understand tools like linters and formatters.",
   accentColor: '#B84FCB',
   textOnAccent: '#fff',
   icon: 'Cc',
@@ -12,7 +12,7 @@ export const compilers: Language = {
   usedFor: ['Language Tools', 'Linters & Formatters', 'Transpilers', 'Performance', 'CS Fundamentals'],
   notableUsers: ['GCC', 'LLVM/Clang', 'V8', 'rustc', 'TypeScript'],
   setup: {
-    description: "Concepts track — any compiler you already have works for the experiments. Godbolt (godbolt.org) shows compiler output for 40+ languages with zero install and is the single best companion to this track.",
+    description: "This is a concepts track, so any compiler you already have will do for the experiments. Compiler Explorer (godbolt.org) shows compiler output for 40+ languages in the browser with nothing to install.",
     windows: `# Zero install: https://godbolt.org
 # paste code, see assembly, toggle optimization flags
 
@@ -40,7 +40,7 @@ objdump -d ./a.out | less       # disassemble a binary
     {
       slug: 'the-pipeline',
       title: 'The Compiler Pipeline',
-      intro: "Every compiler — GCC, V8, rustc, even the TypeScript checker — is the same assembly line: characters to tokens to tree to checked tree to optimized form to output code. Learn the stations once, recognize them everywhere.",
+      intro: "Most compilers, from GCC to the TypeScript checker, follow the same sequence of stages. This lesson gives an overview of each stage so the rest of the track has a map.",
       sections: [
         {
           type: 'code',
@@ -51,7 +51,7 @@ objdump -d ./a.out | less       # disassemble a binary
    v  PARSER       tokens -> syntax tree (AST)
    v  SEMANTIC     names resolved, types checked
    v  IR           tree -> intermediate representation
-   v  OPTIMIZER    IR -> better IR (most of the magic)
+   v  OPTIMIZER    IR -> better IR (most of the speed-up)
    v  CODEGEN      IR -> assembly / bytecode / JS / ...
    |
    v  output program
@@ -61,11 +61,11 @@ Back end  = produce the target (optimizer..codegen).`,
         },
         {
           type: 'text',
-          content: "The front/back split is the field's great economy: LLVM is a shared back end, so Rust, Swift, Clang, and Julia each wrote only a front end and got world-class optimization for every CPU free. Same trick in reverse: one front end can target many back ends — that's how the same C code compiles for x86, ARM, and WebAssembly.",
+          content: "The front/back split saves a lot of work: LLVM is a shared back end, so Rust, Swift, Clang, and Julia each wrote only a front end and got strong optimization for many CPUs. Same trick in reverse: one front end can target many back ends — that's how the same C code compiles for x86, ARM, and WebAssembly.",
         },
         {
           type: 'text',
-          content: "This pipeline isn't just for 'real' compilers. A linter is a front end that reports patterns instead of generating code. A formatter parses and prints the tree back prettily. TypeScript's compiler type-checks and then emits JavaScript — a compiler whose target language is another high-level language (a 'transpiler'). Syntax highlighting in your editor is a lexer running on every keystroke.",
+          content: "This pipeline isn't just for 'real' compilers. A linter is a front end that reports patterns instead of generating code. A formatter parses the code and prints the tree back out neatly. TypeScript's compiler type-checks and then emits JavaScript — a compiler whose target language is another high-level language (a 'transpiler'). Syntax highlighting in your editor is a lexer running on every keystroke.",
         },
         {
           type: 'note',
@@ -76,7 +76,7 @@ Back end  = produce the target (optimizer..codegen).`,
     {
       slug: 'lexing',
       title: 'Lexing — Text to Tokens',
-      intro: "The lexer reads raw characters and groups them into tokens: words, numbers, operators. It's the simplest stage — simple enough that you can write a real one in 40 lines, and you're about to.",
+      intro: "The lexer reads raw characters and groups them into tokens such as words, numbers and operators. It's the simplest stage, and you'll write a working one in about 40 lines.",
       sections: [
         {
           type: 'code',
@@ -128,14 +128,14 @@ print(lex("price = 3 * (cost + 12);"))
         },
         {
           type: 'tip',
-          content: "'Unexpected token' errors come from this stage's output: the parser received a legal token in an illegal place. 'Unexpected character' or 'invalid token' means the lexer itself choked — usually a stray symbol or an unterminated string.",
+          content: "'Unexpected token' errors come from this stage's output: the parser received a legal token in an illegal place. 'Unexpected character' or 'invalid token' means the lexer itself failed — usually a stray symbol or an unterminated string.",
         },
       ],
     },
     {
       slug: 'parsing',
       title: 'Parsing — Tokens to Trees',
-      intro: "Flat token lists become a tree that captures structure: what belongs to what, what happens first. The AST — abstract syntax tree — is the data structure every language tool lives on.",
+      intro: "The parser turns a flat list of tokens into a tree that shows structure and order of operations. This tree, the abstract syntax tree (AST), is what most language tools work with.",
       sections: [
         {
           type: 'code',
@@ -194,14 +194,14 @@ print(parse_expr(lex("3 * (4 + 12)")))
         },
         {
           type: 'note',
-          content: "Once you have an AST, an interpreter is trivial: walk the tree, evaluating children before parents. def eval(n): return n[1] if n[0]=='num' else eval(n[1]) + eval(n[2]) if n[0]=='add' else eval(n[1]) * eval(n[2]). Congratulations — lexer, parser, evaluator is a complete language implementation, and you've now seen all three.",
+          content: "Once you have an AST, a simple interpreter is short: walk the tree, evaluating children before parents. def eval(n): return n[1] if n[0]=='num' else eval(n[1]) + eval(n[2]) if n[0]=='add' else eval(n[1]) * eval(n[2]). A lexer, parser and evaluator together make a complete, if small, language implementation.",
         },
       ],
     },
     {
       slug: 'semantic-analysis',
       title: 'Names, Scopes & Type Checking',
-      intro: "The parser accepts 'undefined_thing + 3' happily — it's grammatically fine. Semantic analysis is where the compiler asks: does this name exist? Do these types fit? It's the stage that catches your actual bugs.",
+      intro: "Semantic analysis checks whether names exist and whether types fit, which the parser does not. It's the stage that catches many real bugs before the program runs.",
       sections: [
         {
           type: 'text',
@@ -245,8 +245,8 @@ five different policies on when/whether to ask it.`,
     },
     {
       slug: 'optimization',
-      title: 'Optimization — Where the Magic Lives',
-      intro: "Naively translated code is slow. Optimizers transform the program — hundreds of passes, each a small rewrite that provably preserves behavior — until the output beats what you'd write by hand.",
+      title: 'Optimization',
+      intro: "Optimizers rewrite a program in many small steps that keep its behavior the same but make it faster. You'll see the common passes and what they mean for how you write code.",
       sections: [
         {
           type: 'code',
@@ -293,7 +293,7 @@ int always_42(void) {
         },
         {
           type: 'text',
-          content: "The contract is the 'as-if' rule: the optimizer may do anything as long as observable behavior is unchanged. This is also where undefined behavior gets teeth — in C, signed overflow is UB, so the compiler assumes it never happens and deletes your 'if (x + 1 < x)' overflow check as dead code. The optimizer isn't malicious; it's holding you to the language's rules.",
+          content: "The contract is the 'as-if' rule: the optimizer may do anything as long as observable behavior is unchanged. This is also where undefined behavior matters most — in C, signed overflow is UB, so the compiler assumes it never happens and deletes your 'if (x + 1 < x)' overflow check as dead code. The optimizer is simply applying the language's rules.",
         },
         {
           type: 'tip',
@@ -304,7 +304,7 @@ int always_42(void) {
     {
       slug: 'codegen-and-linking',
       title: 'Code Generation, Linking & JITs',
-      intro: "The last mile: optimized IR becomes real instructions with real registers, separate files get stitched into one executable, and JIT compilers do the whole pipeline live while your program runs.",
+      intro: "This lesson covers the final stages: turning IR into real instructions, linking separate files into one executable, and how JIT compilers do all of this while a program runs.",
       sections: [
         {
           type: 'text',
@@ -351,11 +351,11 @@ advice exists: monomorphic code stays compiled;
 type-shifting code bounces between tiers.
 
 The full pipeline, running in milliseconds,
-while your page loads. Compilers all the way down.`,
+while your page loads.`,
         },
         {
           type: 'note',
-          content: "Where to go deeper: 'Crafting Interpreters' by Robert Nystrom (free online — you build two complete languages), then LLVM's Kaleidoscope tutorial for a real back end. You already have the map; those fill in the territory.",
+          content: "Where to go deeper: 'Crafting Interpreters' by Robert Nystrom (free online — you build two complete languages), then LLVM's Kaleidoscope tutorial for a real back end. This track gives you the overview; those fill in the details.",
         },
       ],
     },

@@ -3,16 +3,16 @@ import { Language } from '../types'
 export const powershell: Language = {
   slug: 'powershell',
   name: 'PowerShell',
-  tagline: 'Bash for Windows. Except it\'s also on Linux now. And it\'s object-oriented. Long story.',
-  description: 'PowerShell is Microsoft\'s powerful shell and scripting language. Unlike Bash which works with text, PowerShell works with objects. This makes parsing command output dramatically easier. It\'s cross-platform and surprisingly capable.',
+  tagline: 'Microsoft\'s cross-platform shell for automating Windows, Linux and macOS.',
+  description: 'PowerShell is Microsoft\'s shell and scripting language, and it runs on Windows, Linux and macOS. Unlike Bash, which passes text between commands, PowerShell passes objects, so you read properties instead of parsing output.',
   accentColor: '#5391FE',
   textOnAccent: '#fff',
   icon: 'PS',
   difficulty: 'beginner',
   usedFor: ['Windows Administration', 'Azure DevOps', 'CI/CD', 'System Automation', 'Active Directory'],
-  notableUsers: ['Microsoft', 'GitHub Actions', 'Azure', 'Every Windows sysadmin'],
+  notableUsers: ['Microsoft', 'GitHub Actions', 'Azure', 'Windows system administrators'],
   setup: {
-    description: 'PowerShell 5.1 is built into Windows. PowerShell 7+ (cross-platform) is recommended for scripting and available everywhere.',
+    description: 'Windows includes PowerShell 5.1. For these lessons, install PowerShell 7 or later, which runs on Windows, macOS and Linux.',
     windows: `# PowerShell 5.1 is built in — press Win+X, select "Terminal"
 # For PowerShell 7+ (recommended):
 winget install Microsoft.PowerShell
@@ -54,11 +54,11 @@ sudo dnf install powershell`,
     {
       slug: 'first-script',
       title: 'Your First Script',
-      intro: 'PowerShell scripts have the .ps1 extension. The first thing you need to know: PowerShell works with objects, not just text. This changes everything.',
+      intro: 'Write and run your first .ps1 script, and learn the main idea behind PowerShell: commands pass objects, not just text.',
       sections: [
         {
           type: 'text',
-          content: 'PowerShell cmdlets (pronounced "command-lets") follow a Verb-Noun naming convention: Get-Process, Set-Item, Remove-File. They return objects with properties, not raw text. This is PowerShell\'s biggest differentiator from Bash.',
+          content: 'PowerShell cmdlets (pronounced "command-lets") follow a Verb-Noun naming convention: Get-Process, Set-Item, Remove-File. They return objects with properties, not raw text. This is the main difference from Bash.',
         },
         {
           type: 'code',
@@ -107,7 +107,7 @@ pwsh`,
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'PowerShell variables can hold any .NET type. Numbers, strings, arrays, hashtables, or entire objects returned by cmdlets.',
+      intro: 'Learn how PowerShell variables work and the types you will use most: numbers, strings, arrays and hashtables. A variable can hold any .NET type, including objects returned by cmdlets.',
       sections: [
         {
           type: 'code',
@@ -202,7 +202,7 @@ $ordered = [ordered]@{
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'PowerShell control flow is standard C-family with a few extras. The switch statement is particularly powerful — it can match regexes and wildcards.',
+      intro: 'Learn if statements, loops and switch. PowerShell\'s comparison operators look different from most languages, and switch can match wildcards and regular expressions.',
       sections: [
         {
           type: 'code',
@@ -243,7 +243,7 @@ $result = $score -ge 60 ? "Pass" : "Fail"`,
         {
           type: 'code',
           language: 'powershell',
-          content: `# switch — very powerful in PowerShell
+          content: `# switch — can match exact values, wildcards or regexes
 $day = "Monday"
 switch ($day) {
     "Saturday" { Write-Host "Weekend!"; break }
@@ -291,7 +291,7 @@ while ($n -gt 0) {
     {
       slug: 'functions',
       title: 'Functions & Cmdlets',
-      intro: 'PowerShell functions can behave like cmdlets — with parameters, validation, help text, and pipeline support. It\'s the most sophisticated function system in any shell.',
+      intro: 'Learn to write functions with named parameters, validation, help text and pipeline input, so they behave like built-in cmdlets.',
       sections: [
         {
           type: 'code',
@@ -382,7 +382,7 @@ Get-ChildItem -File | Format-FileSize | Sort-Object Name | Format-Table`,
     {
       slug: 'objects',
       title: 'Working with Objects',
-      intro: 'This is what makes PowerShell unique. Everything is an object. You don\'t parse text — you access properties. It\'s revolutionary if you\'re used to Bash.',
+      intro: 'Learn to filter, sort and select objects in the pipeline. Because commands return objects, you read properties directly instead of parsing text.',
       sections: [
         {
           type: 'code',
@@ -422,14 +422,14 @@ $servers | Sort-Object CPU | Format-Table -AutoSize`,
         },
         {
           type: 'note',
-          content: 'Get-Member is your best friend in PowerShell. Pipe anything to Get-Member to see all its properties and methods: Get-Process | Get-Member. This works on any object and replaces reading documentation for basic exploration.',
+          content: 'Get-Member is one of the most useful commands in PowerShell. Pipe anything to Get-Member to see all its properties and methods: Get-Process | Get-Member. This works on any object and replaces reading documentation for basic exploration.',
         },
       ],
     },
     {
       slug: 'filesystem',
       title: 'Files & the Filesystem',
-      intro: 'PowerShell\'s file cmdlets are powerful and consistent. They work with local files, network paths, and even registry keys using the same commands.',
+      intro: 'Learn to navigate folders and read, write, copy and delete files, including JSON and CSV. The same commands also work on network paths and registry keys.',
       sections: [
         {
           type: 'code',
@@ -484,7 +484,7 @@ $people | Export-Csv "people.csv" -NoTypeInformation`,
     {
       slug: 'mini-project',
       title: 'Mini Project: System Info Script',
-      intro: 'Build a script that gathers system information and outputs a clean, formatted report. Something you could actually run on a new machine.',
+      intro: 'Put the earlier lessons together in a script that gathers system information and prints a formatted report.',
       sections: [
         {
           type: 'code',

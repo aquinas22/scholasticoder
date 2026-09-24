@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const java: Language = {
   slug: 'java',
   name: 'Java',
-  tagline: 'Write once, run anywhere. Debug everywhere.',
-  description: 'Java is a verbose, strictly typed, object-oriented language that powers Android, enterprise backends, and countless financial systems. It\'s been reliably annoying developers since 1995. That longevity means a massive ecosystem and rock-solid tooling.',
+  tagline: 'A statically typed, object-oriented language for Android apps and large backend systems.',
+  description: 'Java is a statically typed, object-oriented language used for Android apps, business backends and financial systems. It has been around since 1995, so it has a large ecosystem of libraries and mature tooling.',
   accentColor: '#ED8B00',
   textOnAccent: '#fff',
   icon: 'Ja',
@@ -12,7 +12,7 @@ export const java: Language = {
   usedFor: ['Android Development', 'Enterprise Backends', 'Big Data (Hadoop, Spark)', 'Financial Systems'],
   notableUsers: ['Google (Android)', 'Netflix', 'LinkedIn', 'Amazon', 'Twitter'],
   setup: {
-    description: 'Java requires the JDK (Java Development Kit). Install JDK 21 (the current LTS) and you\'re good to go.',
+    description: 'To write Java you need the JDK (Java Development Kit). Install JDK 21, the current long-term support release, then check it works with the commands below.',
     windows: `# Option 1: Adoptium (Eclipse Temurin — recommended open source)
 # Download the .msi from adoptium.net — check "Set JAVA_HOME" option
 
@@ -51,11 +51,11 @@ javac --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'The famous Java Hello World. Note: it requires a class. And the class name must match the file name. And everything is public static void. Java is very thorough.',
+      intro: 'Write and run your first Java program. You will see why even a small program needs a class and a main method, and how to compile and run it.',
       sections: [
         {
           type: 'text',
-          content: 'In Java, all code must be inside a class. The entry point is a static method called main. The full signature — public static void main(String[] args) — is required exactly. Welcome to Java.',
+          content: 'In Java, all code must be inside a class. The entry point is a static method called main. The full signature — public static void main(String[] args) — is required exactly.',
         },
         {
           type: 'code',
@@ -113,7 +113,7 @@ public class HelloWorld {
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'Java is strictly typed. You cannot assign an int to a String. You cannot even assign a long to an int without an explicit cast. Java trusts nothing.',
+      intro: 'Learn how to declare variables and use Java\'s basic types. Java is strictly typed, so it checks that every value matches its declared type and asks for an explicit cast when a conversion could lose data.',
       sections: [
         {
           type: 'code',
@@ -203,7 +203,7 @@ public class HelloWorld {
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'Java control flow is straight C-family. No surprises, no weird tricks. The enhanced switch expression in Java 14+ is genuinely nice.',
+      intro: 'Learn if/else, loops and switch in Java. If you know C or JavaScript this will look familiar, and the newer switch expression (Java 14+) makes many branches shorter.',
       sections: [
         {
           type: 'code',
@@ -304,7 +304,7 @@ public class Loops {
     {
       slug: 'methods',
       title: 'Methods',
-      intro: 'In Java, functions are called methods and must live inside classes. A small indignity. Get used to it.',
+      intro: 'Learn how to write and call methods, Java\'s name for functions. In Java every method belongs to a class.',
       sections: [
         {
           type: 'code',
@@ -367,7 +367,7 @@ public class Loops {
     {
       slug: 'arrays-collections',
       title: 'Arrays & Collections',
-      intro: 'Java arrays are fixed-size. For anything dynamic, use the Collections framework — ArrayList, HashMap, HashSet. You\'ll use these constantly.',
+      intro: 'Learn fixed-size arrays and the Collections framework (ArrayList, HashMap, HashSet), which you will use for most lists and lookups in real programs.',
       sections: [
         {
           type: 'code',
@@ -464,7 +464,7 @@ public class Streams {
     {
       slug: 'classes-oop',
       title: 'Classes & OOP',
-      intro: 'Java is fully committed to OOP. Everything is a class. Even the Hello World program. Embrace it.',
+      intro: 'Learn how to define classes, create objects, and use constructors, inheritance and overriding. Classes are how almost all Java code is organised.',
       sections: [
         {
           type: 'code',
@@ -578,7 +578,7 @@ public static void main(String[] args) {
     {
       slug: 'exceptions',
       title: 'Exception Handling',
-      intro: 'Java has checked exceptions, which force you to handle or declare errors. This is either responsible engineering or the most annoying thing in existence, depending on your morning.',
+      intro: 'Learn how to catch and throw exceptions in Java, including checked exceptions, which the compiler requires you to either handle or declare.',
       sections: [
         {
           type: 'code',
@@ -647,7 +647,7 @@ public class ExceptionHandling {
     {
       slug: 'mini-project',
       title: 'Mini Project: Simple Bank',
-      intro: 'A console banking application that puts together classes, collections, exceptions, and user input.',
+      intro: 'Build a small console banking app that puts together classes, collections, exceptions and user input.',
       sections: [
         {
           type: 'code',
@@ -762,7 +762,7 @@ java Bank`,
     {
       slug: 'interfaces-generics',
       title: 'Interfaces, Abstract Classes & Generics',
-      intro: 'Interfaces describe what a type can do; generics let one class or method work with many types without giving up compile-time safety. Together they are the backbone of every Java library you will ever use.',
+      intro: 'Interfaces describe what a type can do, and generics let one class or method work with many types while keeping compile-time checks. Both appear throughout the Java standard library.',
       sections: [
         {
           type: 'code',
@@ -902,7 +902,7 @@ public class Generics {
     {
       slug: 'streams-lambdas',
       title: 'Lambdas & the Stream API',
-      intro: 'Streams turn loops-with-a-mutable-accumulator into a readable pipeline: filter, map, collect. They are the single biggest readability upgrade in modern Java.',
+      intro: 'Learn lambdas and the Stream API, which let you write many loops as a short pipeline of steps such as filter, map and collect.',
       sections: [
         {
           type: 'code',
@@ -1020,7 +1020,7 @@ IntStream.rangeClosed(1, 5).forEach(System.out::println);`,
     {
       slug: 'concurrency',
       title: 'Threads, Executors & Concurrency',
-      intro: 'Java has real OS threads, and since Java 21, cheap virtual threads. The hard part is never starting work in parallel — it is sharing data safely between the pieces.',
+      intro: 'Learn how to run work in parallel with threads, executors and Java 21 virtual threads, and how to share data between threads safely.',
       sections: [
         {
           type: 'code',
@@ -1135,7 +1135,7 @@ static String fetchOrders(int id) { return "3 orders"; }`,
     {
       slug: 'file-io-records',
       title: 'Files, I/O & Modern Java Features',
-      intro: 'Reading and writing files in Java used to mean five nested streams. java.nio.file makes it one line — and records, sealed types, and pattern matching make the surrounding code far shorter than the Java you may have seen before.',
+      intro: 'Learn to read and write files with java.nio.file, and use newer language features such as records, sealed types and pattern matching to keep code short.',
       sections: [
         {
           type: 'code',

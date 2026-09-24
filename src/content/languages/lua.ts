@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const lua: Language = {
   slug: 'lua',
   name: 'Lua',
-  tagline: 'Tiny language, giant reach — games, mods, embedded everywhere.',
-  description: "Lua is a scripting language so small (the whole interpreter is ~300KB) that apps embed it to make themselves scriptable. Roblox, World of Warcraft addons, Neovim configs, Redis scripts — all Lua. It's one of the friendliest first languages, and the standard path into game scripting.",
+  tagline: 'A small, simple scripting language used in games, mods and apps.',
+  description: "Lua is a small scripting language (the interpreter is about 300KB) that many programs embed so users can script them, including Roblox, World of Warcraft addons, Neovim and Redis. Its short, simple syntax makes it a good first language, especially if you are interested in game scripting.",
   accentColor: '#6068C8',
   textOnAccent: '#fff',
   icon: 'Lu',
@@ -12,7 +12,7 @@ export const lua: Language = {
   usedFor: ['Game Scripting', 'Roblox', 'Mods & Addons', 'Embedded Scripting', 'Neovim Config'],
   notableUsers: ['Roblox', 'World of Warcraft', 'Neovim', 'Redis', 'LÖVE'],
   setup: {
-    description: "Install the standalone interpreter to learn the language itself. For games, LÖVE (love2d.org) is the beloved free 2D engine; Roblox Studio has Lua (Luau) built in.",
+    description: "Install the standalone interpreter to follow the lessons. For games, LÖVE (love2d.org) is a free 2D engine, and Roblox Studio has its own version of Lua (Luau) built in.",
     windows: `winget install DEVCOM.Lua
 # Or scoop install lua
 
@@ -42,7 +42,7 @@ sudo apt install love`,
     {
       slug: 'hello-lua',
       title: 'Hello, Lua',
-      intro: "Lua's entire syntax fits on a postcard. If you've never programmed before, this is one of the gentlest starts there is.",
+      intro: "Write your first Lua program and learn variables and basic types. Lua has a small syntax, so it is a comfortable place to start if you are new to programming.",
       sections: [
         {
           type: 'code',
@@ -87,7 +87,7 @@ print(#"hello")           -- 5 (# is length)`,
     {
       slug: 'control-flow',
       title: 'Conditions & Loops',
-      intro: "if/then/end, while, and two flavors of for. Lua uses keywords instead of braces — code reads almost like sentences.",
+      intro: "Learn if statements, while and repeat loops, and the two kinds of for loop. Lua marks blocks with keywords such as then, do and end instead of braces.",
       sections: [
         {
           type: 'code',
@@ -138,14 +138,14 @@ until hp == 3          -- body runs at least once
         },
         {
           type: 'tip',
-          content: "Lua arrays are 1-indexed, and numeric for is inclusive on both ends — so 'for i = 1, #list' walks a whole list. Fighting years of 0-indexed habit is the main adjustment coming from other languages.",
+          content: "Lua arrays are 1-indexed, and numeric for is inclusive on both ends — so 'for i = 1, #list' walks a whole list. If you know a 0-indexed language, this is the main thing to get used to.",
         },
       ],
     },
     {
       slug: 'tables',
-      title: 'Tables — The Only Data Structure',
-      intro: "Lua has exactly one data structure: the table. It's an array, a dictionary, an object, and a module all at once. Understand tables and you understand Lua.",
+      title: 'Tables',
+      intro: "Lua has one data structure, the table, which works as an array, a dictionary and an object. Learn to create tables and loop over them.",
       sections: [
         {
           type: 'code',
@@ -202,7 +202,7 @@ print(party.members[2].name)   -- Alan`,
     {
       slug: 'functions',
       title: 'Functions',
-      intro: "Functions in Lua are values — store them in tables, pass them around, return several results at once. This flexibility is why Lua works so well as a scripting layer.",
+      intro: "Learn to write functions, return several values at once, and use closures. In Lua, functions are values you can store in tables and pass to other functions.",
       sections: [
         {
           type: 'code',
@@ -212,7 +212,7 @@ print(party.members[2].name)   -- Alan`,
 end
 print(greet("Ada"))
 
--- Multiple return values — very Lua:
+-- Multiple return values — common in Lua:
 local function divide(a, b)
   if b == 0 then
     return nil, "division by zero"   -- value, error pattern
@@ -274,7 +274,7 @@ print(sum(1, 2, 3, 4))   -- 10`,
     {
       slug: 'strings-stdlib',
       title: 'Strings & the Standard Library',
-      intro: "Lua's standard library is deliberately tiny — string, table, math, io, os. Small enough to actually learn completely.",
+      intro: "Learn the string functions and the rest of Lua's small standard library: table, math, io and os. It is small enough to learn in full.",
       sections: [
         {
           type: 'code',
@@ -330,7 +330,7 @@ out:close()`,
     {
       slug: 'oop-metatables',
       title: 'OOP & Metatables',
-      intro: "Lua doesn't have classes — it has metatables, hooks that change how tables behave. Every Lua OOP system (including Roblox's) is built from this one mechanism.",
+      intro: "Lua has no classes. Instead it has metatables, which change how tables behave. Learn how to use them to build objects with methods and to overload operators.",
       sections: [
         {
           type: 'text',
@@ -396,7 +396,7 @@ print(pos)               -- (4, 6)`,
     {
       slug: 'love2d-game',
       title: 'Your First Game with LÖVE',
-      intro: "LÖVE (love2d) is a free 2D game framework: you write three callback functions — load, update, draw — and it handles the window, graphics, and input. A moving-square 'game' is 20 lines.",
+      intro: "Build a small game with LÖVE, a free 2D game framework. You write three functions (load, update and draw) and LÖVE handles the window, graphics and input.",
       sections: [
         {
           type: 'code',
@@ -433,7 +433,7 @@ end`,
         },
         {
           type: 'text',
-          content: "That's the whole game loop pattern used by every engine: update() advances the world based on elapsed time, draw() renders it, ~60 times per second. Multiplying movement by dt makes speed identical on a 30 FPS laptop and a 240 Hz gaming rig.",
+          content: "That's the whole game loop pattern used by every engine: update() advances the world based on elapsed time, draw() renders it, ~60 times per second. Multiplying movement by dt keeps speed the same whether the game runs at 30 or 240 frames per second.",
         },
         {
           type: 'code',

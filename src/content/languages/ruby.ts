@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const ruby: Language = {
   slug: 'ruby',
   name: 'Ruby',
-  tagline: "A programmer's best friend.",
-  description: 'Ruby is a dynamic, open source programming language with a focus on simplicity and productivity. It has an elegant syntax that is natural to read and easy to write. Often associated with the Ruby on Rails web framework.',
+  tagline: 'A readable, object-oriented scripting language, best known for web apps built with Rails.',
+  description: 'Ruby is a dynamic, open source programming language designed to be simple and productive, with a syntax that is easy to read and write. It is widely used for web development through the Ruby on Rails framework, as well as for scripts and tooling.',
   accentColor: '#CC342D',
   textOnAccent: '#FFFFFF',
   icon: 'Rb',
@@ -12,7 +12,7 @@ export const ruby: Language = {
   usedFor: ['Web Development', 'Automation', 'DevOps', 'Prototyping'],
   notableUsers: ['GitHub', 'Shopify', 'Airbnb', 'Stripe'],
   setup: {
-    description: 'Ruby is best installed using a version manager like rbenv or rvm on Unix-like systems. On Windows, use RubyInstaller.',
+    description: 'On macOS and Linux, install Ruby with a version manager such as rbenv or rvm so you can switch versions per project. On Windows, use RubyInstaller.',
     windows: `# Download and run RubyInstaller from rubyinstaller.org
 # Choose the version with MSYS2/MINGW development toolchain (DevKit).
 
@@ -46,7 +46,7 @@ ruby -v`,
     {
       slug: 'hello-world',
       title: 'Hello, Ruby!',
-      intro: "Ruby is famous for developer happiness. Matz (Ruby's creator) has said the language is optimized for programmer joy. Let's find out if he was lying.",
+      intro: "Write and run your first Ruby program, and learn the difference between puts, print and p.",
       sections: [
         {
           type: 'text',
@@ -84,7 +84,7 @@ ruby hello.rb`,
     {
       slug: 'variables-and-types',
       title: 'Variables & Types',
-      intro: "Ruby is dynamically typed with a twist: everything is an object. Not almost everything — everything. Even nil, true, and integers are objects with methods.",
+      intro: "Learn how variables, strings, numbers and symbols work in Ruby. Every value in Ruby is an object with methods, including nil, true and integers.",
       sections: [
         {
           type: 'text',
@@ -151,7 +151,7 @@ a, b = b, a`,
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: "Ruby's control flow reads like English prose. `unless` is `if not`. `until` is `while not`. You can put conditions at the end of a line. Matz really meant it about the happiness thing.",
+      intro: "Learn if, unless, case and Ruby's loops. Ruby offers readable forms such as `unless` (if not), `until` (while not) and conditions at the end of a line.",
       sections: [
         {
           type: 'code',
@@ -243,7 +243,7 @@ end`,
     {
       slug: 'methods',
       title: 'Methods',
-      intro: "In Ruby, methods are defined with `def`. They implicitly return the last expression, which either feels elegant or terrifying — but saves a lot of typing.",
+      intro: "Learn how to define methods with `def`, pass arguments, and use blocks, procs and lambdas. A Ruby method returns the value of its last expression automatically.",
       sections: [
         {
           type: 'text',
@@ -333,7 +333,7 @@ end`,
     {
       slug: 'collections',
       title: 'Arrays, Hashes & Ranges',
-      intro: "Ruby's collection classes are loaded with useful methods. You'll rarely need to write a loop — there's almost always a method for what you're trying to do.",
+      intro: "Learn how to work with arrays, hashes and ranges. Built-in methods such as map, select and each handle most tasks you would otherwise write a loop for.",
       sections: [
         {
           type: 'code',
@@ -427,7 +427,7 @@ puts ('a'..'e').to_a.inspect  # ["a", "b", "c", "d", "e"]`,
     {
       slug: 'strings',
       title: 'Strings & Regex',
-      intro: "Ruby's String class has over 100 methods. This is either brilliant or insane, but either way you won't need to import anything.",
+      intro: "Learn the most useful String methods and how to search and transform text with regular expressions. All of this is built in, with nothing to import.",
       sections: [
         {
           type: 'code',
@@ -513,7 +513,7 @@ end`,
     {
       slug: 'classes',
       title: 'Classes & OOP',
-      intro: "Ruby's OOP is clean and expressive. Everything is an object, inheritance is single (by class), and modules fill in for multiple inheritance. The `attr_accessor` macro writes getters and setters so you don't have to.",
+      intro: "Learn how to define classes, create objects and use inheritance in Ruby. Helpers like `attr_accessor` generate getters and setters for you.",
       sections: [
         {
           type: 'code',
@@ -641,7 +641,7 @@ puts acc1 > acc2   # true`,
     {
       slug: 'modules-mixins',
       title: 'Modules & Mixins',
-      intro: "Ruby solves the multiple-inheritance problem with modules. You `include` a module and its methods become instance methods. `extend` makes them class methods. This is called a mixin and it's genuinely elegant.",
+      intro: "Learn how modules group related methods and share them between classes. `include` adds a module's methods as instance methods and `extend` adds them as class methods; this is called a mixin.",
       sections: [
         {
           type: 'code',
@@ -743,7 +743,7 @@ puts ns.min             # 1`,
     {
       slug: 'error-handling',
       title: 'Error Handling',
-      intro: "Ruby calls exceptions exceptions. `begin/rescue/ensure` is Ruby's try/catch/finally. `raise` throws them. Custom exception classes are just subclasses of StandardError.",
+      intro: "Learn how to raise and rescue exceptions so your program can recover from errors. `begin/rescue/ensure` works like try/catch/finally in other languages.",
       sections: [
         {
           type: 'code',
@@ -841,7 +841,7 @@ end`,
     {
       slug: 'mini-project',
       title: 'Mini Project: CLI Password Generator',
-      intro: "Let's build a command-line password generator. It'll use modules, classes, string manipulation, and argument parsing — a real taste of Ruby in action.",
+      intro: "Build a command-line password generator that uses modules, classes, string handling and argument parsing together.",
       sections: [
         {
           type: 'code',

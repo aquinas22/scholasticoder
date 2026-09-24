@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const kotlin: Language = {
   slug: 'kotlin',
   name: 'Kotlin',
-  tagline: "Android's language of choice — Java without the boilerplate.",
-  description: "Kotlin is Google's preferred language for Android development and a full modern replacement for Java: null safety built into the type system, concise syntax, coroutines for async work — while running on the JVM and using every Java library ever written. Learn Kotlin and the entire Android ecosystem opens up.",
+  tagline: "A concise, modern language for Android apps that runs on the JVM.",
+  description: "Kotlin is Google's recommended language for Android development. It runs on the JVM and works with existing Java libraries, while adding concise syntax, null safety in the type system and coroutines for async work.",
   accentColor: '#7F52FF',
   textOnAccent: '#fff',
   icon: 'Kt',
@@ -12,7 +12,7 @@ export const kotlin: Language = {
   usedFor: ['Android Apps', 'Backend (Ktor/Spring)', 'Multiplatform Mobile', 'JVM Development', 'Gradle Scripts'],
   notableUsers: ['Google', 'Netflix', 'Uber', 'Duolingo', 'JetBrains'],
   setup: {
-    description: "For Android, install Android Studio — it bundles everything. To learn the language alone, the Kotlin compiler runs anywhere Java does, or use play.kotlinlang.org with zero install.",
+    description: "For Android apps, install Android Studio, which includes everything you need. To learn just the language, install the Kotlin compiler (it runs anywhere Java does) or use play.kotlinlang.org in your browser with no install.",
     windows: `# Fastest: https://play.kotlinlang.org (no install)
 
 # For Android development:
@@ -49,7 +49,7 @@ java -jar hello.jar`,
     {
       slug: 'hello-kotlin',
       title: 'Hello, Kotlin',
-      intro: "Kotlin's pitch in one file: everything Java does, in half the lines. main doesn't need a class, printing doesn't need System.out, and semicolons are optional.",
+      intro: "Write and run your first Kotlin program and learn val, var and type inference. Kotlin needs less setup code than Java: main does not need a class and semicolons are optional.",
       sections: [
         {
           type: 'code',
@@ -102,7 +102,7 @@ fun main() {
     {
       slug: 'null-safety',
       title: 'Null Safety',
-      intro: "The billion-dollar mistake, fixed in the type system. In Kotlin, String and String? are different types — and the compiler refuses code that could throw a NullPointerException.",
+      intro: "Learn how Kotlin handles null. String and String? are different types, so the compiler can stop you from writing code that would throw a NullPointerException.",
       sections: [
         {
           type: 'code',
@@ -155,7 +155,7 @@ fun main() {
     {
       slug: 'functions-control-flow',
       title: 'Functions, when & Expressions',
-      intro: "In Kotlin, if and when produce values. Combined with expression-body functions, half your code becomes single readable lines.",
+      intro: "Learn how to write functions, use default and named arguments, and branch with if and when. In Kotlin both if and when return values, which keeps many functions short.",
       sections: [
         {
           type: 'code',
@@ -213,7 +213,7 @@ fun main() {
     {
       slug: 'classes-data-classes',
       title: 'Classes & Data Classes',
-      intro: "A Java class with getters, setters, equals, hashCode, and toString is ~50 lines. The Kotlin data class equivalent is one. This lesson is why people switch.",
+      intro: "Learn classes, interfaces and data classes. A data class gives you equals, hashCode, toString and copy from a single line, so you can model data with very little code.",
       sections: [
         {
           type: 'code',
@@ -285,7 +285,7 @@ object Config {
     {
       slug: 'collections-lambdas',
       title: 'Collections & Lambdas',
-      intro: "filter, map, sumOf, groupBy — Kotlin's collection pipeline turns loop-heavy code into declarative one-liners. This style dominates real Android codebases.",
+      intro: "Learn lists, maps and lambdas, and how functions like filter, map, sumOf and groupBy replace many hand-written loops. This style is common in Android code.",
       sections: [
         {
           type: 'code',
@@ -345,8 +345,8 @@ fun main() {
     },
     {
       slug: 'coroutines',
-      title: 'Coroutines — async Made Simple',
-      intro: "Fetch from the network without freezing the UI — the core problem of app development. Coroutines let you write asynchronous code that reads exactly like synchronous code.",
+      title: 'Coroutines and Async Code',
+      intro: "Learn coroutines, Kotlin's way of doing slow work such as network calls without freezing the app. Asynchronous code written with coroutines reads like ordinary step-by-step code.",
       sections: [
         {
           type: 'code',
@@ -411,7 +411,7 @@ class ProfileViewModel : ViewModel() {
     {
       slug: 'first-android-app',
       title: 'Your First Android Screen',
-      intro: "Modern Android UI is Jetpack Compose: describe the screen as Kotlin functions, and it redraws automatically when state changes. Here's a complete working counter app.",
+      intro: "Build a simple counter app with Jetpack Compose, Android's UI toolkit. You describe the screen with Kotlin functions and it redraws when state changes.",
       sections: [
         {
           type: 'code',

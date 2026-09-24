@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const python: Language = {
   slug: 'python',
   name: 'Python',
-  tagline: 'Life is short. Use Python.',
-  description: 'Python is a high-level, dynamically typed language famous for its readable syntax. It powers AI research, web backends, automation scripts, and that one thing your data science friend won\'t stop talking about.',
+  tagline: 'A readable, general-purpose language for scripts, data and the web.',
+  description: 'Python is a high-level, dynamically typed language known for its clean, readable syntax. It is used for data analysis, machine learning, web backends and everyday automation, which makes it a good first language.',
   accentColor: '#FFD43B',
   textOnAccent: '#111',
   icon: 'Py',
@@ -12,7 +12,7 @@ export const python: Language = {
   usedFor: ['Data Science / AI', 'Web Backends', 'Automation', 'Scripting', 'Scientific Computing'],
   notableUsers: ['Google', 'Instagram', 'Netflix', 'NASA', 'CERN'],
   setup: {
-    description: 'Python ships pre-installed on macOS and most Linux distros. Windows users need one extra step — we still accept them.',
+    description: 'Python ships pre-installed on macOS and most Linux distros. On Windows you install it yourself, which takes a few minutes.',
     windows: `# Option 1: Official installer (recommended)
 # Visit python.org/downloads, download the latest 3.x installer
 # CRITICAL: Check "Add Python to PATH" before clicking Install
@@ -51,7 +51,7 @@ python3 --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'Every coding journey starts with Hello World. It\'s tradition, hazing, and a sanity check all rolled into one.',
+      intro: 'Your first program prints a line of text. It confirms Python is installed correctly and shows you how to run a script.',
       sections: [
         {
           type: 'text',
@@ -64,7 +64,7 @@ python3 --version`,
         },
         {
           type: 'text',
-          content: 'Save that as hello.py and run it with python3 hello.py. That\'s it — you\'re a programmer. print() is more flexible than it looks: it accepts multiple arguments and lets you customize the separator and line ending.',
+          content: 'Save that as hello.py and run it with python3 hello.py. That\'s your first program. print() is more flexible than it looks: it accepts multiple arguments and lets you customize the separator and line ending.',
         },
         {
           type: 'code',
@@ -93,7 +93,7 @@ print(True)`,
     {
       slug: 'variables',
       title: 'Variables & Data Types',
-      intro: 'Python is dynamically typed, which means you don\'t declare types — Python figures it out. This is either liberating or terrifying depending on your background.',
+      intro: 'Variables store values so you can use them later. Python is dynamically typed, so you don\'t declare a type: it works it out from the value you assign.',
       sections: [
         {
           type: 'text',
@@ -134,7 +134,7 @@ print(type(is_student))  # <class 'bool'>`,
         },
         {
           type: 'text',
-          content: 'Python supports multiple assignment in one line, and you can swap variables without a temporary variable — a small but delightful trick.',
+          content: 'Python supports multiple assignment in one line, and you can swap variables without a temporary variable.',
         },
         {
           type: 'code',
@@ -169,7 +169,7 @@ back = str(num)          # int -> str`,
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'Python uses indentation to define code blocks. Not curly braces. Not keywords. Whitespace. If you love arguments, bring this up at your next dinner party.',
+      intro: 'Conditions and loops let your program make decisions and repeat work. In Python, indentation (not curly braces) marks which lines belong to each block.',
       sections: [
         {
           type: 'text',
@@ -244,7 +244,7 @@ for i in range(10):
     {
       slug: 'functions',
       title: 'Functions',
-      intro: 'Functions are reusable blocks of code. Write once, call many times. This is the foundation of not hating yourself when you have to change something.',
+      intro: 'Functions are named, reusable blocks of code. They let you write logic once, call it from many places, and change it in one spot.',
       sections: [
         {
           type: 'text',
@@ -316,7 +316,7 @@ print(evens)   # [2, 4]`,
     {
       slug: 'data-structures',
       title: 'Lists, Dicts & Sets',
-      intro: 'Python\'s built-in collections are so good you\'ll rarely need anything else. Lists, dicts, and sets cover 95% of real-world needs.',
+      intro: 'Lists, dictionaries and sets are Python\'s built-in ways to hold groups of values. Between them they cover most everyday data-handling needs.',
       sections: [
         {
           type: 'text',
@@ -402,7 +402,7 @@ print(a - b)   # difference: {1, 2}`,
     {
       slug: 'modules',
       title: 'Modules & Packages',
-      intro: 'Python\'s standard library is enormous. And if that\'s not enough, there\'s PyPI with 500,000+ packages. You will rarely need to write code from scratch.',
+      intro: 'Modules let you split code across files and reuse code other people have written. Python ships with a large standard library, and PyPI hosts hundreds of thousands of extra packages.',
       sections: [
         {
           type: 'text',
@@ -475,14 +475,14 @@ PI = 3.14159
         },
         {
           type: 'note',
-          content: 'Always use a virtual environment for projects. Without one, pip installs packages globally and you\'ll eventually hit version conflicts. It\'s two extra commands and will save you hours of pain.',
+          content: 'Always use a virtual environment for projects. Without one, pip installs packages globally and you\'ll eventually hit version conflicts. It takes two extra commands and saves a lot of trouble later.',
         },
       ],
     },
     {
       slug: 'error-handling',
       title: 'Error Handling',
-      intro: 'Things go wrong. Files don\'t exist. Users type letters when you expected numbers. APIs return 500. Python\'s try/except lets you handle these gracefully instead of crashing.',
+      intro: 'Programs run into problems: missing files, bad input, failed network requests. try/except lets you handle those errors instead of letting the program crash.',
       sections: [
         {
           type: 'text',
@@ -572,7 +572,7 @@ def withdraw(balance, amount):
     {
       slug: 'mini-project',
       title: 'Mini Project: CLI Todo App',
-      intro: 'Let\'s build something real: a command-line todo app that saves your tasks to a file. Everything you\'ve learned, put together.',
+      intro: 'In this project you build a command-line todo app that saves tasks to a file. It brings together everything from the earlier lessons.',
       sections: [
         {
           type: 'text',
@@ -679,7 +679,7 @@ python todo.py delete 2`,
     {
       slug: 'classes-oop',
       title: 'Classes & OOP',
-      intro: 'Python classes are simpler than Java or C++ — no access modifiers, no header files, and you can add attributes whenever you want. This is either liberating or terrifying, depending on your background.',
+      intro: 'Classes let you bundle data and the functions that work on it into your own types. Python classes are lighter than those in Java or C++: no access modifiers and no header files.',
       sections: [
         {
           type: 'text',
@@ -819,7 +819,7 @@ print(player)  # Player(name='Alice', hp=100, inventory=['sword', 'shield'], ...
     {
       slug: 'file-io',
       title: 'File I/O',
-      intro: 'Python file handling is clean and safe with the "with" statement, which automatically closes files even if an exception occurs. It is a small thing that prevents a large number of subtle bugs.',
+      intro: 'Reading and writing files is how programs keep data between runs. The "with" statement opens a file and closes it again automatically, even if an error occurs.',
       sections: [
         {
           type: 'code',
@@ -908,7 +908,7 @@ print(p.exists())              # True`,
     {
       slug: 'comprehensions',
       title: 'Comprehensions & Generators',
-      intro: 'List comprehensions are Pythonic. They are also extremely easy to abuse until you have written a one-liner that takes 10 minutes to understand. Use them for simple transformations; reach for a loop when it gets complicated.',
+      intro: 'Comprehensions build a new list, dict or set from an existing one in a single line. Use them for simple transformations and switch to a regular loop when the logic gets complicated.',
       sections: [
         {
           type: 'code',
@@ -989,7 +989,7 @@ print(pairs)  # [(1, 4), (2, 5), (3, 0)]`,
     {
       slug: 'decorators',
       title: 'Decorators & Functional Tools',
-      intro: 'A decorator is just a function that takes a function and returns a function. The @syntax is syntactic sugar. It looks magic; it is not magic. It is just clever use of the fact that functions are objects.',
+      intro: 'A decorator is a function that takes a function and returns a new one, and the @ syntax is shorthand for applying it. Decorators work because functions in Python are ordinary objects.',
       sections: [
         {
           type: 'code',
@@ -1092,7 +1092,7 @@ print(by_len)   # ['date', 'apple', 'banana', 'cherry']`,
     {
       slug: 'type-hints',
       title: 'Type Hints & Modern Python',
-      intro: 'Python type hints do not make Python a statically typed language — the interpreter still ignores them at runtime. But they let tools like mypy catch bugs before you run the code, and they make your code infinitely more readable.',
+      intro: 'Type hints label what kind of value a variable or function expects. Python ignores them at runtime, but tools like mypy use them to catch bugs before you run the code, and they make your code easier to read.',
       sections: [
         {
           type: 'code',
@@ -1209,7 +1209,7 @@ def dot_product(a: Vector, b: Vector) -> float:
     {
       slug: 'iterators-generators',
       title: 'Iterators & Generators',
-      intro: 'A list holds every element in memory at once. A generator produces elements one at a time, on demand — which means you can iterate over a 40 GB log file, or an infinite sequence, using a few kilobytes of RAM.',
+      intro: 'A list holds every element in memory at once; a generator produces elements one at a time, on demand. That lets you work through very large files or endless sequences using very little memory.',
       sections: [
         {
           type: 'text',
@@ -1323,7 +1323,7 @@ print(list(Fibonacci(8)))   # [0, 1, 1, 2, 3, 5, 8, 13]
     {
       slug: 'async-python',
       title: 'Async & Concurrency',
-      intro: 'Most programs spend their time waiting — on the network, on the disk, on a database. asyncio lets a single thread start hundreds of waits at once and handle whichever finishes first, turning ten sequential one-second requests into one second total.',
+      intro: 'Many programs spend most of their time waiting on the network, the disk or a database. asyncio lets one thread run many of those waits at the same time, so ten one-second requests take about one second instead of ten.',
       sections: [
         {
           type: 'code',
@@ -1434,7 +1434,7 @@ asyncio.run(main())
     {
       slug: 'testing-and-tooling',
       title: 'Testing, Virtual Environments & Packaging',
-      intro: 'Code that is not tested is code you are afraid to change. This lesson covers the practical toolchain around real Python projects: isolated environments, pytest, and a pyproject.toml that makes your code installable.',
+      intro: 'Tests let you change code with confidence. This lesson covers the tools around a real Python project: virtual environments, pytest, and a pyproject.toml that makes your code installable.',
       sections: [
         {
           type: 'code',
@@ -1555,7 +1555,7 @@ pip install -e .          # install your own project in editable mode
     {
       slug: 'package-field-guide',
       title: 'Python Package Field Guide',
-      intro: 'PyPI is a warehouse with half a million shelves. This field guide tells you which aisle to visit, which packages are worth learning, and what each one unlocks.',
+      intro: 'PyPI has hundreds of thousands of packages. This guide points you to the ones worth learning first and what each is good for.',
       sections: [
         {
           type: 'text',
@@ -1629,7 +1629,7 @@ python -m pip install --upgrade rich`,
     {
       slug: 'subprocess-automation',
       title: 'Subprocess & System Automation',
-      intro: 'Python can coordinate the programs already on your computer. subprocess is the safe, modern bridge between Python and command-line tools.',
+      intro: 'Python can run the other programs on your computer. The subprocess module is the standard, safe way to call command-line tools from Python.',
       sections: [
         {
           type: 'text',
@@ -1706,7 +1706,7 @@ if exit_code != 0:
     {
       slug: 'tkinter-desktop-apps',
       title: 'Tkinter Desktop Apps',
-      intro: 'Tkinter ships with most Python installations and turns a script into a real window. It is perfect for small utilities, internal tools, and learning event-driven programming.',
+      intro: 'Tkinter ships with most Python installations and turns a script into a real window. It is a good fit for small utilities, internal tools, and learning event-driven programming.',
       sections: [
         {
           type: 'text',
@@ -1933,7 +1933,7 @@ with requests.get(download_url, stream=True, timeout=30) as response:
     {
       slug: 'pandas-data-tutorial',
       title: 'Pandas: Practical Data Analysis',
-      intro: 'Pandas turns rows and columns into programmable objects. It shines when a spreadsheet is too repetitive but a database would be overkill.',
+      intro: 'Pandas lets you load, clean and analyse tables of data in code. It is useful when a spreadsheet task gets repetitive but a database would be more than you need.',
       sections: [
         {
           type: 'code',
@@ -2230,7 +2230,7 @@ def delete_completed() -> int:
     {
       slug: 'pillow-images',
       title: 'Pillow: Image Automation',
-      intro: 'Pillow is the practical toolkit for resizing, cropping, converting, compositing, and inspecting images. One careful script can replace hours of repetitive editing.',
+      intro: 'Pillow is the practical toolkit for resizing, cropping, converting, compositing, and inspecting images. A short script can replace a lot of repetitive manual editing.',
       sections: [
         {
           type: 'code',
@@ -2291,7 +2291,7 @@ with Image.open("photo.jpg").convert("RGBA") as photo:
     {
       slug: 'openpyxl-excel',
       title: 'OpenPyXL: Automate Excel',
-      intro: 'OpenPyXL reads and writes modern Excel workbooks. It is ideal for reports that people need to open, filter, print, and pass around.',
+      intro: 'OpenPyXL reads and writes modern Excel workbooks. Use it for reports that people need to open, filter, print and share.',
       sections: [
         {
           type: 'code',

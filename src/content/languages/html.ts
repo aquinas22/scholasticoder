@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const html: Language = {
   slug: 'html',
   name: 'HTML',
-  tagline: 'It\'s not a programming language and we don\'t want to hear about it.',
-  description: 'HTML (HyperText Markup Language) is the structure of every web page. It\'s not a programming language — it\'s a markup language. But it\'s the foundation of the web, and you cannot build anything for a browser without understanding it.',
+  tagline: 'The markup language that gives every web page its structure.',
+  description: 'HTML (HyperText Markup Language) describes the structure and content of a web page: headings, paragraphs, links, images, forms and more. It is a markup language rather than a programming language, and it is the starting point for anything you build for the browser.',
   accentColor: '#E34F26',
   textOnAccent: '#fff',
   icon: 'HTML',
@@ -12,7 +12,7 @@ export const html: Language = {
   usedFor: ['Web Pages', 'Email Templates', 'Web Apps (with CSS/JS)', 'Documentation'],
   notableUsers: ['Every single website on the internet'],
   setup: {
-    description: 'HTML requires only a text editor and a web browser. You already have both. Open a .html file in your browser to see it rendered.',
+    description: 'You only need a text editor and a web browser, which you probably already have. Save a file with a .html extension and open it in your browser to see it rendered.',
     windows: `# You need: a text editor and a browser
 # Text editor options:
 #   VS Code (recommended): code.visualstudio.com
@@ -48,7 +48,7 @@ google-chrome index.html
     {
       slug: 'first-page',
       title: 'Your First Web Page',
-      intro: 'HTML is what web browsers read. Create a .html file, open it in a browser, and you\'ve made a web page. No server required.',
+      intro: 'You\'ll create a .html file, learn the basic structure every page shares, and open it in a browser. No server is needed.',
       sections: [
         {
           type: 'text',
@@ -115,7 +115,7 @@ google-chrome index.html
     {
       slug: 'text-headings',
       title: 'Text & Headings',
-      intro: 'HTML has a rich set of text elements. Not because web developers love complexity, but because text comes in many flavors.',
+      intro: 'You\'ll learn the elements for headings, paragraphs, quotes and other kinds of text. Choosing the right one helps browsers, search engines and screen readers understand your page.',
       sections: [
         {
           type: 'code',
@@ -176,7 +176,7 @@ google-chrome index.html
     {
       slug: 'links-images',
       title: 'Links & Images',
-      intro: 'The "HyperText" in HTML is all about links. And images because the web would be unbearable without them.',
+      intro: 'You\'ll learn how to link pages together with <a> and add images with <img>, including the alt text that makes images accessible.',
       sections: [
         {
           type: 'code',
@@ -233,7 +233,7 @@ google-chrome index.html
     {
       slug: 'lists-tables',
       title: 'Lists & Tables',
-      intro: 'Use lists when you have items. Use tables for tabular data. Do not use tables for layout — that was the 1990s. We don\'t talk about the 1990s.',
+      intro: 'You\'ll learn how to mark up ordered and unordered lists, and how to build tables for tabular data. Tables are for data only, not for page layout.',
       sections: [
         {
           type: 'code',
@@ -330,7 +330,7 @@ google-chrome index.html
     {
       slug: 'forms',
       title: 'Forms',
-      intro: 'Forms are how users give you data. Every login page, every search box, every contact form is made with these elements.',
+      intro: 'Forms are how users send you information, from search boxes to sign-up pages. You\'ll learn the main input types, labels and built-in validation.',
       sections: [
         {
           type: 'code',
@@ -402,7 +402,7 @@ google-chrome index.html
     {
       slug: 'semantic-html',
       title: 'Semantic HTML',
-      intro: 'Semantic HTML means using the right element for the right job. Not just div and span everywhere. Browsers, search engines, and assistive technologies all understand semantic HTML.',
+      intro: 'Semantic HTML means choosing elements that describe their content, such as <nav>, <main> and <article>, instead of using <div> for everything. It makes pages easier to navigate with assistive technology and easier to maintain.',
       sections: [
         {
           type: 'code',
@@ -480,7 +480,7 @@ google-chrome index.html
     {
       slug: 'mini-project',
       title: 'Mini Project: Personal Page',
-      intro: 'Build a complete personal homepage using semantic HTML. No CSS yet — pure structure. You\'ll add styles later.',
+      intro: 'You\'ll build a complete personal homepage using semantic HTML. It covers structure only; styling comes in the CSS track.',
       sections: [
         {
           type: 'code',
@@ -575,7 +575,7 @@ google-chrome index.html
   </main>
 
   <footer>
-    <p>© 2024 Alice Smith · Built with pure HTML (and some grit)</p>
+    <p>© 2024 Alice Smith · Built with plain HTML</p>
   </footer>
 
 </body>

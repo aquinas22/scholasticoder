@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const javascript: Language = {
   slug: 'javascript',
   name: 'JavaScript',
-  tagline: 'The language that runs the web. Whether you like it or not.',
-  description: 'JavaScript is the only language that runs natively in every web browser. Originally written in 10 days. Somehow it took over the world. Now it runs on servers, mobile devices, and against all reason, your smart toaster.',
+  tagline: 'The programming language of the web, used in browsers and on servers.',
+  description: 'JavaScript is the language every web browser runs, so it is how web pages become interactive. With Node.js it also runs on servers, in command-line tools and in desktop and mobile apps.',
   accentColor: '#F7DF1E',
   textOnAccent: '#111',
   icon: 'JS',
@@ -12,7 +12,7 @@ export const javascript: Language = {
   usedFor: ['Web Frontend', 'Backend (Node.js)', 'Mobile (React Native)', 'Desktop (Electron)'],
   notableUsers: ['Google', 'Facebook', 'Netflix', 'Twitter', 'GitHub'],
   setup: {
-    description: 'JavaScript runs in every browser, so you already have a runtime. For serious development, install Node.js to run JS outside the browser.',
+    description: 'Every web browser can already run JavaScript, so you can start straight away. To run JavaScript files outside the browser, install Node.js.',
     windows: `# Download Node.js from nodejs.org
 # Get the LTS (Long Term Support) version
 
@@ -49,7 +49,7 @@ node --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'You can run JavaScript in your browser\'s console right now. Open DevTools (F12), click Console, and type. You\'re already set up. Relax.',
+      intro: 'You will print your first message and see the two places JavaScript runs: the browser console and Node.js. You can try it now by opening DevTools (F12) and clicking Console.',
       sections: [
         {
           type: 'text',
@@ -97,11 +97,11 @@ console.log("Hello from Node.js!");
     {
       slug: 'variables',
       title: 'Variables & Types',
-      intro: 'JavaScript has three ways to declare variables: var, let, and const. One is old and troublesome, one is modern, and one is modern and immutable. Spot the pattern.',
+      intro: 'You will learn how to store values with let and const, what types JavaScript has, and why === is safer than ==. These basics appear in every program you write.',
       sections: [
         {
           type: 'text',
-          content: 'Use const for values that don\'t change. Use let for values that do. Avoid var — it has confusing scoping rules and function-level scope instead of block scope. Pretend it doesn\'t exist.',
+          content: 'Use const for values that don\'t change. Use let for values that do. Avoid var — it has confusing scoping rules and function-level scope instead of block scope. There is no reason to use it in new code.',
         },
         {
           type: 'code',
@@ -158,14 +158,14 @@ if ("a") console.log("will print");  // non-empty string is truthy`,
         },
         {
           type: 'warning',
-          content: 'NaN (Not a Number) is the result of invalid math operations like Number("cat") or 0/0. Weirdly, typeof NaN is "number". And NaN !== NaN. Use Number.isNaN() to check for it.',
+          content: 'NaN (Not a Number) is the result of invalid math operations like Number("cat") or 0/0. Note that typeof NaN is "number". And NaN !== NaN. Use Number.isNaN() to check for it.',
         },
       ],
     },
     {
       slug: 'control-flow',
       title: 'Control Flow & Loops',
-      intro: 'JavaScript has all the standard control structures, plus a few extras. It\'s also the only major language where the for loop has four different forms.',
+      intro: 'You will learn how to make decisions with if and switch and how to repeat work with loops and array methods. This is how a program reacts to different data.',
       sections: [
         {
           type: 'code',
@@ -238,7 +238,7 @@ const sum = numbers.reduce((acc, n) => acc + n, 0); // 15`,
     {
       slug: 'functions',
       title: 'Functions & Arrow Functions',
-      intro: 'JavaScript has multiple syntaxes for functions. This is not a bug, it\'s a feature. The arrow syntax is the most common in modern code.',
+      intro: 'You will learn the different ways to write functions, including arrow functions, which are the most common in modern code. Functions let you name a piece of work and reuse it.',
       sections: [
         {
           type: 'code',
@@ -321,7 +321,7 @@ console.log(addThree(...args));  // 6`,
     {
       slug: 'arrays-objects',
       title: 'Arrays & Objects',
-      intro: 'Arrays and objects are the backbone of JavaScript data. Master these and you\'ve mastered 80% of what you\'ll actually use.',
+      intro: 'You will learn how to store lists in arrays and named values in objects, and how to work with both. Most data in JavaScript programs is held in these two structures.',
       sections: [
         {
           type: 'code',
@@ -391,7 +391,7 @@ const host = config?.server?.host ?? "localhost"; // "localhost"`,
     {
       slug: 'classes',
       title: 'Classes & Modules',
-      intro: 'ES6 brought classes to JavaScript. They\'re syntactic sugar over prototypes, but don\'t let that ruin the moment.',
+      intro: 'You will learn how to define classes and split code into modules. Classes group data with the functions that act on it, and modules keep larger programs organised.',
       sections: [
         {
           type: 'code',
@@ -464,7 +464,7 @@ export default function square(x) { return x * x; }
     {
       slug: 'async',
       title: 'Promises & Async/Await',
-      intro: 'JavaScript is single-threaded but non-blocking. This sounds impossible and makes perfect sense once you live with it for a few months.',
+      intro: 'You will learn how JavaScript waits for slow work such as network requests without freezing, using promises and async/await. Almost every real app needs this.',
       sections: [
         {
           type: 'text',
@@ -553,7 +553,7 @@ async function fetchAll() {
     {
       slug: 'mini-project',
       title: 'Mini Project: Fetch & Display Data',
-      intro: 'Let\'s build a real Node.js script that fetches data from a public API and displays it nicely. Networks, JSON, async/await — all in one.',
+      intro: 'You will build a Node.js script that fetches data from a public API and prints it neatly. It brings together network requests, JSON and async/await.',
       sections: [
         {
           type: 'code',
@@ -638,7 +638,7 @@ main().catch(console.error);`,
     {
       slug: 'closures-scope',
       title: 'Closures & Scope',
-      intro: 'A closure is a function that remembers the variables from the scope it was created in, even after that scope has ended. This sounds academic. It powers half of JavaScript.',
+      intro: 'You will learn how scope decides where a variable can be used, and how a closure lets a function keep access to variables from where it was created. Callbacks, event handlers and many common patterns rely on this.',
       sections: [
         {
           type: 'text',
@@ -750,7 +750,7 @@ console.log(triple(5))   // 15`,
     {
       slug: 'destructuring',
       title: 'Destructuring, Spread & Rest',
-      intro: 'ES6 destructuring lets you unpack arrays and objects in a single expression. Combined with spread and rest, it makes JavaScript feel dramatically less verbose. Fair warning: it also makes clever one-liners dramatically easier to write.',
+      intro: 'You will learn how to pull values out of arrays and objects with destructuring, and how to copy and combine them with spread and rest. These make everyday code shorter and clearer.',
       sections: [
         {
           type: 'code',
@@ -843,7 +843,7 @@ for (const { name, score } of users) {
     {
       slug: 'dom-manipulation',
       title: 'DOM & Events',
-      intro: 'The DOM is the browser API that lets JavaScript interact with HTML. It is a tree of nodes. You can read it, modify it, and listen for events on it. This is how every interactive web page works.',
+      intro: 'You will learn how to find, change and create elements on a web page and respond to clicks and other events. This is how JavaScript makes a page interactive.',
       sections: [
         {
           type: 'text',
@@ -949,7 +949,7 @@ document.addEventListener("keydown", (e) => {
     {
       slug: 'modules',
       title: 'Modules & npm',
-      intro: "JavaScript modules let you split code across files and import only what you need. They also gave rise to npm, which has over 2 million packages, making it simultaneously the world's largest software repository and the world's largest potential supply-chain attack surface.",
+      intro: "You will learn how to split code across files with import and export, and how to add packages from npm. Both matter as soon as a project grows beyond one file.",
       sections: [
         {
           type: 'code',
@@ -1054,7 +1054,7 @@ console.log(original.a.b.c)  // 1 (untouched)`,
     {
       slug: 'error-handling-advanced',
       title: 'Error Handling & Debugging',
-      intro: 'JavaScript has one Error type but many error names, a try/catch that silently swallows everything, and async errors that require special handling. The good news: once you understand the three failure modes, it gets simple.',
+      intro: 'You will learn how to catch and throw errors, including errors from async code. Handling errors well keeps a program from failing silently or crashing.',
       sections: [
         {
           type: 'code',
@@ -1159,14 +1159,14 @@ async function loadDashboard(userId) {
         },
         {
           type: 'warning',
-          content: 'Never use empty catch blocks: catch (e) {}. This silently swallows errors and makes debugging a nightmare. At minimum, log the error. If you truly want to ignore an error, write a comment explaining why: // ignore AbortError from cancelled fetch.',
+          content: 'Never use empty catch blocks: catch (e) {}. This silently swallows errors and makes bugs very hard to find. At minimum, log the error. If you truly want to ignore an error, write a comment explaining why: // ignore AbortError from cancelled fetch.',
         },
       ],
     },
     {
       slug: 'fetch-and-apis',
       title: 'Fetch & Working with APIs',
-      intro: 'Almost every real app talks to a server. fetch is the browser (and Node) built-in for HTTP — but its defaults surprise people, especially the fact that a 404 is not an error.',
+      intro: 'You will learn how to send HTTP requests with fetch and handle the responses correctly, including the fact that a 404 does not throw an error. Most apps need to talk to a server.',
       sections: [
         {
           type: 'code',
@@ -1291,7 +1291,7 @@ const todos = await api.get('/todos')
     {
       slug: 'iterators-generators-js',
       title: 'Iterators, Generators & Symbols',
-      intro: 'for...of, spread, and destructuring all work through one protocol. Once you can implement it, your own objects become first-class citizens of the language.',
+      intro: 'You will learn the iteration protocol that for...of, spread and destructuring use, and how generators make it easy to implement. With it, your own objects can be looped over like arrays.',
       sections: [
         {
           type: 'code',
@@ -1405,7 +1405,7 @@ console.log(Object.keys(repo))   // []  — symbol keys are hidden from enumerat
     {
       slug: 'this-and-prototypes',
       title: '"this", Prototypes & the Object Model',
-      intro: 'JavaScript has no classes underneath — class is syntax over prototypes. Understanding what "this" points at, and how property lookup walks the prototype chain, explains most of the language\'s famous weirdness.',
+      intro: 'You will learn how prototypes work underneath classes and how JavaScript decides what "this" refers to. This explains many behaviours that otherwise look surprising.',
       sections: [
         {
           type: 'code',
@@ -1516,7 +1516,7 @@ const clone = structuredClone({ a: { b: [1, 2] } })   // real deep copy
     {
       slug: 'regular-expressions',
       title: 'Regular Expressions',
-      intro: 'Regex is a tiny language for describing text patterns. It is dense and easy to abuse, but for validation, extraction, and search-and-replace it turns twenty lines of string fiddling into one expression.',
+      intro: 'You will learn how to describe text patterns with regular expressions and use them to validate, extract and replace text. One pattern can replace many lines of manual string handling.',
       sections: [
         {
           type: 'code',

@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const rust: Language = {
   slug: 'rust',
   name: 'Rust',
-  tagline: 'Memory safe. Blazingly fast. Compiler as therapist.',
-  description: 'Rust is a systems programming language focused on safety, performance, and concurrency. The borrow checker will reject your code at first. Then at second. Eventually, you\'ll understand why — and you\'ll become a better programmer for it.',
+  tagline: 'A fast systems language that prevents memory bugs at compile time.',
+  description: 'Rust is a systems programming language focused on safety, performance, and concurrency. Its compiler checks how memory is used, so whole classes of bugs are caught before your program runs.',
   accentColor: '#CE4A00',
   textOnAccent: '#fff',
   icon: 'Rs',
@@ -12,7 +12,7 @@ export const rust: Language = {
   usedFor: ['Systems Programming', 'WebAssembly', 'Game Engines', 'Embedded', 'CLI Tools'],
   notableUsers: ['Mozilla', 'Microsoft', 'Google', 'Amazon', 'Meta'],
   setup: {
-    description: 'Rust is installed via rustup, the official toolchain manager. It handles compiler versions, cross-compilation targets, and documentation — all in one tool.',
+    description: 'Install Rust with rustup, the official toolchain manager. It installs the compiler and Cargo, keeps them up to date, and can add other build targets later.',
     windows: `# Download and run rustup-init.exe from:
 # https://www.rust-lang.org/tools/install
 
@@ -46,7 +46,7 @@ cargo --version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'Don\'t worry, the borrow checker is your friend. It\'s a very aggressive friend who won\'t let you do anything fun, but it IS your friend. Let\'s start with something it will definitely approve.',
+      intro: 'Write and run your first Rust program, and learn how to print values with println! and create projects with Cargo.',
       sections: [
         {
           type: 'text',
@@ -61,7 +61,7 @@ cargo --version`,
         },
         {
           type: 'text',
-          content: 'println! is a macro (the ! tells you so). Macros in Rust are more powerful than functions — they can take a variable number of arguments and do compile-time magic. You\'ll use println! constantly for debugging.',
+          content: 'println! is a macro (the ! tells you so). Macros in Rust are more powerful than functions — they can take a variable number of arguments and generate code at compile time. You\'ll use println! constantly for debugging.',
         },
         {
           type: 'code',
@@ -103,7 +103,7 @@ cargo run`,
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'In Rust, variables are immutable by default. This is not a bug. This is the entire point.',
+      intro: 'Learn how to declare variables and which basic types Rust has. Variables cannot be changed unless you mark them as mutable, which makes code easier to reason about.',
       sections: [
         {
           type: 'text',
@@ -144,7 +144,7 @@ cargo run`,
         },
         {
           type: 'text',
-          content: 'Shadowing is a Rust superpower: you can re-declare a variable with the same name using let, even changing its type. This is different from mutation.',
+          content: 'Shadowing lets you re-declare a variable with the same name using let, even changing its type. This is different from mutation.',
         },
         {
           type: 'code',
@@ -185,7 +185,7 @@ cargo run`,
     {
       slug: 'ownership',
       title: 'Ownership & Borrowing',
-      intro: 'This is the chapter that makes people close their laptop and go for a walk. But it\'s also the chapter that makes Rust special. Take it slow.',
+      intro: 'Learn the ownership and borrowing rules that let Rust manage memory without a garbage collector. This is the most important new idea in Rust, so take it one step at a time.',
       sections: [
         {
           type: 'text',
@@ -269,14 +269,14 @@ fn change(s: &mut String) {
         },
         {
           type: 'note',
-          content: 'The borrow checker operates at compile time with zero runtime cost. If your code compiles, memory safety is guaranteed. If it doesn\'t compile, the error messages will tell you exactly what the problem is (usually).',
+          content: 'The borrow checker operates at compile time with zero runtime cost. If your code compiles, memory safety is guaranteed. If it doesn\'t compile, the error messages usually point to the exact problem.',
         },
       ],
     },
     {
       slug: 'structs-enums',
       title: 'Structs & Enums',
-      intro: 'Rust doesn\'t have classes, but it has structs + impl blocks, which are better in every way. Fight me.',
+      intro: 'Learn how to model data with structs and enums, add methods with impl blocks, and handle each case with match. Rust uses these instead of classes.',
       sections: [
         {
           type: 'code',
@@ -362,7 +362,7 @@ fn main() {
     {
       slug: 'error-handling',
       title: 'Error Handling',
-      intro: 'Rust doesn\'t have exceptions. Instead it has Result<T, E> and Option<T>, which force you to handle errors. This sounds annoying until you use a language that doesn\'t do this.',
+      intro: 'Learn how Rust handles errors with Result<T, E> and missing values with Option<T>. Because these are ordinary types, the compiler makes sure you deal with every failure case.',
       sections: [
         {
           type: 'code',
@@ -443,7 +443,7 @@ fn main() {
     {
       slug: 'traits',
       title: 'Traits & Generics',
-      intro: 'Traits are Rust\'s version of interfaces. Generics let you write code that works across types. Together, they\'re how Rust achieves zero-cost abstraction.',
+      intro: 'Learn how traits describe shared behavior and how generics let one piece of code work with many types, without any runtime cost.',
       sections: [
         {
           type: 'code',
@@ -542,7 +542,7 @@ fn main() {
     {
       slug: 'mini-project',
       title: 'Mini Project: CLI Calculator',
-      intro: 'Let\'s build a command-line calculator using everything we\'ve learned: structs, enums, error handling, and pattern matching.',
+      intro: 'Build a command-line calculator that uses structs, enums, error handling and pattern matching together.',
       sections: [
         {
           type: 'code',
@@ -627,7 +627,7 @@ cargo run -- 15 % 7`,
     {
       slug: 'collections-iterators',
       title: 'Collections & Iterators',
-      intro: 'Rust\'s iterators are zero-cost: a chain of map, filter and sum compiles down to the same machine code as the hand-written loop, with none of the off-by-one risk.',
+      intro: 'Learn the standard collections and how to process them with iterators. A chain of map, filter and sum compiles to code as fast as a hand-written loop.',
       sections: [
         {
           type: 'code',
@@ -753,7 +753,7 @@ fn main() {
     {
       slug: 'lifetimes-generics',
       title: 'Generics & Lifetimes',
-      intro: 'Generics let one function serve many types; lifetimes let the compiler prove that every reference outlives the thing it points at. Lifetimes look alien for a week and then become invisible.',
+      intro: 'Learn how generics let one function serve many types, and how lifetimes tell the compiler that a reference will not outlive the data it points to.',
       sections: [
         {
           type: 'code',
@@ -899,7 +899,7 @@ fn main() {
     {
       slug: 'modules-cargo',
       title: 'Modules, Crates & Cargo',
-      intro: 'Cargo is build system, package manager, test runner and doc generator in one binary. Combined with the module system it makes Rust projects unusually consistent from repo to repo.',
+      intro: 'Learn how to split code into modules, use crates from crates.io, and manage builds, tests and dependencies with Cargo.',
       sections: [
         {
           type: 'code',
@@ -1024,7 +1024,7 @@ mod tests {
     {
       slug: 'concurrency-rust',
       title: 'Concurrency & Smart Pointers',
-      intro: 'Rust calls this "fearless concurrency": data races are a compile error, not a production incident. The ownership rules you already learned are exactly what makes that possible.',
+      intro: 'Learn how to run code on multiple threads and share data safely with smart pointers. Rust\'s ownership rules turn data races into compile errors.',
       sections: [
         {
           type: 'code',

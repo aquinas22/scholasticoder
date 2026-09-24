@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const vite: Language = {
   slug: 'vite',
   name: 'Vite',
-  tagline: 'Next generation frontend tooling.',
-  description: "Vite (French for 'fast') is a build tool that uses native ES modules in the browser during development — meaning no bundling step, instant server start, and HMR updates in under 50ms. Created by Evan You (Vue's creator), it's now the standard build tool for Vue, React, Svelte, and vanilla JS projects.",
+  tagline: 'A fast development server and build tool for front-end projects.',
+  description: "Vite (French for 'fast') is a build tool that serves your code to the browser as native ES modules during development, so the dev server starts quickly and changes appear almost immediately. It was created by Evan You, the author of Vue, and is widely used for Vue, React, Svelte and plain JavaScript projects.",
   accentColor: '#646CFF',
   textOnAccent: '#fff',
   icon: 'Vi',
@@ -12,7 +12,7 @@ export const vite: Language = {
   usedFor: ['Dev Server', 'Build Tool', 'Frontend Tooling', 'Library Builds', 'SSR'],
   notableUsers: ['Nuxt', 'SvelteKit', 'Remix', 'Astro', 'Laravel'],
   setup: {
-    description: 'Vite is installed automatically when you scaffold a project with `npm create vite`. You can also add it to an existing project.',
+    description: 'You need Node.js installed. Running `npm create vite` sets up a new project with Vite included, or you can add Vite to an existing project with npm.',
     windows: `# Create a new project:
 npm create vite@latest my-project
 # Choose: framework (React/Vue/Svelte/Vanilla) and variant (JS/TS)
@@ -38,7 +38,7 @@ npm run dev`,
     {
       slug: 'why-vite',
       title: 'Why Vite?',
-      intro: "Webpack bundles everything on start. With 10,000 modules that's 30+ seconds. Vite skips bundling during dev — the browser loads ES modules directly. That's a 2-second start regardless of project size.",
+      intro: "You'll learn what Vite does differently from older bundlers like Webpack: it skips bundling during development and lets the browser load ES modules directly, so even large projects start quickly.",
       sections: [
         {
           type: 'text',
@@ -94,7 +94,7 @@ my-app/
     {
       slug: 'config',
       title: 'Vite Config',
-      intro: "`vite.config.ts` is where you configure everything: plugins, path aliases, proxy rules, build options, and environment variables. It's shorter than Webpack config by an order of magnitude.",
+      intro: "You'll learn how to use `vite.config.ts` to set up plugins, path aliases, a dev-server proxy, build options and environment variables.",
       sections: [
         {
           type: 'code',
@@ -194,7 +194,7 @@ interface ImportMeta {
     {
       slug: 'imports-assets',
       title: 'Imports & Assets',
-      intro: "Vite extends the native ES module system — you can import CSS, images, JSON, SVGs, and more directly from JavaScript. The imports are processed and optimized at build time.",
+      intro: "You'll learn how to import CSS, images, JSON and SVGs directly from JavaScript, and how Vite processes those files when you build.",
       sections: [
         {
           type: 'code',
@@ -274,7 +274,7 @@ for (const path in modules) {
     {
       slug: 'plugins',
       title: 'Plugins & HMR',
-      intro: "Vite's plugin API is based on Rollup's, extended with Vite-specific hooks. Most frameworks have an official Vite plugin. HMR (Hot Module Replacement) updates the browser in milliseconds without a full page reload.",
+      intro: "You'll learn how to add plugins, including the official ones for most frameworks, and how Hot Module Replacement (HMR) updates the page as you edit without a full reload.",
       sections: [
         {
           type: 'code',
@@ -371,7 +371,7 @@ if (import.meta.hot) {
     {
       slug: 'build-optimization',
       title: 'Build & Optimization',
-      intro: "`npm run build` runs Rollup under the hood and produces optimized, code-split output. Vite handles CSS minification, asset hashing, tree-shaking, and chunk splitting automatically.",
+      intro: "You'll learn what `npm run build` produces and how to inspect and tune it. Vite uses Rollup to minify, split and hash your files for production.",
       sections: [
         {
           type: 'code',

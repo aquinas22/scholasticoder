@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const nodejs: Language = {
   slug: 'nodejs',
   name: 'Node.js',
-  tagline: 'JavaScript, but on the server.',
-  description: "Node.js is a runtime that runs JavaScript outside the browser, powered by Chrome's V8 engine. It's event-driven, non-blocking, and perfect for I/O-heavy workloads. It's also the reason you can write your frontend and backend in the same language.",
+  tagline: 'A runtime for running JavaScript outside the browser, on servers and in tools.',
+  description: "Node.js runs JavaScript outside the browser using Chrome's V8 engine. It handles many network and file operations at once without blocking, which suits web servers, APIs and command-line tools, and it lets you use one language for both frontend and backend.",
   accentColor: '#5FA04E',
   textOnAccent: '#fff',
   icon: 'No',
@@ -12,7 +12,7 @@ export const nodejs: Language = {
   usedFor: ['Web Servers', 'REST APIs', 'CLI Tools', 'Real-time Apps', 'Build Tooling'],
   notableUsers: ['Netflix', 'LinkedIn', 'PayPal', 'NASA', 'Uber'],
   setup: {
-    description: 'Install Node.js using nvm (Node Version Manager) — it lets you switch between Node versions easily.',
+    description: 'Install Node.js with nvm (Node Version Manager), which also lets you switch between Node versions later.',
     windows: `# Install nvm-windows from github.com/coreybutler/nvm-windows
 # Then:
 nvm install lts
@@ -44,7 +44,7 @@ node --version`,
     {
       slug: 'hello-world',
       title: 'Hello, Node.js!',
-      intro: "Node.js is JavaScript without a browser. It has no `window`, no `document`, but it does have the file system, network access, and a massive ecosystem of packages through npm.",
+      intro: "Run your first Node.js script and read command-line arguments and environment variables. Node has no `window` or `document`, but it can use the file system, the network and packages from npm.",
       sections: [
         {
           type: 'code',
@@ -87,7 +87,7 @@ node`,
     {
       slug: 'file-system',
       title: 'File System',
-      intro: "Node's `fs` module gives you full control over the file system. The promises API (`fs/promises`) is the modern way — no callbacks needed.",
+      intro: "Learn to read, write and list files with Node's `fs` module. The examples use the promises API (`fs/promises`), which works with async/await instead of callbacks.",
       sections: [
         {
           type: 'code',
@@ -174,7 +174,7 @@ console.log(\`Found \${count} errors\`)`,
     {
       slug: 'http-server',
       title: 'HTTP Server',
-      intro: "Node has a built-in HTTP module that can serve requests with no dependencies. Most real apps use Express on top of it, but understanding the raw module makes Express less magical.",
+      intro: "Build a web server with Node's built-in http module, then the same kind of server with Express. Seeing the plain version first makes it clearer what Express does for you.",
       sections: [
         {
           type: 'code',
@@ -268,7 +268,7 @@ app.listen(PORT, () => console.log(\`http://localhost:\${PORT}\`))`,
     {
       slug: 'modules-npm',
       title: 'Modules & npm',
-      intro: "Node's module system lets you split code across files. npm (Node Package Manager) gives you access to millions of packages. package.json describes your project and its dependencies.",
+      intro: "Learn to split code across files with modules and to install packages with npm. package.json describes your project, its scripts and its dependencies.",
       sections: [
         {
           type: 'code',
@@ -367,7 +367,7 @@ npm outdated   # see what's outdated`,
     {
       slug: 'async-patterns',
       title: 'Async Patterns',
-      intro: "Node.js is built around async I/O. Understanding how the event loop works — and the patterns that emerge from it — is the key to writing fast, non-blocking Node code.",
+      intro: "Learn the common patterns for asynchronous code in Node: promises, async/await, running tasks in parallel, timeouts and retries. They keep your program responsive while it waits on files and networks.",
       sections: [
         {
           type: 'code',
@@ -387,7 +387,7 @@ readFilePromise("data.txt", "utf-8")
   .then(data => console.log(data))
   .catch(err => console.error(err))
 
-// async/await — cleanest
+// async/await — easiest to read
 async function readAndLog(path) {
   try {
     const data = await readFilePromise(path, "utf-8")
@@ -468,7 +468,7 @@ const data = await retry(
     {
       slug: 'mini-project',
       title: 'Mini Project: REST API with Persistence',
-      intro: "Let's build a simple REST API for a notes app that saves data to a JSON file. No database setup required — just Node, Express, and the file system.",
+      intro: "Build a small REST API for notes that saves data to a JSON file, using Express and the file system. No database setup is needed.",
       sections: [
         {
           type: 'code',

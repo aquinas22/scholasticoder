@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const tailwind: Language = {
   slug: 'tailwind',
   name: 'Tailwind CSS',
-  tagline: 'A utility-first CSS framework for rapid UI development.',
-  description: "Tailwind CSS gives you low-level utility classes that let you build custom designs without leaving your HTML. No more writing CSS files, fighting specificity, or naming things. It's controversial until you use it, then it's difficult to go back.",
+  tagline: 'A CSS framework built from small utility classes you apply directly in your HTML.',
+  description: "Tailwind CSS gives you small, single-purpose classes such as `p-4` and `text-center` that you combine in your HTML to style pages. It cuts down on writing custom CSS and naming classes, and it keeps spacing and colors consistent.",
   accentColor: '#06B6D4',
   textOnAccent: '#fff',
   icon: 'Tw',
@@ -12,7 +12,7 @@ export const tailwind: Language = {
   usedFor: ['Web UI Styling', 'Design Systems', 'Rapid Prototyping', 'Component Libraries'],
   notableUsers: ['GitHub', 'Shopify', 'OpenAI', 'Loom', 'Linear'],
   setup: {
-    description: 'Install Tailwind via npm and configure it with PostCSS. Works with any framework — Vite, Next.js, Astro, plain HTML.',
+    description: 'Install Tailwind with npm and set it up with PostCSS. It works with most tools and frameworks, including Vite, Next.js, Astro and plain HTML.',
     windows: `# Via Vite (recommended for new projects):
 npm create vite@latest my-project -- --template vanilla
 cd my-project
@@ -44,11 +44,11 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'core-concept',
       title: 'The Utility-First Approach',
-      intro: "Traditional CSS: you write a class name, then write CSS for it. Tailwind: the class names ARE the CSS. `p-4` means `padding: 1rem`. `text-blue-500` means that specific blue. No naming, no context-switching, no files.",
+      intro: "With plain CSS you name a class and then write rules for it. With Tailwind each class applies one style, such as `p-4` for `padding: 1rem`. You'll see how that changes the way you style a page.",
       sections: [
         {
           type: 'text',
-          content: "Tailwind classes are atomic utilities — each does exactly one thing. You compose them directly in your HTML to build any design. This feels weird for about two hours and then feels obviously correct.",
+          content: "Tailwind classes are atomic utilities — each does exactly one thing. You compose them directly in your HTML to build any design. It can feel unfamiliar at first, but most people find it a fast way to work once they are used to it.",
         },
         {
           type: 'code',
@@ -80,7 +80,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'spacing-sizing',
       title: 'Spacing & Sizing',
-      intro: "Tailwind's spacing scale is based on `0.25rem` increments. `p-4` = 1rem padding, `m-8` = 2rem margin, `w-1/2` = 50% width. Memorize the scale and you stop looking things up.",
+      intro: "You'll learn Tailwind's spacing and sizing scale, which goes up in `0.25rem` steps: `p-4` is 1rem of padding, `m-8` is 2rem of margin, `w-1/2` is 50% width. Once you know the scale you rarely need to look values up.",
       sections: [
         {
           type: 'code',
@@ -142,7 +142,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'typography-colors',
       title: 'Typography & Colors',
-      intro: "Tailwind ships a carefully-curated color palette (50 shades × 22 colors) and a typographic scale covering size, weight, line-height, letter-spacing, and more. All of it is accessible by name.",
+      intro: "You'll learn Tailwind's color palette and its text utilities for size, weight, line height and letter spacing. Every value is available by name, which keeps styles consistent.",
       sections: [
         {
           type: 'code',
@@ -218,7 +218,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'flexbox-grid',
       title: 'Flexbox & Grid',
-      intro: "Tailwind wraps flexbox and CSS Grid in intuitive utilities. Most layouts are one-liners. `flex items-center justify-between` = horizontal bar with centered items. `grid grid-cols-3 gap-6` = three-column grid.",
+      intro: "You'll learn the utilities for Flexbox and CSS Grid. Common layouts take only a few classes, for example `flex items-center justify-between` for a toolbar or `grid grid-cols-3 gap-6` for a three-column grid.",
       sections: [
         {
           type: 'code',
@@ -302,7 +302,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'responsive-states',
       title: 'Responsive Design & States',
-      intro: "Tailwind uses a mobile-first approach. Classes apply at all sizes unless prefixed. `sm:text-xl` means \"text-xl at 640px and above.\" Hover, focus, active — all controlled by state prefixes.",
+      intro: "You'll learn how prefixes like `sm:` and `lg:` apply styles at larger screen sizes, and how `hover:` and `focus:` style interactive states. Tailwind is mobile-first, so unprefixed classes apply at every size.",
       sections: [
         {
           type: 'code',
@@ -385,7 +385,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'components',
       title: 'Building Components',
-      intro: "Real-world Tailwind means building reusable component patterns. In a framework like React or Vue you extract these into components. In plain HTML, `@apply` in CSS can package groups of utilities.",
+      intro: "You'll learn how to avoid repeating the same long class lists: extract components in React or Vue, or group utilities with `@apply` in plain HTML projects.",
       sections: [
         {
           type: 'code',
@@ -472,7 +472,7 @@ npm install -D tailwindcss @tailwindcss/vite
     {
       slug: 'mini-project',
       title: 'Mini Project: Landing Page',
-      intro: "Let's build a complete landing page hero section using Tailwind. Navigation, headline, subtext, CTAs, and a responsive layout.",
+      intro: "You'll build a landing page hero section with Tailwind, including navigation, a headline, supporting text, call-to-action buttons and a responsive layout.",
       sections: [
         {
           type: 'code',

@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const computerArchitecture: Language = {
   slug: 'computer-architecture',
   name: 'Computer Architecture',
-  tagline: 'What actually happens when code runs.',
-  description: "Beneath every language sits the same machine: a CPU fetching instructions, registers, caches, and RAM. Understanding the hardware makes you better in any language — you'll know why arrays beat linked lists in practice, what a cache miss costs, and what 'compiled to machine code' really means. No soldering required.",
+  tagline: 'How the hardware runs your code.',
+  description: "Every language runs on the same basic machine: a CPU, registers, caches and RAM. Knowing how they work explains practical things like why arrays are usually faster than linked lists and what a cache miss costs.",
   accentColor: '#FF9E2C',
   textOnAccent: '#1a1a1a',
   icon: 'CA',
@@ -12,7 +12,7 @@ export const computerArchitecture: Language = {
   usedFor: ['Performance Tuning', 'Systems Programming', 'Embedded Devices', 'Debugging', 'CS Fundamentals'],
   notableUsers: ['Intel', 'AMD', 'ARM', 'Apple Silicon', 'RISC-V'],
   setup: {
-    description: "This is a concepts track — no toolchain to install. To poke at real hardware info and machine code, these commands help (all optional).",
+    description: "This is a concepts track, so there is nothing to install. These optional commands let you look at your own CPU details and at compiled machine code.",
     windows: `# See your CPU's details:
 # Task Manager -> Performance -> CPU
 # or:
@@ -44,7 +44,7 @@ objdump -d hello | head -50`,
     {
       slug: 'bits-and-binary',
       title: 'Bits, Bytes & Binary',
-      intro: "Everything in a computer — numbers, text, photos, this webpage — is stored as bits: billions of tiny switches that are either on or off. Learn to count the way the machine does.",
+      intro: "Everything a computer stores, from numbers to text to images, is made of bits that are either 0 or 1. You'll learn binary, hexadecimal and how negative numbers and text are represented.",
       sections: [
         {
           type: 'text',
@@ -95,11 +95,11 @@ Text is numbers too (ASCII/Unicode):
     {
       slug: 'cpu-fetch-decode-execute',
       title: 'The CPU: Fetch, Decode, Execute',
-      intro: "A CPU does one conceptually simple thing, billions of times per second: fetch the next instruction from memory, decode what it means, execute it. Every program ever written reduces to this loop.",
+      intro: "A CPU repeats one loop billions of times per second: fetch the next instruction, decode it, execute it. You'll see what instructions look like and how modern CPUs speed this loop up.",
       sections: [
         {
           type: 'text',
-          content: "Machine instructions are tiny: load this memory address into a register, add two registers, compare, jump somewhere else if the result was zero. Registers are the CPU's hands — a few dozen ultra-fast storage slots (64 bits each on modern machines) where all actual work happens. The program counter register holds the address of the next instruction; jumps just overwrite it.",
+          content: "Machine instructions are tiny: load this memory address into a register, add two registers, compare, jump somewhere else if the result was zero. Registers are a few dozen very fast storage slots (64 bits each on modern machines) where all actual work happens. The program counter register holds the address of the next instruction; jumps just overwrite it.",
         },
         {
           type: 'code',
@@ -124,7 +124,7 @@ loop_start:
         },
         {
           type: 'note',
-          content: "Branch prediction: pipelines only stay full if the CPU guesses which way an if will go before it's computed. Predictors are right ~95%+ of the time; a wrong guess flushes the pipeline (~15-20 cycles wasted). This is why sorting data before a branchy loop over it can make the loop dramatically faster — famous StackOverflow question, real effect.",
+          content: "Branch prediction: pipelines only stay full if the CPU guesses which way an if will go before it's computed. Predictors are right ~95%+ of the time; a wrong guess flushes the pipeline (~15-20 cycles wasted). This is why sorting data before a loop full of branches can make the loop much faster.",
         },
         {
           type: 'code',
@@ -144,7 +144,7 @@ gcc -O1 -c tiny.c && objdump -d tiny.o
     {
       slug: 'memory-hierarchy',
       title: 'The Memory Hierarchy & Caches',
-      intro: "RAM is ~200 cycles away from the CPU. That's an eternity when you execute 4 instructions per cycle — so CPUs keep copies of recently-used memory in caches. Cache behavior explains more real-world performance than algorithmic complexity does.",
+      intro: "Reading from RAM takes around 200 CPU cycles, so CPUs keep copies of recently used memory in small, fast caches. You'll learn how caches work and how to write code that uses them well.",
       sections: [
         {
           type: 'code',
@@ -185,7 +185,7 @@ for (int col = 0; col < N; col++)
         },
         {
           type: 'tip',
-          content: "This is why arrays usually crush linked lists in practice even when big-O says they're equal: array elements are adjacent (cache lines full of useful data), list nodes are scattered (every next-pointer a likely cache miss). Data layout is a first-class performance decision.",
+          content: "This is why arrays usually beat linked lists in practice even when big-O says they're equal: array elements are adjacent (cache lines full of useful data), list nodes are scattered (every next-pointer a likely cache miss). Data layout is a first-class performance decision.",
         },
         {
           type: 'note',
@@ -196,7 +196,7 @@ for (int col = 0; col < N; col++)
     {
       slug: 'how-code-becomes-instructions',
       title: 'From Source Code to Machine Code',
-      intro: "You write text; the CPU eats binary instructions. The journeys differ — compiled ahead of time (C, Rust, Go), compiled just-in-time (JavaScript, Java), or interpreted (pure Python) — with very different performance consequences.",
+      intro: "Source code reaches the CPU in one of three ways: compiled ahead of time, compiled just in time, or interpreted. You'll learn how each works and what it means for performance.",
       sections: [
         {
           type: 'text',
@@ -208,7 +208,7 @@ for (int col = 0; col < N; col++)
         },
         {
           type: 'text',
-          content: "Just-in-time (JIT) compilation (JavaScript's V8, the JVM, C#, PyPy): start by interpreting, watch which functions run hot, compile those to native machine code at runtime — optimizing for the types actually seen. That's how JavaScript went from toy speed to within a few x of C for many workloads.",
+          content: "Just-in-time (JIT) compilation (JavaScript's V8, the JVM, C#, PyPy): start by interpreting, watch which functions run hot, compile those to native machine code at runtime — optimizing for the types actually seen. That's how JavaScript became fast enough to run within a few times the speed of C for many workloads.",
         },
         {
           type: 'code',
@@ -236,8 +236,8 @@ Rough single-thread speed for a numeric loop:
     },
     {
       slug: 'parallelism',
-      title: 'Cores, Threads & Why Free Lunch Ended',
-      intro: "CPUs stopped getting dramatically faster per-core around 2005 — physics said no. Instead we got more cores. Using them is now the programmer's job, and it's the hardest part of the machine.",
+      title: 'Cores, Threads & Parallelism',
+      intro: "Around 2005 single cores stopped getting much faster, so chips gained more cores instead. You'll learn how cores and threads work and why sharing memory between them needs care.",
       sections: [
         {
           type: 'text',
@@ -277,18 +277,18 @@ same data need coordination — and that's where bugs live.`,
         },
         {
           type: 'tip',
-          content: "Modern hardware parallelism also includes SIMD (one instruction operating on 8-16 values at once — how video codecs and NumPy fly) and GPUs (thousands of simple cores for uniform work — graphics and neural networks). Different shapes of the same idea: do more per clock, since clocks stopped climbing.",
+          content: "Modern hardware parallelism also includes SIMD (one instruction operating on 8-16 values at once — how video codecs and NumPy get their speed) and GPUs (thousands of simple cores for uniform work — graphics and neural networks). Different shapes of the same idea: do more per clock, since clocks stopped climbing.",
         },
         {
           type: 'note',
-          content: "Cache coherency ties the whole chip together: when core A writes data cached by core B, hardware invalidates B's copy automatically. Correctness is preserved, but ping-ponging a hot cache line between cores ('false sharing') silently wrecks performance — a classic advanced gotcha.",
+          content: "Cache coherency ties the whole chip together: when core A writes data cached by core B, hardware invalidates B's copy automatically. Correctness is preserved, but ping-ponging a hot cache line between cores ('false sharing') quietly hurts performance — a common advanced pitfall.",
         },
       ],
     },
     {
       slug: 'performance-thinking',
       title: 'Thinking in Nanoseconds',
-      intro: "Great engineers carry a mental price list for operations. Once you know a RAM access costs ~100ns and a disk read ~100µs, whole categories of design decisions become obvious.",
+      intro: "It helps to know roughly how long common operations take. Once you know a RAM access costs ~100ns and a disk read ~100µs, many design decisions become easier.",
       sections: [
         {
           type: 'code',
@@ -313,7 +313,7 @@ SSD read = 4.4 hours, transatlantic packet = 4.8 YEARS.`,
         },
         {
           type: 'text',
-          content: "Read the table vertically and rules of thumb fall out. Sequential beats random at every level. Memory beats disk by ~100x, disk beats network round trips. One database query per item in a loop (the N+1 problem) is catastrophic not because queries are slow, but because each one is a network round trip — half a million nanoseconds of waiting per item.",
+          content: "Read the table vertically and rules of thumb fall out. Sequential beats random at every level. Memory beats disk by ~100x, disk beats network round trips. One database query per item in a loop (the N+1 problem) is very slow not because queries are slow, but because each one is a network round trip — half a million nanoseconds of waiting per item.",
         },
         {
           type: 'code',

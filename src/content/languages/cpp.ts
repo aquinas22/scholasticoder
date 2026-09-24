@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const cpp: Language = {
   slug: 'cpp',
   name: 'C++',
-  tagline: 'C, but with more ways to shoot yourself in the foot. And classes.',
-  description: 'C++ is C with object-oriented programming, templates, and a standard library that actually does things. It\'s complex, but it\'s used for game engines, browsers, trading systems, and anything where performance is non-negotiable.',
+  tagline: 'A fast, compiled language that builds on C with classes, templates and a large standard library.',
+  description: 'C++ extends C with classes, templates and a standard library of containers and algorithms. It is used where performance matters, such as game engines, browsers, trading systems and embedded software.',
   accentColor: '#2E86D6',
   textOnAccent: '#fff',
   icon: 'C++',
@@ -42,7 +42,7 @@ g++ -std=c++20 hello.cpp -o hello`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'C++ Hello World has a critical upgrade over C\'s version: it uses cout instead of printf, and the difference reveals everything about the two languages.',
+      intro: 'Write and run your first C++ program, and see how printing with cout differs from C\'s printf.',
       sections: [
         {
           type: 'code',
@@ -99,7 +99,7 @@ int main() {
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'C++ inherits all of C\'s types and adds a bunch of its own. The good news: you\'ll mostly use int, double, string, and bool.',
+      intro: 'Learn C++\'s basic types. Most everyday code uses int, double, string and bool.',
       sections: [
         {
           type: 'code',
@@ -183,7 +183,7 @@ int main() {
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'Same as C, with a few quality-of-life improvements. The range-based for loop alone is worth learning C++.',
+      intro: 'Learn if/else, switch and loops in C++, including the range-based for loop for walking through collections.',
       sections: [
         {
           type: 'code',
@@ -244,7 +244,7 @@ int main() {
     {
       slug: 'functions',
       title: 'Functions & References',
-      intro: 'C++ functions add default arguments, function overloading, and references — things C wishes it had.',
+      intro: 'Learn to write functions in C++, including default arguments, overloading and passing by reference.',
       sections: [
         {
           type: 'code',
@@ -315,7 +315,7 @@ int main() {
     {
       slug: 'classes',
       title: 'Classes & OOP',
-      intro: 'Here\'s the part that justified calling C++ "C with classes." The original name, by the way, was actually "C with Classes." Creative bunch.',
+      intro: 'Learn to define classes with constructors, member functions, inheritance and virtual methods.',
       sections: [
         {
           type: 'code',
@@ -433,7 +433,7 @@ int main() {
     {
       slug: 'stl',
       title: 'STL Containers',
-      intro: 'The Standard Template Library is C++\'s collection of containers and algorithms. It\'s massive, powerful, and the reason you don\'t have to implement your own linked list.',
+      intro: 'Learn the Standard Template Library\'s main containers and algorithms, so you can use ready-made vectors, maps and sets instead of writing your own.',
       sections: [
         {
           type: 'code',
@@ -494,7 +494,7 @@ int main() {
     {
       slug: 'error-handling',
       title: 'Error Handling & Exceptions',
-      intro: 'C++ uses exceptions for error handling. They\'re controversial in some circles — many game engines and embedded systems disable them. Know them anyway.',
+      intro: 'Learn to throw and catch exceptions in C++. Some projects, such as many game engines, turn them off, but you will meet them in most codebases.',
       sections: [
         {
           type: 'code',
@@ -569,7 +569,7 @@ int main() {
     {
       slug: 'mini-project',
       title: 'Mini Project: Bank Account System',
-      intro: 'Let\'s put it all together: a small bank account system using classes, vectors, exceptions, and file I/O.',
+      intro: 'Put the earlier lessons together to build a small bank account system with classes, vectors, exceptions and file I/O.',
       sections: [
         {
           type: 'code',
@@ -659,7 +659,7 @@ int main() {
     {
       slug: 'pointers-references-memory',
       title: 'Pointers, References & Memory',
-      intro: 'C++ gives you direct control over memory, which is why it is fast and why it is unforgiving. This lesson covers the three ways to refer to a value — by copy, by reference, by pointer — and what actually happens to the stack and the heap.',
+      intro: 'Learn the three ways to refer to a value in C++ (by copy, by reference and by pointer) and what happens on the stack and the heap.',
       sections: [
         {
           type: 'code',
@@ -768,7 +768,7 @@ int main() {
     {
       slug: 'smart-pointers-raii',
       title: 'RAII, Smart Pointers & Move Semantics',
-      intro: 'C++ has no garbage collector and does not need one. RAII ties every resource to an object\'s lifetime, so memory, files, locks and sockets are released exactly when the owner goes out of scope — even when an exception is thrown.',
+      intro: 'Learn RAII, smart pointers and move semantics: how C++ ties memory, files and locks to an object\'s lifetime so they are released automatically, even when an exception is thrown.',
       sections: [
         {
           type: 'code',
@@ -895,7 +895,7 @@ void demo() {
     {
       slug: 'templates',
       title: 'Templates & Compile-Time Generics',
-      intro: 'A template is a recipe the compiler uses to generate a concrete function or class for each type you actually use. No boxing, no virtual dispatch, no runtime cost — the specialization happens before your program ever runs.',
+      intro: 'Learn to write templates, which let the compiler generate a version of a function or class for each type you use, with no runtime cost.',
       sections: [
         {
           type: 'code',
@@ -1028,7 +1028,7 @@ int main() {
     {
       slug: 'modern-cpp',
       title: 'Modern C++: Lambdas, Algorithms & Ranges',
-      intro: 'Everything since C++11 pushes toward writing intent instead of index arithmetic. Learn the standard algorithms and you will delete most of your hand-written loops — along with the off-by-one bugs living in them.',
+      intro: 'Learn lambdas, the standard algorithms and ranges, which let you say what you want done instead of writing index loops by hand.',
       sections: [
         {
           type: 'code',

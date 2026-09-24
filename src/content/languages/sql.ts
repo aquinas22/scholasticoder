@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const sql: Language = {
   slug: 'sql',
   name: 'SQL',
-  tagline: 'The language every database speaks.',
-  description: "SQL (Structured Query Language) has been the way to talk to relational databases since the 1970s — and it's not going anywhere. Whether you write Python, JavaScript, or Java, your data almost certainly lives in a SQL database. It's arguably the highest return-on-investment language you can learn.",
+  tagline: 'The standard language for querying and changing data in relational databases.',
+  description: "SQL (Structured Query Language) is how you read and change data in relational databases such as PostgreSQL, MySQL and SQLite. Almost every application stores its data this way, so SQL is useful whichever other language you work in.",
   accentColor: '#E38C00',
   textOnAccent: '#fff',
   icon: 'SQ',
@@ -12,7 +12,7 @@ export const sql: Language = {
   usedFor: ['Databases', 'Data Analysis', 'Backend Development', 'Reporting', 'Data Engineering'],
   notableUsers: ['Every bank', 'Every airline', 'PostgreSQL', 'MySQL', 'SQLite'],
   setup: {
-    description: 'The easiest way to start is SQLite — a full SQL database in a single file, no server needed. It ships with Python and most operating systems.',
+    description: 'The easiest way to start is SQLite: a complete SQL database stored in a single file, with no server to set up. It comes with Python and most operating systems.',
     windows: `# SQLite comes with Python. Or download the CLI:
 # https://www.sqlite.org/download.html (sqlite-tools zip)
 
@@ -41,7 +41,7 @@ sudo -u postgres psql`,
     {
       slug: 'tables-and-select',
       title: 'Tables & SELECT',
-      intro: "A relational database is just spreadsheets with rules: tables made of rows and columns. SELECT is how you ask questions about them — and it's 80% of the SQL you'll ever write.",
+      intro: "A relational database stores data in tables made of rows and columns. SELECT is how you read from them, and it is the statement you will use most.",
       sections: [
         {
           type: 'text',
@@ -94,7 +94,7 @@ SELECT name FROM students WHERE name LIKE 'A%';`,
     {
       slug: 'creating-data',
       title: 'CREATE, INSERT, UPDATE, DELETE',
-      intro: "Reading data is half the story. The other half: creating tables and changing what's in them. These four statements are called CRUD — Create, Read, Update, Delete.",
+      intro: "This lesson covers creating tables and changing the data in them. Together with SELECT, these statements make up CRUD: Create, Read, Update, Delete.",
       sections: [
         {
           type: 'text',
@@ -138,7 +138,7 @@ DELETE FROM students WHERE age < 16;`,
     {
       slug: 'sorting-and-limiting',
       title: 'ORDER BY, LIMIT & DISTINCT',
-      intro: "Rows in a table have no guaranteed order. If you want the top 10 students by grade, you need to say so explicitly — that's ORDER BY and LIMIT.",
+      intro: "Rows in a table have no guaranteed order. ORDER BY sorts your results, LIMIT keeps only the first few, and DISTINCT removes duplicates.",
       sections: [
         {
           type: 'code',
@@ -185,7 +185,7 @@ SELECT DISTINCT age, grade FROM students;
     {
       slug: 'aggregates',
       title: 'COUNT, SUM & GROUP BY',
-      intro: "So far every query returned rows as-is. Aggregate functions collapse many rows into one answer: how many students? What's the average grade? GROUP BY asks that per category.",
+      intro: "Aggregate functions turn many rows into a single answer, such as a count or an average. GROUP BY gives you that answer for each group, for example per age or per country.",
       sections: [
         {
           type: 'code',
@@ -229,7 +229,7 @@ HAVING AVG(grade) > 85;
     {
       slug: 'joins',
       title: 'JOINs — Combining Tables',
-      intro: "Real databases split data across many tables: students in one, courses in another, enrollments linking them. JOIN stitches them back together. This is the concept that makes databases 'relational'.",
+      intro: "Real databases split data across several tables: students in one, courses in another, and enrollments linking them. JOIN combines related rows from those tables in one query.",
       sections: [
         {
           type: 'text',
@@ -285,7 +285,7 @@ WHERE e.student_id IS NULL;`,
     {
       slug: 'indexes-and-keys',
       title: 'Primary Keys, Foreign Keys & Indexes',
-      intro: "Why was that query slow? Nine times out of ten: a missing index. Keys and indexes are how databases stay fast and consistent as tables grow to millions of rows.",
+      intro: "Keys keep your data consistent, and indexes keep queries fast as tables grow. A slow query is very often a missing index.",
       sections: [
         {
           type: 'text',
@@ -330,7 +330,7 @@ SELECT * FROM students WHERE email = 'ada@example.com';
     {
       slug: 'transactions',
       title: 'Transactions & Safety',
-      intro: "Transfer $100 between accounts: subtract from one, add to the other. If the server crashes between those two statements, money vanishes. Transactions make multiple statements succeed or fail as one unit.",
+      intro: "Transactions make several statements succeed or fail together. For example, moving $100 between two accounts should never leave the money taken from one but not added to the other.",
       sections: [
         {
           type: 'code',
@@ -372,7 +372,7 @@ cursor.execute("SELECT * FROM users WHERE name = ?", (name,))`,
     {
       slug: 'subqueries-and-ctes',
       title: 'Subqueries & CTEs',
-      intro: 'When one query needs the answer to another query, you have two options: nest it as a subquery, or name it up front as a CTE. CTEs read top to bottom like a recipe, which is why they win for anything non-trivial.',
+      intro: 'When one query needs the answer to another query, you have two options: nest it as a subquery, or name it up front as a CTE. CTEs read top to bottom, which makes longer queries easier to follow.',
       sections: [
         {
           type: 'code',
@@ -602,7 +602,7 @@ WINDOW w AS (ORDER BY day ROWS UNBOUNDED PRECEDING);`,
     {
       slug: 'schema-design',
       title: 'Schema Design & Constraints',
-      intro: 'The database is the last line of defence for your data. Application code has bugs, scripts get run by hand, and a second service will eventually write to the same table — constraints are what keep the data honest through all of it.',
+      intro: 'Constraints are rules the database enforces on every write, whatever program makes it. They keep bad data out even when application code has bugs or someone edits the table by hand.',
       sections: [
         {
           type: 'code',
@@ -706,7 +706,7 @@ CREATE INDEX idx_customers_active ON customers(id) WHERE deleted_at IS NULL;`,
     {
       slug: 'query-performance',
       title: 'Query Performance & EXPLAIN',
-      intro: 'A query that returns in 5 ms on your laptop can take 30 seconds on production data. EXPLAIN shows you what the database actually plans to do — the difference between guessing and knowing.',
+      intro: 'A query that is fast on a small test database can be slow on real data. EXPLAIN shows how the database plans to run a query, so you can see why it is slow and fix it.',
       sections: [
         {
           type: 'code',

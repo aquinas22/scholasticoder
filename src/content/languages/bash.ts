@@ -3,16 +3,16 @@ import { Language } from '../types'
 export const bash: Language = {
   slug: 'bash',
   name: 'Bash',
-  tagline: 'Your terminal\'s native tongue. Learn it and become one with the shell.',
-  description: 'Bash (Bourne Again Shell) is the command interpreter on most Linux systems and macOS. It\'s a programming language that runs directly in your terminal. Automate repetitive tasks, write deployment scripts, glue other programs together — Bash is the universal duct tape of computing.',
+  tagline: 'The standard shell on Linux and macOS, used for commands and scripts.',
+  description: 'Bash (Bourne Again Shell) is the command interpreter on most Linux systems and macOS. You use it to run commands, automate repetitive tasks and tie other programs together in scripts.',
   accentColor: '#4EAA25',
   textOnAccent: '#fff',
   icon: 'Sh',
   difficulty: 'beginner',
   usedFor: ['Shell Scripting', 'System Administration', 'CI/CD Pipelines', 'Task Automation', 'DevOps'],
-  notableUsers: ['Linux', 'macOS', 'Every CI system ever', 'Every server ever'],
+  notableUsers: ['Linux', 'macOS', 'GitHub Actions', 'Docker'],
   setup: {
-    description: 'Bash is already on your system if you\'re on Linux or macOS. Windows users can get it via WSL2 or Git Bash.',
+    description: 'Bash is already installed on Linux and macOS. On Windows, use WSL2 for a full Linux environment or Git Bash for a lighter option.',
     windows: `# Option 1: WSL2 (recommended — real Linux environment)
 wsl --install          # install WSL2 + Ubuntu
 wsl                    # start a Linux shell
@@ -51,7 +51,7 @@ bash script.sh`,
     {
       slug: 'first-script',
       title: 'Your First Script',
-      intro: 'A Bash script is just a text file with commands in it. The magic is in the shebang line at the top, which tells the system which interpreter to use.',
+      intro: 'A Bash script is a text file of commands. You will write one, make it executable and run it, and see how the shebang line tells the system which interpreter to use.',
       sections: [
         {
           type: 'text',
@@ -97,7 +97,7 @@ printf "Pi: %.4f\\n" 3.14159`,
     {
       slug: 'variables',
       title: 'Variables & Input',
-      intro: 'Bash variables have no types. Everything is a string. This is either simple or chaos, depending on what you\'re trying to do with numbers.',
+      intro: 'Learn how to store values in variables, do arithmetic and read input. In Bash every variable is a string, so arithmetic needs its own syntax.',
       sections: [
         {
           type: 'code',
@@ -189,7 +189,7 @@ echo "Hello, $1 $2!"`,
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'Bash conditionals look strange at first. The [ ... ] is actually a command (test). The spaces inside are required. Yes, really.',
+      intro: 'Learn if statements and loops in Bash. The [ ... ] in a condition is actually a command (test), which is why the spaces inside it are required.',
       sections: [
         {
           type: 'code',
@@ -289,7 +289,7 @@ done`,
     {
       slug: 'functions',
       title: 'Functions',
-      intro: 'Bash functions are reusable blocks of code. They work differently from functions in other languages — no return values, just exit codes and stdout.',
+      intro: 'Learn to group commands into reusable functions. Bash functions work differently from most languages: they report success with an exit code and pass data back through standard output.',
       sections: [
         {
           type: 'code',
@@ -377,7 +377,7 @@ require_file "config.json"`,
     {
       slug: 'files',
       title: 'Working with Files',
-      intro: 'Bash was born to manipulate files. Half the Unix philosophy is "everything is a file." The other half is "small tools that do one thing well."',
+      intro: 'Learn to read, write, copy and search files, and to process text with grep, sed and awk. Most everyday shell work is file work.',
       sections: [
         {
           type: 'code',
@@ -429,7 +429,7 @@ find . -name "*.log" -delete          # find and delete`,
           language: 'bash',
           content: `#!/bin/bash
 
-# Text processing — the Unix triumvirate
+# Text processing — grep, sed and awk
 # grep — search for patterns
 grep "error" log.txt               # lines containing "error"
 grep -i "error" log.txt            # case-insensitive
@@ -459,7 +459,7 @@ grep "ERROR" log.txt | awk '{print $4}' | sort | uniq -c | sort -rn`,
     {
       slug: 'pipes-redirection',
       title: 'Pipes & Redirection',
-      intro: 'Pipes are how Unix tools talk to each other. Each small tool does one thing — pipes connect them into powerful pipelines. This is the Unix superpower.',
+      intro: 'Learn to send a command\'s output to a file or into another command. Pipes let you combine small tools into one useful command.',
       sections: [
         {
           type: 'code',
@@ -503,7 +503,7 @@ diff <(ls dir1/) <(ls dir2/)    # compare output of two commands`,
     {
       slug: 'mini-project',
       title: 'Mini Project: Backup Script',
-      intro: 'A practical backup script that compresses directories, keeps the last N backups, and logs everything. Something you might actually use.',
+      intro: 'Put the earlier lessons together in a backup script that compresses a directory, keeps the last few backups and logs what it did.',
       sections: [
         {
           type: 'code',

@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const typescript: Language = {
   slug: 'typescript',
   name: 'TypeScript',
-  tagline: 'JavaScript that scales.',
-  description: 'TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale. It catches errors early in your editor, not later in production. All valid JavaScript is valid TypeScript — migration is gradual.',
+  tagline: 'JavaScript with types, for catching mistakes before your code runs.',
+  description: 'TypeScript is JavaScript with optional static types, checked by a compiler before the code runs. Your editor can catch mistakes and suggest completions as you type, and because all valid JavaScript is valid TypeScript, you can adopt it one file at a time.',
   accentColor: '#3178C6',
   textOnAccent: '#FFFFFF',
   icon: 'TS',
@@ -12,7 +12,7 @@ export const typescript: Language = {
   usedFor: ['Web Development', 'Full-stack Applications', 'Libraries', 'Tooling'],
   notableUsers: ['Microsoft', 'Slack', 'Asana', 'Airbnb', 'Google'],
   setup: {
-    description: 'TypeScript is installed via npm. For quick experimentation, ts-node lets you run .ts files directly without a compile step.',
+    description: 'Install TypeScript with npm (you need Node.js first). For quick experiments, ts-node or tsx can run .ts files directly without a separate compile step.',
     windows: `# Install Node.js from nodejs.org first
 # Then install TypeScript and ts-node:
 npm install -g typescript ts-node
@@ -43,7 +43,7 @@ tsc --version`,
     {
       slug: 'hello-world',
       title: 'Hello, TypeScript!',
-      intro: "TypeScript is a superset of JavaScript. Every .js file is valid TypeScript — you just get to add types on top. Start simple, add types where they help.",
+      intro: "Write and run your first TypeScript file. You will see how types are added on top of ordinary JavaScript and how the code is compiled to run.",
       sections: [
         {
           type: 'text',
@@ -85,7 +85,7 @@ tsc            # compiles everything in project`,
     {
       slug: 'basic-types',
       title: 'Basic Types',
-      intro: "TypeScript has all JavaScript's types plus a few extras: tuples, enums, `unknown`, `never`, and `void`. The most important one is the one TypeScript infers for you automatically.",
+      intro: "Learn TypeScript's basic types, including the extras it adds to JavaScript such as tuples, enums, `unknown`, `never` and `void`. You will also see how TypeScript infers types so you do not have to write them everywhere.",
       sections: [
         {
           type: 'code',
@@ -175,7 +175,7 @@ const value = (input).value`,
     {
       slug: 'interfaces-and-types',
       title: 'Interfaces & Type Aliases',
-      intro: "Interfaces and type aliases both let you name a shape. The difference is subtle — interfaces are open (extendable), type aliases are closed. In practice, use whichever your team prefers. The important thing is using them.",
+      intro: "Interfaces and type aliases both let you give a name to the shape of an object. This lesson shows how to use each and the small differences between them.",
       sections: [
         {
           type: 'code',
@@ -278,7 +278,7 @@ console.log(area({ kind: "rectangle", width: 4, height: 6 }))  // 24`,
     {
       slug: 'functions',
       title: 'Typed Functions',
-      intro: "Adding types to functions is where TypeScript pays off most immediately — your editor knows what you're passing and what you'll get back, and the compiler catches mismatches before you run anything.",
+      intro: "Learn how to type function parameters and return values. This is where types help most day to day, because the compiler checks every call before you run anything.",
       sections: [
         {
           type: 'code',
@@ -370,7 +370,7 @@ function makeSound(animal: Cat | Dog): void {
     {
       slug: 'classes',
       title: 'Classes',
-      intro: "TypeScript classes add access modifiers (`public`, `private`, `protected`, `readonly`) and parameter properties — a shorthand that declares and assigns instance properties in the constructor signature.",
+      intro: "Learn how TypeScript extends JavaScript classes with access modifiers (`public`, `private`, `protected`, `readonly`) and parameter properties, a shorthand for declaring fields in the constructor.",
       sections: [
         {
           type: 'code',
@@ -476,7 +476,7 @@ console.log(r.describe())   // Area: 24.00, Perimeter: 20.00`,
     {
       slug: 'generics',
       title: 'Generics',
-      intro: "Generics let you write code that works with many types while staying type-safe. Think of `<T>` as a type parameter — like a function parameter, but for types.",
+      intro: "Generics let one function or class work with many types while staying type-safe. You will learn to read and write type parameters like `<T>`.",
       sections: [
         {
           type: 'code',
@@ -576,7 +576,7 @@ if (res.ok) console.log(res.value)   // 5`,
     {
       slug: 'utility-types',
       title: 'Utility Types',
-      intro: "TypeScript ships a library of generic utility types that transform existing types. These replace entire categories of repetitive type definitions. Once you know them, you'll wonder how you lived without them.",
+      intro: "TypeScript includes built-in utility types such as Partial, Pick and Omit that build new types from existing ones. Using them saves you from writing and maintaining near-duplicate type definitions.",
       sections: [
         {
           type: 'code',
@@ -665,7 +665,7 @@ function validateUser(values: FormValues): FormErrors {
     {
       slug: 'async',
       title: 'Async TypeScript',
-      intro: "TypeScript's async types are straightforward once you know the pattern: async functions return `Promise<T>`, and `await` unwraps them to `T`. The tricky part is typing errors, which TypeScript forces you to acknowledge.",
+      intro: "Learn how async functions are typed: they return `Promise<T>`, and `await` gives you the `T`. You will also see how to handle errors safely, since a caught error has the type `unknown`.",
       sections: [
         {
           type: 'code',
@@ -765,7 +765,7 @@ class TypedEmitter<Events extends Record<string, unknown[]>> {
     {
       slug: 'mini-project',
       title: 'Mini Project: Typed CLI Tool',
-      intro: "Let's build a typed command-line tool that queries a public API. We'll use generics, interfaces, async/await, and the Result pattern — all in one cohesive program.",
+      intro: "Build a small typed command-line tool that queries a public API. It brings together generics, interfaces, async/await and the Result pattern in one program.",
       sections: [
         {
           type: 'code',
@@ -858,7 +858,7 @@ main().catch(err => {
     {
       slug: 'narrowing-and-guards',
       title: 'Narrowing & Type Guards',
-      intro: 'A value typed string | number is useless until TypeScript knows which one it is. Narrowing is how the compiler follows your control flow and shrinks a union down to a single concrete type.',
+      intro: 'Learn how TypeScript narrows a union type such as string | number to a single type by following your if statements and checks. This is how you work safely with values that can be more than one type.',
       sections: [
         {
           type: 'code',
@@ -968,7 +968,7 @@ function process(input?: string) {
     {
       slug: 'advanced-types',
       title: 'Conditional, Mapped & Template Literal Types',
-      intro: 'TypeScript\'s type system is itself a small functional language: it has conditionals, iteration over keys, pattern matching with infer, and string manipulation. This is how utility types like Partial and ReturnType are built.',
+      intro: 'Learn conditional types, mapped types, infer and template literal types. These are the tools used to build utility types like Partial and ReturnType, and they help you read library type definitions.',
       sections: [
         {
           type: 'code',
@@ -1069,7 +1069,7 @@ config.port.toFixed(0)   // still known to be number, not string | number
     {
       slug: 'modules-and-config',
       title: 'Modules, Declaration Files & tsconfig',
-      intro: 'The type system is only half of TypeScript. The other half is the compiler configuration that decides how your code is found, checked, and emitted — and it is where most "but it works on my machine" problems live.',
+      intro: 'Learn how tsconfig.json controls which files the compiler checks, how strict it is and what JavaScript it outputs. Many confusing build problems come down to these settings.',
       sections: [
         {
           type: 'code',

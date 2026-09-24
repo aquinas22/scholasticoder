@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const swift: Language = {
   slug: 'swift',
   name: 'Swift',
-  tagline: 'The language of iPhone, iPad, Mac & Vision Pro apps.',
-  description: "Swift is Apple's modern language for every platform they make. It's fast (compiled, no garbage collector), safe (optionals kill null crashes at compile time), and expressive. With SwiftUI, building an iOS app has never required less code. If you want to ship to the App Store, this is the language.",
+  tagline: 'Apple\'s language for building iPhone, iPad and Mac apps.',
+  description: "Swift is Apple's language for apps on iPhone, iPad, Mac and its other devices. It is compiled and fast, its optionals catch missing-value errors at compile time, and with SwiftUI you can build app screens in a small amount of code.",
   accentColor: '#F05138',
   textOnAccent: '#fff',
   icon: 'Sw',
@@ -12,7 +12,7 @@ export const swift: Language = {
   usedFor: ['iOS Apps', 'macOS Apps', 'watchOS & tvOS', 'Server (Vapor)', 'App Store'],
   notableUsers: ['Apple', 'Airbnb', 'Lyft', 'LinkedIn', 'Duolingo'],
   setup: {
-    description: "iOS development requires Xcode, which requires a Mac. The language itself runs on Linux and Windows too — and Swift Playground on iPad is a genuinely good way to learn.",
+    description: "Building iOS apps requires Xcode, which only runs on a Mac. The language itself also runs on Linux and Windows, and the Swift Playgrounds app on iPad or Mac is a good way to learn.",
     windows: `# Swift toolchain for Windows exists (swift.org/install),
 # but you cannot build iOS apps on Windows.
 winget install Swift.Toolchain
@@ -47,7 +47,7 @@ swift hello.swift
     {
       slug: 'hello-swift',
       title: 'Hello, Swift',
-      intro: "Clean syntax, strong types, no semicolons. Swift reads like pseudocode but compiles to machine code as fast as C++ in many benchmarks.",
+      intro: "Write and run your first Swift program and learn let, var and Swift's basic types. Swift has concise syntax with no semicolons, and it compiles to fast native code.",
       sections: [
         {
           type: 'code',
@@ -97,7 +97,7 @@ let parsed = Int("123")     // Int? — might fail! (next lesson)`,
     {
       slug: 'optionals',
       title: 'Optionals',
-      intro: "Swift's answer to null crashes: a value that might be absent has a different type — String? instead of String — and the compiler forces you to handle the absence before using it.",
+      intro: "Learn optionals, Swift's way of handling values that might be missing. A String? is a different type from a String, and the compiler makes you handle the missing case before you use it.",
       sections: [
         {
           type: 'code',
@@ -156,7 +156,7 @@ print(maybeNumber ?? 0)                 // 42`,
     {
       slug: 'control-flow-functions',
       title: 'Functions & Control Flow',
-      intro: "Swift function signatures read like sentences — argument labels are part of the design. Plus switch, which is so capable it replaces most if-chains.",
+      intro: "Learn how to write functions with argument labels, and how to branch with if and switch. Swift's switch can match ranges and patterns, so it often replaces long if-else chains.",
       sections: [
         {
           type: 'code',
@@ -218,7 +218,7 @@ case (let x, let y): print("at \\(x), \\(y)")
     {
       slug: 'structs-enums',
       title: 'Structs, Enums & Value Types',
-      intro: "Swift's twist on OOP: structs (copied on assignment) are the default, classes (shared references) the exception. And Swift enums carry data — they're a superpower, not a list of constants.",
+      intro: "Learn structs, enums and the difference between value and reference types. In Swift, structs are copied on assignment and are the usual choice, and enum cases can carry data.",
       sections: [
         {
           type: 'code',
@@ -303,7 +303,7 @@ print(Circle(radius: 2).shout())    // CIRCLE R=2.0`,
     {
       slug: 'collections-closures',
       title: 'Collections & Closures',
-      intro: "Arrays, dictionaries, sets — plus map/filter/reduce with Swift's famously terse $0 closure syntax.",
+      intro: "Learn arrays, dictionaries and sets, and how to transform them with closures and map, filter and reduce, including the short $0 syntax.",
       sections: [
         {
           type: 'code',
@@ -359,7 +359,7 @@ let byGrade = students.sorted { $0.grade > $1.grade }`,
     {
       slug: 'error-handling-async',
       title: 'Errors & async/await',
-      intro: "Two things every real app does: handle failures and wait for the network. Swift makes both explicit — throws in the signature, await at the call site.",
+      intro: "Learn how to throw and handle errors and how to call asynchronous code with async/await. Swift marks both in the code: throws in a function signature and await at the call site.",
       sections: [
         {
           type: 'code',
@@ -420,7 +420,7 @@ func fetchTwo() async throws {
     {
       slug: 'first-swiftui-app',
       title: 'Your First SwiftUI App',
-      intro: "SwiftUI describes screens as structs, updates them automatically when @State changes, and previews live in Xcode as you type. A complete counter app fits on one screen.",
+      intro: "Build a simple counter app with SwiftUI. You describe screens as structs, and SwiftUI updates them when @State values change.",
       sections: [
         {
           type: 'code',

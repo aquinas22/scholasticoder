@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const git: Language = {
   slug: 'git',
   name: 'Git',
-  tagline: 'Version control. Undo for your entire project.',
-  description: "Git tracks every version of every file in your project, lets you experiment on branches without fear, and makes collaborating with other people possible without emailing zip files. Created by Linus Torvalds in 2005 to manage Linux kernel development, it's now used by essentially every software team on Earth.",
+  tagline: 'A version control tool that records the history of your project.',
+  description: "Git keeps every saved version of your project, lets you try changes on separate branches, and lets several people work on the same code. Linus Torvalds created it in 2005 for Linux kernel development, and today most software teams use it.",
   accentColor: '#F05033',
   textOnAccent: '#fff',
   icon: 'Gt',
@@ -12,7 +12,7 @@ export const git: Language = {
   usedFor: ['Version Control', 'Collaboration', 'Code Review', 'Backups', 'Open Source'],
   notableUsers: ['Linux kernel', 'GitHub', 'GitLab', 'Microsoft', 'Google'],
   setup: {
-    description: 'Git is a command-line tool. After installing, tell it your name and email — every change you save is stamped with them.',
+    description: 'Git is a command-line tool. After installing it, set your name and email; Git records them on every commit you make.',
     windows: `winget install Git.Git
 # Or download from https://git-scm.com
 
@@ -38,7 +38,7 @@ git config --global user.email "you@example.com"`,
     {
       slug: 'what-git-solves',
       title: 'What Git Actually Solves',
-      intro: "final.doc, final_v2.doc, final_FINAL_really.doc — everyone has done this. Git is that instinct, systematized: every saved version kept, named, dated, and recoverable.",
+      intro: "Learn what version control is and why it is useful. Instead of keeping copies like final.doc and final_v2.doc, Git keeps every saved version with a name, date and description you can return to.",
       sections: [
         {
           type: 'text',
@@ -70,7 +70,7 @@ git status`,
     {
       slug: 'add-commit',
       title: 'The Core Loop: add & commit',
-      intro: "Edit, stage, commit. You'll run these commands thousands of times. Understand the staging area and everything else in git makes sense.",
+      intro: "Learn the everyday loop of editing, staging and committing. Once the staging area makes sense, most other Git commands are easier to follow.",
       sections: [
         {
           type: 'code',
@@ -132,7 +132,7 @@ dist/
     {
       slug: 'branches',
       title: 'Branches',
-      intro: "A branch is a parallel timeline for your code. Experiment freely on a branch — if it works, merge it in; if not, delete it and main never knew.",
+      intro: "Learn to create, switch between and merge branches. A branch lets you work on a change separately; if it works you merge it into main, and if not you delete it.",
       sections: [
         {
           type: 'text',
@@ -175,7 +175,7 @@ git log --oneline --graph --all`,
     {
       slug: 'merge-conflicts',
       title: 'Merge Conflicts',
-      intro: "Two branches edit the same line, then merge. Git can't guess which version you want — so it asks. Conflicts look scary; they're actually a simple text-editing chore.",
+      intro: "When two branches change the same line, Git cannot tell which version you want and asks you to choose. Learn to read conflict markers and resolve them.",
       sections: [
         {
           type: 'text',
@@ -205,7 +205,7 @@ The part between ======= and >>>>>>> is THEIR side (branch being merged).`,
 git add greeting.js
 git commit               # completes the merge
 
-# Panic button — abandon the merge, back to before:
+# To cancel the merge and go back to how things were:
 git merge --abort`,
         },
         {
@@ -217,7 +217,7 @@ git merge --abort`,
     {
       slug: 'remotes-github',
       title: 'Remotes: push, pull & GitHub',
-      intro: "So far everything lived on your machine. A remote is a copy of your repository on a server — backup, publish point, and the way teams share work.",
+      intro: "Learn to push your work to a remote copy on a server such as GitHub and pull other people's changes. Remotes are how teams share code and how you back up your work.",
       sections: [
         {
           type: 'code',
@@ -262,7 +262,7 @@ git branch -d fix-header`,
     {
       slug: 'undoing-things',
       title: 'Undoing Things',
-      intro: "The whole point of git is that mistakes are recoverable. Here's the undo toolbox — from 'fix my last commit message' to 'where did my work go?'",
+      intro: "Learn the main ways to undo changes in Git, from fixing your last commit message to recovering work you thought you had lost.",
       sections: [
         {
           type: 'code',
@@ -291,7 +291,7 @@ git reset --hard HEAD~1     # DESTRUCTIVE — changes are gone`,
 git stash            # working directory is clean again
 git stash pop        # bring the changes back
 
-# Reflog — git's black box recorder. Every position HEAD
+# Reflog — a log of every position HEAD
 # has been at, even 'deleted' commits:
 git reflog
 # a1b2c3d HEAD@{0}: reset: moving to HEAD~1
@@ -301,14 +301,14 @@ git reset --hard f4e5d6c    # ...and it's back`,
         },
         {
           type: 'tip',
-          content: "Almost nothing committed is ever truly lost — reflog keeps entries for ~90 days. If you're mid-panic: stop running commands, run git reflog, breathe, then reset to the entry from before things went wrong.",
+          content: "Almost nothing committed is ever truly lost — reflog keeps entries for ~90 days. If something goes wrong: stop running commands, run git reflog, then reset to the entry from before things went wrong.",
         },
       ],
     },
     {
       slug: 'history-inspection',
-      title: 'Reading History Like a Detective',
-      intro: "Who wrote this line? When did this bug appear? What changed last week? Git answers all of these — history isn't just backup, it's documentation.",
+      title: 'Reading History',
+      intro: "Learn to search your project's history to find who changed a line, what changed last week, and which commit introduced a bug.",
       sections: [
         {
           type: 'code',
@@ -344,7 +344,7 @@ git bisect reset             # back to where you started`,
         },
         {
           type: 'note',
-          content: "This is why small, working commits matter: bisect can only pinpoint a bug to a commit. If that commit is a 2,000-line 'various fixes', you've found the haystack, not the needle.",
+          content: "This is why small, working commits matter: bisect can only pinpoint a bug to a commit. If that commit is a 2,000-line 'various fixes', you still have to search the whole thing.",
         },
       ],
     },

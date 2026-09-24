@@ -3,8 +3,8 @@ import { Language } from '../types'
 export const go: Language = {
   slug: 'go',
   name: 'Go',
-  tagline: 'Simple by design. Boring on purpose. Runs on everything.',
-  description: 'Go (Golang) is a statically typed, compiled language designed at Google. It prioritizes simplicity and readability. There are usually only one or two ways to do anything — and the Go team considers this a feature, not a limitation.',
+  tagline: 'A small, fast, compiled language for servers, command-line tools and cloud services.',
+  description: 'Go (Golang) is a statically typed, compiled language created at Google, with a small feature set that keeps code easy to read. It has built-in support for concurrency and compiles to a single binary that is easy to deploy.',
   accentColor: '#00ADD8',
   textOnAccent: '#fff',
   icon: 'Go',
@@ -12,7 +12,7 @@ export const go: Language = {
   usedFor: ['Backend Services', 'CLIs', 'Kubernetes / DevOps', 'Microservices', 'Networking'],
   notableUsers: ['Google', 'Docker', 'Kubernetes', 'Cloudflare', 'Dropbox'],
   setup: {
-    description: 'Go has a single, straightforward installer and one of the best tooling experiences in the ecosystem.',
+    description: 'Go has one official installer per platform, and it includes everything you need: the compiler, formatter, test runner and module tools.',
     windows: `# Download the Windows installer from go.dev/dl
 # Run the .msi — it handles PATH setup automatically
 
@@ -44,7 +44,7 @@ go version`,
     {
       slug: 'hello-world',
       title: 'Hello, World!',
-      intro: 'Go\'s Hello World is famously minimal. Package declaration, one import, one function. That\'s the whole language in microcosm.',
+      intro: 'Write and run your first Go program. It shows the three pieces every Go file has: a package declaration, imports and functions.',
       sections: [
         {
           type: 'text',
@@ -96,14 +96,14 @@ func main() {
         },
         {
           type: 'note',
-          content: 'Go enforces that all imports are used. If you import a package and don\'t use it, your code won\'t compile. Same for declared variables — unused variables are compile errors. Go takes "clean code" literally.',
+          content: 'Go enforces that all imports are used. If you import a package and don\'t use it, your code won\'t compile. Same for declared variables — unused variables are compile errors. This keeps code free of leftovers.',
         },
       ],
     },
     {
       slug: 'variables-types',
       title: 'Variables & Types',
-      intro: 'Go is statically typed, but it has type inference. You get the safety of static types without the verbosity. Usually.',
+      intro: 'Learn how to declare variables and constants and which basic types Go provides. Go checks types at compile time but can often infer them for you.',
       sections: [
         {
           type: 'code',
@@ -190,14 +190,14 @@ func main() {
         },
         {
           type: 'note',
-          content: 'Go has no implicit type conversion. Ever. int(x) and float64(y) are required everywhere. This catches bugs but requires more typing. The Go team considers this a worthwhile tradeoff.',
+          content: 'Go has no implicit type conversion. int(x) and float64(y) are required everywhere. This means a little more typing, but it catches bugs early.',
         },
       ],
     },
     {
       slug: 'control-flow',
       title: 'Control Flow',
-      intro: 'Go\'s for loop is its only loop. No while, no do-while. Just for, wearing three different costumes.',
+      intro: 'Learn if, switch and for. Go has only one loop keyword, for, which covers counting loops, while-style loops and loops over collections.',
       sections: [
         {
           type: 'code',
@@ -307,7 +307,7 @@ func main() {
     {
       slug: 'functions',
       title: 'Functions & Multiple Returns',
-      intro: 'Go functions can return multiple values. This is how Go does error handling, and it\'s a genuinely elegant design.',
+      intro: 'Learn how to write functions, including ones that return more than one value. Returning a result together with an error is how Go handles failures.',
       sections: [
         {
           type: 'code',
@@ -395,7 +395,7 @@ func main() {
     {
       slug: 'slices-maps',
       title: 'Slices & Maps',
-      intro: 'Go\'s two primary collection types. Slices are dynamic arrays. Maps are hash tables. Together they cover nearly everything.',
+      intro: 'Learn Go\'s two main collection types: slices, which are resizable lists, and maps, which store key-value pairs. Most Go programs use both.',
       sections: [
         {
           type: 'code',
@@ -511,7 +511,7 @@ func main() {
     {
       slug: 'structs-interfaces',
       title: 'Structs & Interfaces',
-      intro: 'Go favors composition over inheritance. There are no classes, no extends. Just structs, methods, and interfaces. It\'s refreshingly simple.',
+      intro: 'Learn how Go groups data with structs, attaches behavior with methods, and describes shared behavior with interfaces. Go uses composition instead of classes and inheritance.',
       sections: [
         {
           type: 'code',
@@ -595,7 +595,7 @@ func main() {
     {
       slug: 'mini-project',
       title: 'Mini Project: HTTP Server',
-      intro: 'Go\'s standard library includes a production-quality HTTP server. No frameworks needed for the basics. Let\'s build one.',
+      intro: 'Build a small web server using only Go\'s standard library. It brings together functions, structs, maps and error handling in one working program.',
       sections: [
         {
           type: 'code',
@@ -714,7 +714,7 @@ curl -X PUT http://localhost:8080/tasks/1/done`,
     {
       slug: 'goroutines-channels',
       title: 'Goroutines & Channels',
-      intro: 'A goroutine costs a couple of kilobytes, so starting ten thousand is normal. Channels are how they talk: "do not communicate by sharing memory; share memory by communicating."',
+      intro: 'Learn how to run work concurrently with goroutines and pass data between them with channels. Goroutines are cheap, so Go programs often start thousands of them.',
       sections: [
         {
           type: 'code',
@@ -849,7 +849,7 @@ func main() {
     {
       slug: 'errors-and-testing',
       title: 'Errors, Panics & Testing',
-      intro: 'Go has no exceptions. Errors are ordinary values returned alongside results, checked with an if, and wrapped as they travel up. It is more typing and far fewer surprises.',
+      intro: 'Learn how Go reports errors as ordinary return values, when panic is appropriate, and how to write tests with the built-in testing package.',
       sections: [
         {
           type: 'code',
@@ -1022,7 +1022,7 @@ func BenchmarkAdd(b *testing.B) {
     {
       slug: 'packages-modules',
       title: 'Packages, Modules & the Standard Library',
-      intro: 'Go\'s build system is refreshingly small: one go.mod file, one command, no plugin configuration. Get the layout right and everything else follows.',
+      intro: 'Learn how Go code is organized into packages and modules, and how to use the standard library. A single go.mod file and the go command handle building and dependencies.',
       sections: [
         {
           type: 'code',
@@ -1149,7 +1149,7 @@ func main() {
     {
       slug: 'generics-go',
       title: 'Generics',
-      intro: 'Since Go 1.18 you can write one function that works for many types without interface{} and type assertions. Generics in Go are deliberately plain — type parameters and constraints, nothing more.',
+      intro: 'Learn how to write functions and types that work with many types using type parameters and constraints, available since Go 1.18.',
       sections: [
         {
           type: 'code',
